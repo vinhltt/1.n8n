@@ -18,7 +18,7 @@ ingress:
 
   # Endpoint SSH qua Cloudflare - đọc từ biến môi trường
   - hostname: ${SSH_DOMAIN}
-    service: ssh://host.docker.internal:22
+    service: tcp://172.17.0.1:22
     originRequest:
       noTLSVerify: true
 
