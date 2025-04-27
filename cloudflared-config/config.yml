@@ -5,6 +5,9 @@
 tunnel: ${CLOUDFLARE_TUNNEL_TOKEN}
 credentials-file: /etc/cloudflared/credentials.json
 
+# Đường dẫn đến cert.pem - thêm để khắc phục lỗi certificate path
+origincert: /etc/cloudflared/cert.pem
+
 # Ghi log vào stdout để Docker có thể xử lý
 logfile: /dev/stdout
 
