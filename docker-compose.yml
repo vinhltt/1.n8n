@@ -1,0 +1,30 @@
+services:
+  pfm_redisdb:
+    image: redis:alpine
+
+  mysqldb:
+    image: mysql:8.0.29
+
+  postgresdb:
+    image: postgres:15 # Hoặc dùng postgres:latest
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n  
+    
+  cloudflared-tunnel:
+    image: cloudflare/cloudflared:latest
+    
+#network section
+networks:
+  default:
+    name: psl-pfm-network
+    driver: bridge
+    
+#volumes section
+volumes:
+  mysql_data:
+    name: mysql_data
+  n8n_data: # Định nghĩa Docker volume tên là n8n_data
+    name: n8n_data
+  postgres_data: # Định nghĩa Docker volume mới cho Postgres
+    name: postgres_data
