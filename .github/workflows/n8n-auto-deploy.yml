@@ -7,9 +7,6 @@ on:
       - 'docker-compose.yml'
       - 'docker-compose.override.yml'
       - 'cloudflared-config/**'
-  # schedule:
-  #   # Kiểm tra version mới vào 2 giờ sáng hàng ngày
-  #   - cron: '0 2 * * *'
   workflow_dispatch:
     # Cho phép kích hoạt thủ công
 
@@ -49,34 +46,6 @@ jobs:
           # Thiết lập cloudflared với token
           mkdir -p ~/.cloudflared
           echo "${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}" > ~/.cloudflared/token
-          
-      - name: Check for n8n update
-        id: check-update
-        run: |
-          # Lấy phiên bản hiện tại
-          CURRENT_VERSION=$(ssh ${{ env.SSH_DOMAIN }} 'docker exec n8n_main n8n --version 2>/dev/null || echo "not-installed"')
-          
-          # # Lấy phiên bản mới nhất
-          # LATEST_VERSION=$(curl -s https://api.github.com/repos/n8n-io/n8n/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')
-          
-          # echo "Current version: $CURRENT_VERSION"
-          # echo "Latest version: $LATEST_VERSION"
-          
-          # Kiểm tra nếu là push từ thay đổi docker-compose files
-          DEPLOY_REASON="Unknown"
-          
-          if [[ "${{ github.event_name }}" == "push" ]]; then
-            DEPLOY_REASON="Docker compose files changed"
-            echo "deploy=true" >> $GITHUB_OUTPUT
-          # elif [[ "$CURRENT_VERSION" != "$LATEST_VERSION" ]]; then
-          #   DEPLOY_REASON="New n8n version available: $LATEST_VERSION"
-          #   echo "deploy=true" >> $GITHUB_OUTPUT
-          else
-            DEPLOY_REASON="No updates needed"
-            echo "deploy=false" >> $GITHUB_OUTPUT
-          fi
-          
-          echo "deploy_reason=$DEPLOY_REASON" >> $GITHUB_OUTPUT
           
       - name: Deploy to server if needed
         if: steps.check-update.outputs.deploy == 'true'
