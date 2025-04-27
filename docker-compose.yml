@@ -2,9 +2,6 @@ services:
   pfm_redisdb:
     image: redis:alpine
 
-  mysqldb:
-    image: mysql:8.0.29
-
   postgresdb:
     image: postgres:15 # Hoặc dùng postgres:latest
 
