@@ -5,4 +5,3 @@ bk/
 .env*
 !.env.template
 *.key
-*.pem
