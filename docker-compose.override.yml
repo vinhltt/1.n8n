@@ -23,7 +23,7 @@ services:
     container_name: n8n_main_test  # Tên container tùy chọn
     restart: always
     ports:
-      - "5678:5678" # Map cổng host:container
+      - "5679:5678" # Đổi cổng từ 5678 sang 5679 để tránh xung đột
     volumes:
       - n8n_data:/home/node/.n8n # Sử dụng Docker volume để lưu dữ liệu
       - ./ssh:/home/node/.ssh # Mount thư mục .ssh từ host vào container
