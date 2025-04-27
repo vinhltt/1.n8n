@@ -11,7 +11,7 @@ on:
     # Cho phép kích hoạt thủ công
 
 jobs:
-  check-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     # Sử dụng biến môi trường ở cấp workflow thay vì secrets
     steps:
@@ -24,6 +24,10 @@ jobs:
           # Lưu domain vào biến môi trường
           echo "SSH_DOMAIN=${{ vars.SSH_DOMAIN || 'ssh.yourdomain.com' }}" >> $GITHUB_ENV
           echo "N8N_DOMAIN=${{ vars.N8N_DOMAIN || 'n8n.yourdomain.com' }}" >> $GITHUB_ENV
+          # Debug
+          echo "SSH Domain: ${{ env.SSH_DOMAIN }}"
+          echo "N8N Domain: ${{ env.N8N_DOMAIN }}"
+          echo "Deploy Path: ${{ secrets.DEPLOY_PATH }}"
 
       - name: Setup SSH config for Cloudflare Access
         run: |
@@ -32,6 +36,11 @@ jobs:
           echo "  ProxyCommand cloudflared access ssh --hostname %h" >> ~/.ssh/config
           echo "  User ${{ secrets.SSH_USER }}" >> ~/.ssh/config
           echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+          echo "  ConnectTimeout 30" >> ~/.ssh/config
+          
+          # Hiển thị SSH config
+          echo "SSH config:"
+          cat ~/.ssh/config
           
           # Thiết lập SSH key
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
@@ -47,25 +56,54 @@ jobs:
           mkdir -p ~/.cloudflared
           echo "${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}" > ~/.cloudflared/token
           
-      - name: Deploy to server if needed
-        if: steps.check-update.outputs.deploy == 'true'
+      - name: Check connectivity
         run: |
-          echo "Deploying because: ${{ steps.check-update.outputs.deploy_reason }}"
+          echo "Testing SSH connectivity..."
+          # Test kết nối cơ bản
+          ssh -v ${{ env.SSH_DOMAIN }} "echo Connected successfully && pwd"
+          
+      - name: Deploy to server
+        run: |
+          echo "Deploying n8n..."
+          
+          # Debug - kiểm tra các file trước khi scp
+          echo "Files to be copied:"
+          ls -la docker-compose.yml docker-compose.override.yml cloudflared-config/
+          
+          # Debug - kiểm tra DEPLOY_PATH
+          echo "Deploy path: ${{ secrets.DEPLOY_PATH }}"
           
           # Sao chép các file docker-compose và cấu hình Cloudflare
-          scp -r docker-compose.yml docker-compose.override.yml cloudflared-config ${{ env.SSH_DOMAIN }}:${{ secrets.DEPLOY_PATH }}
+          echo "Copying files to server..."
+          scp -v -r docker-compose.yml docker-compose.override.yml cloudflared-config ${{ env.SSH_DOMAIN }}:${{ secrets.DEPLOY_PATH }}
+          
+          # Kiểm tra trạng thái của lệnh copy
+          echo "SCP exit code: $?"
           
           # Thực hiện pull và restart
-          ssh ${{ env.SSH_DOMAIN }} '
-            cd ${{ secrets.DEPLOY_PATH }} && 
-            docker-compose pull && 
+          echo "Running docker-compose commands..."
+          ssh ${{ env.SSH_DOMAIN }} "
+            echo 'Current directory on server:'
+            pwd
+            echo 'Changing to deploy directory:'
+            cd ${{ secrets.DEPLOY_PATH }}
+            echo 'Current directory after cd:'
+            pwd
+            echo 'Running docker-compose down:'
+            docker-compose down
+            echo 'Down exit code: $?'
+            echo 'Running docker-compose pull:'
+            docker-compose pull
+            echo 'Pull exit code: $?'
+            echo 'Running docker-compose up -d:'
             docker-compose up -d
-          '
+            echo 'Up exit code: $?'
+          "
           
           # Gửi thông báo Telegram (nếu cần)
           if [[ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" && ! -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]]; then
             curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
               -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-              -d text="🚀 Deployed n8n: ${{ steps.check-update.outputs.deploy_reason }}" \
+              -d text="🚀 Deployed n8n successfully!" \
               -d parse_mode=Markdown
           fi
