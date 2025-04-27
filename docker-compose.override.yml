@@ -1,5 +1,4 @@
 services:
-  #redisdb: redis
   pfm_redisdb:
     container_name: pfm_redisdb
     restart: always
@@ -87,11 +86,17 @@ services:
     environment:
       # Biến môi trường TUNNEL_TOKEN bên trong container này...
       # ...sẽ lấy giá trị từ biến môi trường CLOUDFLARE_TUNNEL_TOKEN bên ngoài (trên máy host hoặc từ file .env)
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
-    
+      - CLOUDFLARE_TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+      - N8N_DOMAIN=${N8N_DOMAIN}
+      - SSH_DOMAIN=${SSH_DOMAIN}
+
     # Sử dụng tệp cấu hình thay vì lệnh đơn giản để hỗ trợ nhiều endpoint
     volumes:
       - ./cloudflared-config:/etc/cloudflared
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - n8n
     
     # Chạy tunnel với tệp cấu hình
     command: tunnel --config /etc/cloudflared/config.yml run
