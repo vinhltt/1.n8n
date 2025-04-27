@@ -1,4 +1,8 @@
 *.log*
-.env
-.bk
+.bk/
 bk_*
+bk/
+.env*
+!.env.template
+*.key
+*.pem

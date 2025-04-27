@@ -1,0 +1,102 @@
+name: Auto Deploy n8n
+
+on:
+  push:
+    branches: [ develop ]
+    paths:
+      - 'docker-compose.yml'
+      - 'docker-compose.override.yml'
+      - 'cloudflared-config/**'
+  schedule:
+    # Kiểm tra version mới vào 2 giờ sáng hàng ngày
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    # Cho phép kích hoạt thủ công
+
+jobs:
+  check-and-deploy:
+    runs-on: ubuntu-latest
+    # Sử dụng biến môi trường ở cấp workflow thay vì secrets
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup environment variables
+        # Chỉ đọc biến từ GitHub variables
+        run: |
+          # Lưu domain vào biến môi trường
+          echo "SSH_DOMAIN=${{ vars.SSH_DOMAIN || 'ssh.yourdomain.com' }}" >> $GITHUB_ENV
+          echo "N8N_DOMAIN=${{ vars.N8N_DOMAIN || 'n8n.yourdomain.com' }}" >> $GITHUB_ENV
+
+      - name: Setup SSH config for Cloudflare Access
+        run: |
+          mkdir -p ~/.ssh
+          echo "Host ${{ env.SSH_DOMAIN }}" > ~/.ssh/config
+          echo "  ProxyCommand cloudflared access ssh --hostname %h" >> ~/.ssh/config
+          echo "  User ${{ secrets.SSH_USER }}" >> ~/.ssh/config
+          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+          
+          # Thiết lập SSH key
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Install cloudflared
+        run: |
+          # Tải và cài đặt cloudflared
+          wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared-linux-amd64.deb
+          
+          # Thiết lập cloudflared với token
+          mkdir -p ~/.cloudflared
+          echo "${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}" > ~/.cloudflared/token
+          
+      - name: Check for n8n update
+        id: check-update
+        run: |
+          # Lấy phiên bản hiện tại
+          CURRENT_VERSION=$(ssh ${{ env.SSH_DOMAIN }} 'docker exec n8n_main n8n --version 2>/dev/null || echo "not-installed"')
+          
+          # Lấy phiên bản mới nhất
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/n8n-io/n8n/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')
+          
+          echo "Current version: $CURRENT_VERSION"
+          echo "Latest version: $LATEST_VERSION"
+          
+          # Kiểm tra nếu là push từ thay đổi docker-compose files
+          DEPLOY_REASON="Unknown"
+          
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            DEPLOY_REASON="Docker compose files changed"
+            echo "deploy=true" >> $GITHUB_OUTPUT
+          elif [[ "$CURRENT_VERSION" != "$LATEST_VERSION" ]]; then
+            DEPLOY_REASON="New n8n version available: $LATEST_VERSION"
+            echo "deploy=true" >> $GITHUB_OUTPUT
+          else
+            DEPLOY_REASON="No updates needed"
+            echo "deploy=false" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "deploy_reason=$DEPLOY_REASON" >> $GITHUB_OUTPUT
+          
+      - name: Deploy to server if needed
+        if: steps.check-update.outputs.deploy == 'true'
+        run: |
+          echo "Deploying because: ${{ steps.check-update.outputs.deploy_reason }}"
+          
+          # Sao chép các file docker-compose và cấu hình Cloudflare
+          scp -r docker-compose.yml docker-compose.override.yml cloudflared-config ${{ env.SSH_DOMAIN }}:${{ secrets.DEPLOY_PATH }}
+          
+          # Thực hiện pull và restart
+          ssh ${{ env.SSH_DOMAIN }} '
+            cd ${{ secrets.DEPLOY_PATH }} && 
+            docker-compose pull && 
+            docker-compose up -d
+          '
+          
+          # Gửi thông báo Telegram (nếu cần)
+          if [[ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" && ! -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]]; then
+            curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+              -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+              -d text="🚀 Deployed n8n: ${{ steps.check-update.outputs.deploy_reason }}" \
+              -d parse_mode=Markdown
+          fi
