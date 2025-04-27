@@ -17,6 +17,48 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Create .env file from secrets
+        run: |
+          echo "Creating .env file..."
+          
+          # Tạo file .env từ GitHub Secrets
+          cat > .env << EOF
+          # PostgreSQL
+          POSTGRES_USER=${{ secrets.POSTGRES_USER || 'n8n' }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB=${{ secrets.POSTGRES_DB || 'n8n_database' }}
+          
+          # n8n
+          N8N_BASIC_AUTH_USER=${{ secrets.N8N_BASIC_AUTH_USER || 'admin' }}
+          N8N_BASIC_AUTH_PASSWORD=${{ secrets.N8N_BASIC_AUTH_PASSWORD }}
+          N8N_ENCRYPTION_KEY=${{ secrets.N8N_ENCRYPTION_KEY }}
+          DB_POSTGRESDB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          
+          # Timezone & other settings
+          GENERIC_TIMEZONE=${{ secrets.GENERIC_TIMEZONE || 'Asia/Ho_Chi_Minh' }}
+          TZ=${{ secrets.TZ || 'Asia/Ho_Chi_Minh' }}
+          N8N_DEFAULT_BINARY_DATA_MODE=${{ secrets.N8N_DEFAULT_BINARY_DATA_MODE || 'filesystem' }}
+          EXECUTIONS_DATA_PRUNE=${{ secrets.EXECUTIONS_DATA_PRUNE || 'true' }}
+          EXECUTIONS_DATA_MAX_AGE=${{ secrets.EXECUTIONS_DATA_MAX_AGE || '720' }}
+          EXECUTIONS_DATA_PRUNE_MAX_COUNT=${{ secrets.EXECUTIONS_DATA_PRUNE_MAX_COUNT || '50000' }}
+          
+          # Cloudflare Tunnel
+          CLOUDFLARE_TUNNEL_TOKEN=${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
+          N8N_DOMAIN=${{ secrets.N8N_DOMAIN }}
+          SSH_DOMAIN=${{ secrets.SSH_DOMAIN }}
+          EOF
+          
+          # Hiển thị thông báo thành công (không hiển thị nội dung của file vì bảo mật)
+          echo "✅ .env file created successfully"
+          
+          # Kiểm tra xem file đã tồn tại chưa
+          if [ -f .env ]; then
+            echo "✅ .env file exists"
+          else
+            echo "❌ Failed to create .env file"
+            exit 1
+          fi
+
       - name: Deploy n8n
         run: |
           echo "Deploying n8n..."
