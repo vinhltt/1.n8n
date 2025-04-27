@@ -1,10 +1,4 @@
 services:
-  pfm_redisdb:
-    container_name: pfm_redisdb_test
-    restart: always
-    ports:
-      - "16379:6379"
-  
   #postgresdb: postgresql database
   postgresdb:
     container_name: postgresdb_test # Tên container tùy chọn
@@ -18,7 +12,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data # Map volume đã định nghĩa ở file kia
     ports:
-      - "15432:5432" # Map cổng 5432 của container ra cổng 15432 của host (chọn cổng khác nếu cần)
+      - "25432:5432" # Đổi cổng từ 15432 sang 25432 để tránh xung đột
     healthcheck: # Tùy chọn: kiểm tra sức khỏe DB
         test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
         interval: 10s

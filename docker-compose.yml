@@ -1,7 +1,4 @@
 services:
-  pfm_redisdb:
-    image: redis:alpine
-
   postgresdb:
     image: postgres:15 # Hoặc dùng postgres:latest
 
