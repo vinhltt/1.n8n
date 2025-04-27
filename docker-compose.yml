@@ -1,17 +1,17 @@
 services:
-  postgresdb:
+  postgresdb_test:
     image: postgres:15 # Hoặc dùng postgres:latest
 
-  n8n:
+  n8n_test:
     image: docker.n8n.io/n8nio/n8n  
     
-  cloudflared-tunnel:
+  cloudflared-tunnel-test:
     image: cloudflare/cloudflared:latest
     
 #network section
 networks:
   default:
-    name: psl-pfm-network
+    name: psl-pfm-network-test
     driver: bridge
     
 #volumes section

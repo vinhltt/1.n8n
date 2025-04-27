@@ -1,6 +1,6 @@
 services:
   #postgresdb: postgresql database
-  postgresdb:
+  postgresdb_test:
     container_name: postgresdb_test # Tên container tùy chọn
     restart: always # Hoặc unless-stopped
     environment:
@@ -19,17 +19,17 @@ services:
         timeout: 5s
         retries: 5
 
-  n8n:
+  n8n_test:
     container_name: n8n_main_test  # Tên container tùy chọn
     restart: always
     ports:
       - "5679:5678" # Đổi cổng từ 5678 sang 5679 để tránh xung đột
     volumes:
-      - n8n_data:/home/node/.n8n # Sử dụng Docker volume để lưu dữ liệu
+      - n8n_data_test:/home/node/.n8n # Sử dụng Docker volume để lưu dữ liệu
       - ./ssh:/home/node/.ssh # Mount thư mục .ssh từ host vào container
       # Hoặc map thư mục local: - ./n8n_data:/home/node/.n8n
     depends_on:
-      - postgresdb # Đảm bảo Postgres khởi động trước n8n
+      - postgresdb_test # Đảm bảo Postgres khởi động trước n8n
     environment:
       - TZ=Asia/Ho_Chi_Minh # Đặt múi giờ (quan trọng cho các trigger theo lịch)
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-Asia/Ho_Chi_Minh} # Lấy từ .env hoặc dùng default
@@ -37,8 +37,8 @@ services:
       # -----------------------------------------
 
       # --- Cấu hình Database (PostgreSQL) ---
-      - DB_TYPE=postgresdb
-      - DB_POSTGRESDB_HOST=postgresdb
+      - DB_TYPE=postgresdb_test
+      - DB_POSTGRESDB_HOST=postgresdb_test
       - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
       - DB_POSTGRESDB_USER=${POSTGRES_USER}
@@ -59,7 +59,7 @@ services:
       - N8N_DEFAULT_BINARY_DATA_MODE=${N8N_DEFAULT_BINARY_DATA_MODE:-filesystem} # Chế độ lưu trữ binary data
       # -----------------------------------------
 
-  cloudflared-tunnel:
+  cloudflared-tunnel-test:
     container_name: cloudflared-tunnel-service-test # Optional
     restart: unless-stopped
     
@@ -76,7 +76,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
-      - n8n
+      - n8n_test
     
     # Chạy tunnel với tệp cấu hình
     command: tunnel --config /etc/cloudflared/config.yml run
