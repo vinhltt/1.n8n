@@ -20,3 +20,4 @@ volumes:
     name: n8n_data_test
   postgres_data: # Định nghĩa Docker volume mới cho Postgres
     name: postgres_data_test
+ 
