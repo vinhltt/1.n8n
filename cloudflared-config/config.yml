@@ -15,15 +15,17 @@ logfile: /dev/stdout
 ingress:
   # Đường dẫn đến n8n web interface - đọc từ biến môi trường
   - hostname: ${N8N_DOMAIN}
-    service: http://n8n:5678
+    service: http://n8n_test:5678
     originRequest:
       noTLSVerify: true
 
   # Endpoint SSH qua Cloudflare - đọc từ biến môi trường
   - hostname: ${SSH_DOMAIN}
-    service: ssh://host.docker.internal:22
+    service: tcp://host.docker.internal:22
     originRequest:
       noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
 
   # Catch-all rule, để đảm bảo bất kỳ traffic không khớp nào cũng được từ chối
   - service: http_status:404

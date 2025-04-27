@@ -78,5 +78,5 @@ services:
     depends_on:
       - n8n_test
       
-    # Chạy tunnel với tệp cấu hình
-    command: tunnel --config /etc/cloudflared/config.yml run
+    # Sử dụng lại cấu hình từ file config.yml
+    command: tunnel --no-autoupdate --config /etc/cloudflared/config.yml run
