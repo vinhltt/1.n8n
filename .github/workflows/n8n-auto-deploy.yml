@@ -12,95 +12,31 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-    # Sử dụng biến môi trường ở cấp workflow thay vì secrets
+    runs-on: self-hosted  # Chỉ định sử dụng self-hosted runner thay vì ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
-      - name: Setup environment variables
-        # Chỉ đọc biến từ GitHub variables
-        run: |
-          # Lưu domain vào biến môi trường
-          echo "SSH_DOMAIN=${{ vars.SSH_DOMAIN || 'ssh.yourdomain.com' }}" >> $GITHUB_ENV
-          echo "N8N_DOMAIN=${{ vars.N8N_DOMAIN || 'n8n.yourdomain.com' }}" >> $GITHUB_ENV
-          # Debug
-          echo "SSH Domain: ${{ env.SSH_DOMAIN }}"
-          echo "N8N Domain: ${{ env.N8N_DOMAIN }}"
-          echo "Deploy Path: ${{ secrets.DEPLOY_PATH }}"
 
-      - name: Setup SSH config for Cloudflare Access
-        run: |
-          mkdir -p ~/.ssh
-          echo "Host ${{ env.SSH_DOMAIN }}" > ~/.ssh/config
-          echo "  ProxyCommand cloudflared access ssh --hostname %h" >> ~/.ssh/config
-          echo "  User ${{ secrets.SSH_USER }}" >> ~/.ssh/config
-          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
-          echo "  ConnectTimeout 30" >> ~/.ssh/config
-          
-          # Hiển thị SSH config
-          echo "SSH config:"
-          cat ~/.ssh/config
-          
-          # Thiết lập SSH key
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-      - name: Install cloudflared
-        run: |
-          # Tải và cài đặt cloudflared
-          wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-          sudo dpkg -i cloudflared-linux-amd64.deb
-          
-          # Thiết lập cloudflared với token
-          mkdir -p ~/.cloudflared
-          echo "${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}" > ~/.cloudflared/token
-          
-      - name: Check connectivity
-        run: |
-          echo "Testing SSH connectivity..."
-          # Test kết nối cơ bản
-          ssh -v ${{ env.SSH_DOMAIN }} "echo Connected successfully && pwd"
-          
-      - name: Deploy to server
+      - name: Deploy n8n
         run: |
           echo "Deploying n8n..."
           
-          # Debug - kiểm tra các file trước khi scp
-          echo "Files to be copied:"
-          ls -la docker-compose.yml docker-compose.override.yml cloudflared-config/
-          
-          # Debug - kiểm tra DEPLOY_PATH
-          echo "Deploy path: ${{ secrets.DEPLOY_PATH }}"
-          
-          # Sao chép các file docker-compose và cấu hình Cloudflare
-          echo "Copying files to server..."
-          scp -v -r docker-compose.yml docker-compose.override.yml cloudflared-config ${{ env.SSH_DOMAIN }}:${{ secrets.DEPLOY_PATH }}
-          
-          # Kiểm tra trạng thái của lệnh copy
-          echo "SCP exit code: $?"
-          
           # Thực hiện pull và restart
           echo "Running docker-compose commands..."
-          ssh ${{ env.SSH_DOMAIN }} "
-            echo 'Current directory on server:'
-            pwd
-            echo 'Changing to deploy directory:'
-            cd ${{ secrets.DEPLOY_PATH }}
-            echo 'Current directory after cd:'
-            pwd
-            echo 'Running docker-compose down:'
-            docker-compose down
-            echo 'Down exit code: $?'
-            echo 'Running docker-compose pull:'
-            docker-compose pull
-            echo 'Pull exit code: $?'
-            echo 'Running docker-compose up -d:'
-            docker-compose up -d
-            echo 'Up exit code: $?'
-          "
+          echo "Running docker-compose down:"
+          docker-compose down
+          echo "Down exit code: $?"
+          echo "Running docker-compose pull:"
+          docker-compose pull
+          echo "Pull exit code: $?"
+          echo "Running docker-compose up -d:"
+          docker-compose up -d
+          echo "Up exit code: $?"
           
-          # Gửi thông báo Telegram (nếu cần)
+      # Gửi thông báo Telegram (nếu cần)
+      - name: Send notification
+        if: success()
+        run: |
           if [[ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" && ! -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]]; then
             curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
               -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
