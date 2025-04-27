@@ -7,7 +7,7 @@ services:
   
   #postgresdb: postgresql database
   postgresdb:
-    container_name: postgresdb # Tên container tùy chọn
+    container_name: postgresdb_test # Tên container tùy chọn
     restart: always # Hoặc unless-stopped
     environment:
       # !!! QUAN TRỌNG: Nên sử dụng file .env cho các thông tin nhạy cảm này !!!
