@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # <--- THAY BẰNG MẬT KHẨU MẠNH CỦA BẠN
       # POSTGRES_HOST_AUTH_METHOD: trust # Chỉ dùng cho test, không an toàn!
     volumes:
-      - postgres_data:/var/lib/postgresql/data # Map volume đã định nghĩa ở file kia
+      - postgresdb_test_data:/var/lib/postgresql/data # Map volume đã định nghĩa ở file kia
     ports:
       - "25432:5432" # Đổi cổng từ 15432 sang 25432 để tránh xung đột
     healthcheck: # Tùy chọn: kiểm tra sức khỏe DB
@@ -25,7 +25,7 @@ services:
     ports:
       - "5679:5678" # Đổi cổng từ 5678 sang 5679 để tránh xung đột
     volumes:
-      - n8n_data_test:/home/node/.n8n # Sử dụng Docker volume để lưu dữ liệu
+      - n8n_test_data:/home/node/.n8n # Sử dụng Docker volume để lưu dữ liệu
       - ./ssh:/home/node/.ssh # Mount thư mục .ssh từ host vào container
       # Hoặc map thư mục local: - ./n8n_data:/home/node/.n8n
     depends_on:
@@ -77,6 +77,6 @@ services:
       - "host.docker.internal:host-gateway"
     depends_on:
       - n8n_test
-    
+      
     # Chạy tunnel với tệp cấu hình
     command: tunnel --config /etc/cloudflared/config.yml run

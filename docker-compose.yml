@@ -16,8 +16,8 @@ networks:
     
 #volumes section
 volumes:
-  n8n_data: # Định nghĩa Docker volume tên là n8n_data
-    name: n8n_data_test
-  postgres_data: # Định nghĩa Docker volume mới cho Postgres
-    name: postgres_data_test
+  n8n_test_data: # Định nghĩa Docker volume tên là n8n_data
+    name: n8n_test_data
+  postgresdb_test_data: # Định nghĩa Docker volume mới cho Postgres
+    name: postgresdb_test_data
  
