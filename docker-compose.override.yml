@@ -1,25 +1,4 @@
 services:
-  #redisdb: redis
-  pfm_redisdb:
-    container_name: pfm_redisdb
-    restart: always
-    ports:
-      - "16379:6379"
-
-  #mysqldb: mysql
-  mysqldb:
-    container_name: mysqldb
-    command: --default-authentication-plugin=mysql_native_password
-    environment:
-      MYSQL_TCP_PORT: 3306
-      MYSQL_DATABASE: ${MYSQL_DATABASE} # Tên database sẽ được tạo tự động
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # <--- THAY BẰNG MẬT KHẨU MẠNH CỦA BẠN
-    restart: always
-    volumes:
-      - mysql_data:/var/lib/mysql
-    ports:
-      - "13306:3306"
-  
   #postgresdb: postgresql database
   postgresdb:
     container_name: postgresdb # Tên container tùy chọn
@@ -31,9 +10,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # <--- THAY BẰNG MẬT KHẨU MẠNH CỦA BẠN
       # POSTGRES_HOST_AUTH_METHOD: trust # Chỉ dùng cho test, không an toàn!
     volumes:
-      - postgres_data:/var/lib/postgresql/data # Map volume đã định nghĩa ở file kia
+      - postgresdb_data:/var/lib/postgresql/data # Map volume đã định nghĩa ở file kia
     ports:
-      - "15432:5432" # Map cổng 5432 của container ra cổng 15432 của host (chọn cổng khác nếu cần)
+      - "15432:5432" # Đổi cổng từ 15432 sang 25432 để tránh xung đột
     healthcheck: # Tùy chọn: kiểm tra sức khỏe DB
         test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
         interval: 10s
@@ -44,7 +23,7 @@ services:
     container_name: n8n_main  # Tên container tùy chọn
     restart: always
     ports:
-      - "5678:5678" # Map cổng host:container
+      - "5678:5678" # Đổi cổng từ 5678 sang 5679 để tránh xung đột
     volumes:
       - n8n_data:/home/node/.n8n # Sử dụng Docker volume để lưu dữ liệu
       - ./ssh:/home/node/.ssh # Mount thư mục .ssh từ host vào container
@@ -81,17 +60,21 @@ services:
       # -----------------------------------------
 
   cloudflared-tunnel:
-    container_name: cloudflared-tunnel-service # Optional
+    container_name: cloudflared-tunnel-service
     restart: unless-stopped
     
     environment:
-      # Biến môi trường TUNNEL_TOKEN bên trong container này...
-      # ...sẽ lấy giá trị từ biến môi trường CLOUDFLARE_TUNNEL_TOKEN bên ngoài (trên máy host hoặc từ file .env)
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+      # Sử dụng token từ biến môi trường
+      - CLOUDFLARE_TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+      - N8N_DOMAIN=${N8N_DOMAIN}
+      - NO_AUTOUPDATE=true
     
-    # Sử dụng tệp cấu hình thay vì lệnh đơn giản để hỗ trợ nhiều endpoint
     volumes:
       - ./cloudflared-config:/etc/cloudflared
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - n8n
     
-    # Chạy tunnel với tệp cấu hình
-    command: tunnel --config /etc/cloudflared/config.yml run
+    # Sử dụng token trực tiếp thay vì thông qua file cấu hình, tránh vấn đề certificate
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}

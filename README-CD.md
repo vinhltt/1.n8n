@@ -82,7 +82,38 @@ sudo apt-get update
 sudo apt-get install -y docker-compose-plugin
 ```
 
-### 2. Thiết lập SSH key
+### 2. Cài đặt và Cấu hình SSH Server
+
+Nếu SSH server chưa được cài đặt (đặc biệt là khi gặp lỗi "Connection refused"), hãy cài đặt và kích hoạt nó:
+
+```bash
+# Cài đặt SSH server
+sudo apt update
+sudo apt install -y openssh-server
+
+# Khởi động dịch vụ SSH
+sudo systemctl enable ssh
+sudo systemctl start ssh
+
+# Kiểm tra trạng thái
+sudo systemctl status ssh
+
+# Kiểm tra kết nối đến localhost
+ssh localhost
+```
+
+Nếu gặp vấn đề khi kết nối, hãy kiểm tra cấu hình SSH:
+
+```bash
+# Kiểm tra cấu hình SSH
+cat /etc/ssh/sshd_config | grep "Port"
+
+# Đảm bảo UFW cho phép SSH (nếu UFW được kích hoạt)
+sudo ufw allow ssh
+sudo ufw status
+```
+
+### 3. Thiết lập SSH key
 
 Đảm bảo server của bạn có SSH key được cấu hình:
 
@@ -96,7 +127,7 @@ echo "ssh-rsa AAAA..." >> ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 ```
 
-### 3. Chuẩn bị thư mục triển khai
+### 4. Chuẩn bị thư mục triển khai
 
 Tạo thư mục để chứa các file docker-compose trên server:
 

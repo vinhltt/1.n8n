@@ -7,96 +7,88 @@ on:
       - 'docker-compose.yml'
       - 'docker-compose.override.yml'
       - 'cloudflared-config/**'
-  schedule:
-    # Kiểm tra version mới vào 2 giờ sáng hàng ngày
-    - cron: '0 2 * * *'
   workflow_dispatch:
     # Cho phép kích hoạt thủ công
 
 jobs:
-  check-and-deploy:
-    runs-on: ubuntu-latest
-    # Sử dụng biến môi trường ở cấp workflow thay vì secrets
+  deploy:
+    runs-on: self-hosted  # Chỉ định sử dụng self-hosted runner thay vì ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
-      - name: Setup environment variables
-        # Chỉ đọc biến từ GitHub variables
-        run: |
-          # Lưu domain vào biến môi trường
-          echo "SSH_DOMAIN=${{ vars.SSH_DOMAIN || 'ssh.yourdomain.com' }}" >> $GITHUB_ENV
-          echo "N8N_DOMAIN=${{ vars.N8N_DOMAIN || 'n8n.yourdomain.com' }}" >> $GITHUB_ENV
 
-      - name: Setup SSH config for Cloudflare Access
+      - name: Create .env file from secrets
         run: |
-          mkdir -p ~/.ssh
-          echo "Host ${{ env.SSH_DOMAIN }}" > ~/.ssh/config
-          echo "  ProxyCommand cloudflared access ssh --hostname %h" >> ~/.ssh/config
-          echo "  User ${{ secrets.SSH_USER }}" >> ~/.ssh/config
-          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+          echo "Creating .env file..."
           
-          # Thiết lập SSH key
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-      - name: Install cloudflared
-        run: |
-          # Tải và cài đặt cloudflared
-          wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-          sudo dpkg -i cloudflared-linux-amd64.deb
+          # Tạo file .env từ GitHub Secrets và Variables
+          cat > .env << EOF
+          # PostgreSQL
+          POSTGRES_USER=${{ secrets.POSTGRES_USER || 'n8n' }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB=${{ secrets.POSTGRES_DB || 'n8n_database' }}
           
-          # Thiết lập cloudflared với token
-          mkdir -p ~/.cloudflared
-          echo "${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}" > ~/.cloudflared/token
+          # n8n
+          N8N_BASIC_AUTH_USER=${{ secrets.N8N_BASIC_AUTH_USER || 'admin' }}
+          N8N_BASIC_AUTH_PASSWORD=${{ secrets.N8N_BASIC_AUTH_PASSWORD }}
+          N8N_ENCRYPTION_KEY=${{ secrets.N8N_ENCRYPTION_KEY }}
+          DB_POSTGRESDB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          WEBHOOK_URL=${{ vars.N8N_DOMAIN }}
           
-      - name: Check for n8n update
-        id: check-update
-        run: |
-          # Lấy phiên bản hiện tại
-          CURRENT_VERSION=$(ssh ${{ env.SSH_DOMAIN }} 'docker exec n8n_main n8n --version 2>/dev/null || echo "not-installed"')
+          # Timezone & other settings
+          GENERIC_TIMEZONE=${{ secrets.GENERIC_TIMEZONE || 'Asia/Ho_Chi_Minh' }}
+          TZ=${{ secrets.TZ || 'Asia/Ho_Chi_Minh' }}
+          N8N_DEFAULT_BINARY_DATA_MODE=${{ secrets.N8N_DEFAULT_BINARY_DATA_MODE || 'filesystem' }}
+          EXECUTIONS_DATA_PRUNE=${{ secrets.EXECUTIONS_DATA_PRUNE || 'true' }}
+          EXECUTIONS_DATA_MAX_AGE=${{ secrets.EXECUTIONS_DATA_MAX_AGE || '720' }}
+          EXECUTIONS_DATA_PRUNE_MAX_COUNT=${{ secrets.EXECUTIONS_DATA_PRUNE_MAX_COUNT || '50000' }}
           
-          # Lấy phiên bản mới nhất
-          LATEST_VERSION=$(curl -s https://api.github.com/repos/n8n-io/n8n/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')
+          # Cloudflare Tunnel
+          CLOUDFLARE_TUNNEL_TOKEN=${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
+          N8N_DOMAIN=${{ vars.N8N_DOMAIN }}
+          EOF
           
-          echo "Current version: $CURRENT_VERSION"
-          echo "Latest version: $LATEST_VERSION"
+          # Hiển thị thông báo thành công (không hiển thị nội dung của file vì bảo mật)
+          echo "✅ .env file created successfully"
           
-          # Kiểm tra nếu là push từ thay đổi docker-compose files
-          DEPLOY_REASON="Unknown"
-          
-          if [[ "${{ github.event_name }}" == "push" ]]; then
-            DEPLOY_REASON="Docker compose files changed"
-            echo "deploy=true" >> $GITHUB_OUTPUT
-          elif [[ "$CURRENT_VERSION" != "$LATEST_VERSION" ]]; then
-            DEPLOY_REASON="New n8n version available: $LATEST_VERSION"
-            echo "deploy=true" >> $GITHUB_OUTPUT
+          # Kiểm tra xem file đã tồn tại chưa
+          if [ -f .env ]; then
+            echo "✅ .env file exists"
           else
-            DEPLOY_REASON="No updates needed"
-            echo "deploy=false" >> $GITHUB_OUTPUT
+            echo "❌ Failed to create .env file"
+            exit 1
           fi
-          
-          echo "deploy_reason=$DEPLOY_REASON" >> $GITHUB_OUTPUT
-          
-      - name: Deploy to server if needed
-        if: steps.check-update.outputs.deploy == 'true'
+
+      - name: Deploy n8n
         run: |
-          echo "Deploying because: ${{ steps.check-update.outputs.deploy_reason }}"
-          
-          # Sao chép các file docker-compose và cấu hình Cloudflare
-          scp -r docker-compose.yml docker-compose.override.yml cloudflared-config ${{ env.SSH_DOMAIN }}:${{ secrets.DEPLOY_PATH }}
+          echo "Deploying n8n..."
           
           # Thực hiện pull và restart
-          ssh ${{ env.SSH_DOMAIN }} '
-            cd ${{ secrets.DEPLOY_PATH }} && 
-            docker-compose pull && 
-            docker-compose up -d
-          '
+          echo "Running docker-compose commands..."
+          echo "Running docker-compose down:"
+          docker-compose down
+          echo "Down exit code: $?"
+          echo "Running docker-compose pull:"
+          docker-compose pull
+          echo "Pull exit code: $?"
+          echo "Running docker-compose up -d:"
+          docker-compose --env-file ./.env -f docker-compose.yml -f docker-compose.override.yml up -d
+          echo "Up exit code: $?"
           
-          # Gửi thông báo Telegram (nếu cần)
+      # Gửi thông báo Telegram (nếu cần)
+      - name: Send notification
+        if: success()
+        run: |
           if [[ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" && ! -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]]; then
+            # Tạo link đến GitHub Action run hiện tại
+            ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            
+            # Tạo thông báo với link
+            MESSAGE="🚀 *Deployed n8n successfully!*\n\n📊 [View Deployment Details]($ACTION_URL)"
+            
+            # Gửi thông báo tới Telegram
             curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
               -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-              -d text="🚀 Deployed n8n: ${{ steps.check-update.outputs.deploy_reason }}" \
+              -d text="$MESSAGE" \
               -d parse_mode=Markdown
           fi

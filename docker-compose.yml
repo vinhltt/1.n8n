@@ -1,18 +1,15 @@
 services:
-  pfm_redisdb:
-    image: redis:alpine
-
-  mysqldb:
-    image: mysql:8.0.29
-
   postgresdb:
     image: postgres:15 # Hoặc dùng postgres:latest
+    container_name: postgresdb # Sử dụng tên container gốc
 
   n8n:
     image: docker.n8n.io/n8nio/n8n  
+    container_name: n8n_main # Sử dụng tên container gốc
     
   cloudflared-tunnel:
     image: cloudflare/cloudflared:latest
+    container_name: cloudflared-tunnel-service # Sử dụng tên container gốc
     
 #network section
 networks:
@@ -22,9 +19,9 @@ networks:
     
 #volumes section
 volumes:
-  mysql_data:
-    name: mysql_data
-  n8n_data: # Định nghĩa Docker volume tên là n8n_data
+  n8n_data: 
+    external: true # Sử dụng volume hiện có thay vì tạo mới
     name: n8n_data
-  postgres_data: # Định nghĩa Docker volume mới cho Postgres
-    name: postgres_data
+  postgresdb_data: 
+    external: true # Sử dụng volume hiện có thay vì tạo mới
+    name: postgresdb_data
