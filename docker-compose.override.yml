@@ -67,7 +67,6 @@ services:
       # Sử dụng token từ biến môi trường
       - CLOUDFLARE_TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
       - N8N_DOMAIN=${N8N_DOMAIN}
-      - SSH_DOMAIN=${SSH_DOMAIN}
       - NO_AUTOUPDATE=true
     
     volumes:
