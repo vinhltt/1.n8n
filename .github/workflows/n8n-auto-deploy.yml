@@ -77,20 +77,31 @@ jobs:
           docker-compose --env-file ./.env -f docker-compose.yml -f docker-compose.override.yml up -d
           echo "Up exit code: $?"
           
-      # Gửi thông báo Telegram (nếu cần)
+      # Gửi thông báo Telegram (luôn gửi dù thành công hay thất bại)
       - name: Send notification
-        if: success()
+        if: always()  # Thay đổi từ success() thành always() để luôn gửi thông báo
         run: |
           if [[ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" && ! -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]]; then
             # Tạo link đến GitHub Action run hiện tại
             ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
-            # Tạo thông báo với link
-            MESSAGE="🚀 *Deployed n8n successfully!*\n\n📊 [View Deployment Details]($ACTION_URL)"
-
-            # Gửi thông báo tới Telegram
+            
+            # Kiểm tra trạng thái của job
+            if [ "${{ job.status }}" == "success" ]; then
+              # Thông báo thành công
+              STATUS_EMOJI="✅"
+              STATUS_TEXT="Deployed n8n successfully!"
+            else
+              # Thông báo thất bại
+              STATUS_EMOJI="❌"
+              STATUS_TEXT="Deployment n8n failed!"
+            fi
+            
+            # Gửi thông báo tới Telegram sử dụng JSON để đảm bảo xuống dòng hoạt động chính xác
             curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
-              -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-              -d text="$MESSAGE" \
-              -d parse_mode=Markdown
+              -H "Content-Type: application/json" \
+              -d '{
+                "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
+                "text": "'"$STATUS_EMOJI"' *'"$STATUS_TEXT"'*\n [View Deployment Details]('"$ACTION_URL"')",
+                "parse_mode": "Markdown"
+              }'
           fi
