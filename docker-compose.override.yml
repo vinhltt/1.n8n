@@ -59,8 +59,8 @@ services:
       - N8N_DEFAULT_BINARY_DATA_MODE=${N8N_DEFAULT_BINARY_DATA_MODE:-filesystem} # Chế độ lưu trữ binary data
       # -----------------------------------------
 
-  cloudflared-tunnel-test:
-    container_name: cloudflared-tunnel-service-test
+  cloudflared-tunnel:
+    container_name: cloudflared-tunnel-service
     restart: unless-stopped
     
     environment:
