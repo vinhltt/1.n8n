@@ -21,7 +21,7 @@ jobs:
         run: |
           echo "Creating .env file..."
           
-          # Tạo file .env từ GitHub Secrets
+          # Tạo file .env từ GitHub Secrets và Variables
           cat > .env << EOF
           # PostgreSQL
           POSTGRES_USER=${{ secrets.POSTGRES_USER || 'n8n' }}
@@ -33,6 +33,7 @@ jobs:
           N8N_BASIC_AUTH_PASSWORD=${{ secrets.N8N_BASIC_AUTH_PASSWORD }}
           N8N_ENCRYPTION_KEY=${{ secrets.N8N_ENCRYPTION_KEY }}
           DB_POSTGRESDB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          WEBHOOK_URL=${{ vars.N8N_DOMAIN }}
           
           # Timezone & other settings
           GENERIC_TIMEZONE=${{ secrets.GENERIC_TIMEZONE || 'Asia/Ho_Chi_Minh' }}
@@ -44,7 +45,7 @@ jobs:
           
           # Cloudflare Tunnel
           CLOUDFLARE_TUNNEL_TOKEN=${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
-          N8N_DOMAIN=${{ secrets.N8N_DOMAIN }}
+          N8N_DOMAIN=${{ vars.N8N_DOMAIN }}
           EOF
           
           # Hiển thị thông báo thành công (không hiển thị nội dung của file vì bảo mật)
