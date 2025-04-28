@@ -60,23 +60,22 @@ services:
       # -----------------------------------------
 
   cloudflared-tunnel-test:
-    container_name: cloudflared-tunnel-service-test # Optional
+    container_name: cloudflared-tunnel-service-test
     restart: unless-stopped
     
     environment:
-      # Biến môi trường TUNNEL_TOKEN bên trong container này...
-      # ...sẽ lấy giá trị từ biến môi trường CLOUDFLARE_TUNNEL_TOKEN bên ngoài (trên máy host hoặc từ file .env)
+      # Sử dụng token từ biến môi trường
       - CLOUDFLARE_TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
       - N8N_DOMAIN=${N8N_DOMAIN}
       - SSH_DOMAIN=${SSH_DOMAIN}
-
-    # Sử dụng tệp cấu hình thay vì lệnh đơn giản để hỗ trợ nhiều endpoint
+      - NO_AUTOUPDATE=true
+    
     volumes:
       - ./cloudflared-config:/etc/cloudflared
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
       - n8n_test
-      
-    # Sử dụng lại cấu hình từ file config.yml
-    command: tunnel --no-autoupdate --config /etc/cloudflared/config.yml run
+    
+    # Sử dụng token trực tiếp thay vì thông qua file cấu hình, tránh vấn đề certificate
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
