@@ -109,60 +109,60 @@ jobs:
         run: |
           echo "Deploying n8n..."
           
-          # Đảm bảo khóa mã hóa trong file config khớp với .env trước khi triển khai
-          if docker ps --filter "name=n8n_main" --format "{{.Names}}" | grep -q "n8n_main"; then
-            echo "Container n8n đang chạy, chuẩn bị cập nhật file config..."
-            ENV_KEY=$(grep "N8N_ENCRYPTION_KEY" .env | cut -d'=' -f2)
-            
-            if [ -n "$ENV_KEY" ]; then
-              echo "Đang cập nhật file config trong container..."
-              # Tạo file config tạm thời
-              CONFIG_JSON="{\"encryptionKey\": \"$ENV_KEY\"}"
-              echo "$CONFIG_JSON" > /tmp/n8n_config.json
-              
-              # Cập nhật file config trong container
-              docker cp /tmp/n8n_config.json n8n_main:/home/node/.n8n/config
-              rm /tmp/n8n_config.json
-              
-              # Sửa quyền
-              docker exec -u root n8n_main sh -c "chown node:node /home/node/.n8n/config && chmod 644 /home/node/.n8n/config"
-              echo "✅ Đã cập nhật file config với khóa mã hóa từ .env"
-            fi
+          # Lưu khóa mã hóa từ .env để sử dụng sau
+          N8N_KEY=$(grep "N8N_ENCRYPTION_KEY" .env | cut -d'=' -f2)
+          if [ -z "$N8N_KEY" ]; then
+            echo "❌ Không tìm thấy N8N_ENCRYPTION_KEY trong file .env."
+            exit 1
           fi
           
           # Hiển thị khóa mã hóa (đã che) để debug
-          ENV_KEY=$(grep "N8N_ENCRYPTION_KEY" .env | cut -d'=' -f2)
-          if [ -n "$ENV_KEY" ]; then
-            MASKED_KEY="${ENV_KEY:0:3}...${ENV_KEY: -3}"
-            echo "Khóa mã hóa (.env): $MASKED_KEY (đã ẩn phần giữa)"
-          else
-            echo "❌ CẢNH BÁO: Không tìm thấy khóa mã hóa trong file .env"
-          fi
+          MASKED_KEY="${N8N_KEY:0:3}...${N8N_KEY: -3}"
+          echo "Khóa mã hóa (.env): $MASKED_KEY (đã ẩn phần giữa)"
           
-          # Thực hiện pull và restart - thay đổi thứ tự lệnh
-          echo "Running docker-compose commands..."
-          
-          # Bước 1: Tắt các container hiện tại mà không xóa volume (-v)
+          # Bước 1: Tắt container hiện tại nhưng KHÔNG xóa volume
+          echo "Đang tắt container hiện tại..."
           docker-compose down
           
-          # Bước 2: Cập nhật images
+          # Bước 2: Cập nhật file config trong volume trước khi khởi động lại
+          echo "Đang cập nhật file config trong volume..."
+          
+          # Tạo file tạm chứa config mới
+          CONFIG_JSON="{\"encryptionKey\": \"$N8N_KEY\"}"
+          echo "$CONFIG_JSON" > /tmp/n8n_config.json
+          
+          # Tạo container tạm để truy cập volume và cập nhật file config
+          docker run --rm -v n8n_data:/data -v /tmp/n8n_config.json:/config.json alpine sh -c "mkdir -p /data/.n8n && cp /config.json /data/.n8n/config && chmod 644 /data/.n8n/config"
+          rm /tmp/n8n_config.json
+          
+          echo "✅ Đã cập nhật file config trong volume"
+          
+          # Bước 3: Cập nhật images
+          echo "Đang cập nhật images..."
           docker-compose pull
           
-          # Bước 3: Khởi động với file .env được tạo bởi workflow
+          # Bước 4: Khởi động lại với file .env được tạo bởi workflow
+          echo "Đang khởi động container..."
           docker-compose --env-file .env -f docker-compose.yml -f docker-compose.override.yml up -d
           UP_EXIT_CODE=$?
           
-          echo "Up exit code: $UP_EXIT_CODE"
-          
-          # Bước 4: Hiển thị logs để debug nếu có lỗi
+          # Hiển thị kết quả
           if [ $UP_EXIT_CODE -ne 0 ]; then
-            echo "❌ Lỗi khi khởi động container. Hiển thị logs:"
+            echo "❌ Lỗi khi khởi động container. Exit code: $UP_EXIT_CODE"
+            echo "Hiển thị logs của n8n:"
             docker-compose logs n8n
+            exit $UP_EXIT_CODE
           else
-            echo "✅ Containers đã được khởi động thành công"
-            echo "Kiểm tra logs n8n:"
-            docker logs --tail 20 n8n_main
+            echo "✅ Các container đã được khởi động thành công"
           fi
+          
+          # Đợi container n8n khởi động hoàn tất
+          echo "Đang đợi container n8n khởi động..."
+          sleep 10
+          
+          # Kiểm tra logs để xác nhận không còn lỗi
+          echo "Kiểm tra logs n8n để xác nhận không còn lỗi:"
+          docker logs --tail 20 n8n_main
 
       # Gửi thông báo Telegram (luôn gửi dù thành công hay thất bại)
       - name: Send notification
