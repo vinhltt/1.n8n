@@ -35,7 +35,7 @@ jobs:
           N8N_BASIC_AUTH_PASSWORD=${{ secrets.N8N_BASIC_AUTH_PASSWORD }}
           N8N_ENCRYPTION_KEY=${{ secrets.N8N_ENCRYPTION_KEY }}
           DB_POSTGRESDB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-          WEBHOOK_URL=${{ vars.N8N_DOMAIN }}
+          WEBHOOK_URL=${{ vars.WEBHOOK_URL }}
           
           # Timezone & other settings
           GENERIC_TIMEZONE=${{ secrets.GENERIC_TIMEZONE || 'Asia/Ho_Chi_Minh' }}
