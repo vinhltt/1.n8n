@@ -51,6 +51,9 @@ jobs:
       - name: Fix n8n permissions
         run: |
           echo "Cấu hình quyền truy cập file cho n8n..."
+          # Đảm bảo script có quyền thực thi
+          chmod +x fix-n8n-permissions.sh
+          # Chạy script đã cải tiến để xử lý cả trường hợp container không chạy
           ./fix-n8n-permissions.sh
           echo "✅ Đã cấu hình quyền file"
           
@@ -127,13 +130,9 @@ jobs:
           # Bước 2: Cập nhật file config trong volume trước khi khởi động lại
           echo "Đang cập nhật file config trong volume..."
           
-          # Tạo file tạm chứa config mới
-          CONFIG_JSON="{\"encryptionKey\": \"$N8N_KEY\"}"
-          echo "$CONFIG_JSON" > /tmp/n8n_config.json
-          
-          # Tạo container tạm để truy cập volume và cập nhật file config
-          docker run --rm -v n8n_data:/data -v /tmp/n8n_config.json:/config.json alpine sh -c "mkdir -p /data/.n8n && cp /config.json /data/.n8n/config && chmod 644 /data/.n8n/config"
-          rm /tmp/n8n_config.json
+          # Không sử dụng mount từ /tmp trên Windows, thay vào đó truyền trực tiếp nội dung qua bash
+          echo "Tạo container tạm để cập nhật file config trong volume..."
+          docker run --rm -v n8n_data:/data alpine sh -c "mkdir -p /data/.n8n && echo '{\"encryptionKey\": \"$N8N_KEY\"}' > /data/.n8n/config && chmod 644 /data/.n8n/config"
           
           echo "✅ Đã cập nhật file config trong volume"
           
