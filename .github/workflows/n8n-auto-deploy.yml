@@ -78,17 +78,7 @@ jobs:
           
           # Thực hiện pull và restart
           echo "Running docker-compose commands..."
-          echo "Running docker-compose down:"
-          docker-compose down -v
-          echo "Down exit code: $?" 
-          echo "Running docker-compose pull:"
-          docker-compose pull          
-          docker-compose --env-file .env run --rm n8n \
-            sh -c 'printf "{\"encryptionKey\":\"%s\"}" "$N8N_ENCRYPTION_KEY" \
-             > /home/node/.n8n/config'
-          echo "Pull exit code: $?" 
-          echo "Running docker-compose up -d:"
-          docker-compose --env-file .env -f docker-compose.yml -f docker-compose.override.yml up -d
+          docker-compose down -v && docker-compose pull && docker-compose --env-file .env -f docker-compose.yml -f docker-compose.override.yml up -d
           echo "Up exit code: $?" 
           
       # Gửi thông báo Telegram (luôn gửi dù thành công hay thất bại)
