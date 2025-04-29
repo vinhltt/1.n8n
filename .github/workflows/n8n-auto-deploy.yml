@@ -61,30 +61,6 @@ jobs:
             exit 1
           fi
 
-      - name: Clean up old configurations
-        run: |
-          echo "Cleaning up old configuration files and cache..."
-          
-          # Dừng tất cả các container đang chạy
-          docker-compose down || true
-          
-          # Xóa thư mục cloudflared-config để đảm bảo không còn cấu hình cũ
-          echo "Removing old cloudflared configuration..."
-          rm -rf ./cloudflared-config/* || true
-          mkdir -p ./cloudflared-config
-          
-          # Xóa các container liên quan nếu vẫn còn
-          echo "Removing any existing containers..."
-          docker rm -f cloudflared-tunnel-service || true
-          docker rm -f n8n_main || true
-          docker rm -f postgresdb || true
-          
-          # Xóa cache của docker và đảm bảo dữ liệu cũ được xóa
-          echo "Pruning Docker system to remove old data..."
-          docker system prune -f
-          
-          echo "✅ Cleanup completed successfully"
-
       - name: Deploy n8n
         run: |
           echo "Deploying n8n..."
@@ -99,26 +75,8 @@ jobs:
           echo "Pull exit code: $?"
           echo "Running docker-compose up -d:"
           docker-compose --env-file .env -f docker-compose.yml -f docker-compose.override.yml up -d
+
           echo "Up exit code: $?"
-          
-      - name: Verify deployment
-        run: |
-          echo "Verifying deployment..."
-          sleep 10 # Đợi container khởi động
-          
-          # Kiểm tra các container đã chạy chưa
-          echo "Checking running containers:"
-          docker ps
-          
-          # Kiểm tra logs của cloudflared để đảm bảo token đã được áp dụng đúng
-          echo "Checking cloudflared logs for token validation:"
-          docker logs cloudflared-tunnel-service 2>&1 | grep -i "registered tunnel" || echo "Token validation information not found in logs"
-          
-          # Kiểm tra biến môi trường trong container (không hiển thị giá trị nhạy cảm)
-          echo "Checking if CLOUDFLARE_TUNNEL_TOKEN exists in container:"
-          docker exec cloudflared-tunnel-service sh -c '[ ! -z "$CLOUDFLARE_TUNNEL_TOKEN" ] && echo "✅ Token exists" || echo "❌ Token not found"'
-          
-          echo "Deployment verification completed"
           
       # Gửi thông báo Telegram (luôn gửi dù thành công hay thất bại)
       - name: Send notification
