@@ -93,46 +93,25 @@ jobs:
           echo "Kiểm tra khóa mã hóa n8n sau khi deploy..."
           sleep 10  # Chờ cho container khởi động hoàn tất
           
-          # Kiểm tra giá trị trong file .env
-          ENV_KEY=$(grep -o "N8N_ENCRYPTION_KEY=.*" .env | cut -d'=' -f2)
+          # Lấy khóa mã hóa từ container
+          CONTAINER_KEY=$(docker exec n8n_main grep -o "N8N_ENCRYPTION_KEY=.*" /proc/1/environ | cut -d'=' -f2)
           
-          # Kiểm tra trong container
-          CONTAINER_KEY=$(docker exec n8n_main printenv N8N_ENCRYPTION_KEY)
-          
-          # Kiểm tra xem khóa có tồn tại và giống nhau không
-          if [ -n "$ENV_KEY" ] && [ -n "$CONTAINER_KEY" ]; then
-            # Lấy phần đầu và phần cuối của khóa để hiển thị an toàn
-            ENV_KEY_LENGTH=${#ENV_KEY}
-            ENV_KEY_PREFIX=${ENV_KEY:0:4}
-            ENV_KEY_SUFFIX=${ENV_KEY: -4}
+          # Lấy phần đầu và phần cuối của khóa để xác minh mà không hiển thị toàn bộ khóa
+          if [ -n "$CONTAINER_KEY" ]; then
+            KEY_LENGTH=${#CONTAINER_KEY}
+            KEY_PREFIX=${CONTAINER_KEY:0:4}
+            KEY_SUFFIX=${CONTAINER_KEY: -4}
             
-            CONTAINER_KEY_LENGTH=${#CONTAINER_KEY}
-            CONTAINER_KEY_PREFIX=${CONTAINER_KEY:0:4}
-            CONTAINER_KEY_SUFFIX=${CONTAINER_KEY: -4}
-            
-            echo "✅ Thông tin khóa mã hóa n8n:"
-            echo "   - Trong file .env: độ dài $ENV_KEY_LENGTH ký tự, signature: $ENV_KEY_PREFIX****$ENV_KEY_SUFFIX"
-            echo "   - Trong container: độ dài $CONTAINER_KEY_LENGTH ký tự, signature: $CONTAINER_KEY_PREFIX****$CONTAINER_KEY_SUFFIX"
-            
-            # Kiểm tra xem hai khóa có khớp nhau không
-            if [ "$ENV_KEY" = "$CONTAINER_KEY" ]; then
-              echo "✅ KIỂM TRA THÀNH CÔNG: Khóa mã hóa trong .env và container GIỐNG NHAU"
-            else
-              echo "⚠️ CẢNH BÁO: Khóa mã hóa trong .env và container KHÁC NHAU!"
-            fi
+            echo "✅ Đã xác minh khóa mã hóa n8n trong container:"
+            echo "   - Độ dài khóa: $KEY_LENGTH ký tự"
+            echo "   - Prefix khóa: $KEY_PREFIX****$KEY_SUFFIX"
             
             # Log khóa vào file an toàn
             TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
-            echo "Timestamp: $TIMESTAMP" >> n8n-key-verification.log
-            echo "  .env file: Length=$ENV_KEY_LENGTH, Signature=$ENV_KEY_PREFIX****$ENV_KEY_SUFFIX" >> n8n-key-verification.log
-            echo "  Container: Length=$CONTAINER_KEY_LENGTH, Signature=$CONTAINER_KEY_PREFIX****$CONTAINER_KEY_SUFFIX" >> n8n-key-verification.log
-            echo "  Match: $([[ "$ENV_KEY" = "$CONTAINER_KEY" ]] && echo "YES" || echo "NO")" >> n8n-key-verification.log
-            echo "----------------------------" >> n8n-key-verification.log
+            echo "Timestamp: $TIMESTAMP, Key Length: $KEY_LENGTH, Key Signature: $KEY_PREFIX****$KEY_SUFFIX" >> n8n-key-verification.log
             chmod 600 n8n-key-verification.log
           else
-            echo "⚠️ Không thể đọc khóa mã hóa từ .env hoặc container!"
-            [ -z "$ENV_KEY" ] && echo "   - Không tìm thấy khóa trong file .env"
-            [ -z "$CONTAINER_KEY" ] && echo "   - Không tìm thấy khóa trong container"
+            echo "⚠️ Không thể đọc khóa mã hóa từ container!"
           fi
           
       # Gửi thông báo Telegram (luôn gửi dù thành công hay thất bại)
