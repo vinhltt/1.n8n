@@ -86,33 +86,7 @@ jobs:
           echo "Pull exit code: $?" 
           echo "Running docker-compose up -d:"
           docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d
-          echo "Up exit code: $?"
-          
-      - name: Check N8N_ENCRYPTION_KEY
-        run: |
-          echo "Kiểm tra khóa mã hóa n8n sau khi deploy..."
-          sleep 10  # Chờ cho container khởi động hoàn tất
-          
-          # Lấy khóa mã hóa từ container
-          CONTAINER_KEY=$(docker exec n8n_main grep -o "N8N_ENCRYPTION_KEY=.*" /proc/1/environ | cut -d'=' -f2)
-          
-          # Lấy phần đầu và phần cuối của khóa để xác minh mà không hiển thị toàn bộ khóa
-          if [ -n "$CONTAINER_KEY" ]; then
-            KEY_LENGTH=${#CONTAINER_KEY}
-            KEY_PREFIX=${CONTAINER_KEY:0:4}
-            KEY_SUFFIX=${CONTAINER_KEY: -4}
-            
-            echo "✅ Đã xác minh khóa mã hóa n8n trong container:"
-            echo "   - Độ dài khóa: $KEY_LENGTH ký tự"
-            echo "   - Prefix khóa: $KEY_PREFIX****$KEY_SUFFIX"
-            
-            # Log khóa vào file an toàn
-            TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
-            echo "Timestamp: $TIMESTAMP, Key Length: $KEY_LENGTH, Key Signature: $KEY_PREFIX****$KEY_SUFFIX" >> n8n-key-verification.log
-            chmod 600 n8n-key-verification.log
-          else
-            echo "⚠️ Không thể đọc khóa mã hóa từ container!"
-          fi
+          echo "Up exit code: $?" 
           
       # Gửi thông báo Telegram (luôn gửi dù thành công hay thất bại)
       - name: Send notification
