@@ -23,6 +23,29 @@ jobs:
         run: |
           echo "Creating .env file..."
           
+          # Trích xuất khóa mã hóa hiện tại từ container n8n (nếu container đang chạy)
+          EXISTING_KEY=""
+          if docker ps --filter "name=n8n_main" --format "{{.Names}}" | grep -q "n8n_main"; then
+            echo "✅ Tìm thấy container n8n đang chạy, trích xuất khóa mã hóa..."
+            EXISTING_KEY=$(docker exec n8n_main sh -c 'cat /home/node/.n8n/config 2>/dev/null | grep -o "\"encryptionKey\": \"[^\"]*\"" | cut -d"\"" -f4')
+            if [ ! -z "$EXISTING_KEY" ]; then
+              echo "✅ Đã trích xuất khóa mã hóa từ container hiện tại"
+            else
+              echo "⚠️ Không thể trích xuất khóa mã hóa từ container"
+            fi
+          else
+            echo "⚠️ Không tìm thấy container n8n đang chạy, sẽ sử dụng khóa mã hóa từ Secrets"
+          fi
+          
+          # Ưu tiên sử dụng khóa mã hóa hiện có, nếu không có thì dùng từ Secrets
+          N8N_ENCRYPTION_KEY_VALUE="$EXISTING_KEY"
+          if [ -z "$N8N_ENCRYPTION_KEY_VALUE" ]; then
+            N8N_ENCRYPTION_KEY_VALUE="${{ secrets.N8N_ENCRYPTION_KEY }}"
+            echo "🔑 Sử dụng khóa mã hóa từ GitHub Secrets"
+          else
+            echo "🔑 Sử dụng khóa mã hóa từ container hiện tại"
+          fi
+          
           # Tạo file .env từ GitHub Secrets và Variables
           cat > .env << EOF
           # PostgreSQL
@@ -33,7 +56,7 @@ jobs:
           # n8n
           N8N_BASIC_AUTH_USER=${{ secrets.N8N_BASIC_AUTH_USER || 'admin' }}
           N8N_BASIC_AUTH_PASSWORD=${{ secrets.N8N_BASIC_AUTH_PASSWORD }}
-          N8N_ENCRYPTION_KEY=${{ secrets.N8N_ENCRYPTION_KEY }}
+          N8N_ENCRYPTION_KEY=$N8N_ENCRYPTION_KEY_VALUE
           DB_POSTGRESDB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           WEBHOOK_URL=${{ vars.WEBHOOK_URL }}
           
