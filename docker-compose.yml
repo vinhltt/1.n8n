@@ -26,4 +26,4 @@ volumes:
     name: n8n_data
   postgresdb_data: 
     # Bỏ external: true để Docker tự tạo volume nếu chưa tồn tại
-  name: postgresdb_data
+    name: postgresdb_data
