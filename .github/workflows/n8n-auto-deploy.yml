@@ -16,6 +16,10 @@ jobs:
   deploy:
     runs-on: self-hosted  # Chỉ định sử dụng self-hosted runner thay vì ubuntu-latest
     steps:
+      - name: Clean runner temp env files
+        run: |
+          rm -f $RUNNER_WORKSPACE/_temp/*
+
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -74,7 +78,7 @@ jobs:
           docker-compose pull
           echo "Pull exit code: $?"
           echo "Running docker-compose up -d:"
-          docker-compose --env-file .env -f docker-compose.yml -f docker-compose.override.yml up -d
+          docker-compose up -d
 
           echo "Up exit code: $?"
           
