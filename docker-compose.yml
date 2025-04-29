@@ -14,14 +14,16 @@ services:
 #network section
 networks:
   default:
-    name: psl-pfm-network
+    name: n8n-network
     driver: bridge
+    
+#volumes sect    external: true # Đánh dấu network là external để sử dụng network hiện có
     
 #volumes section
 volumes:
   n8n_data: 
-    external: true # Sử dụng volume hiện có thay vì tạo mới
+    # Bỏ external: true để Docker tự tạo volume nếu chưa tồn tại
     name: n8n_data
   postgresdb_data: 
-    external: true # Sử dụng volume hiện có thay vì tạo mới
-    name: postgresdb_data
+    # Bỏ external: true để Docker tự tạo volume nếu chưa tồn tại
+  name: postgresdb_data
