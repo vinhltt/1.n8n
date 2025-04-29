@@ -19,29 +19,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set execution permission for scripts
-        run: |
-          chmod +x *.sh
-          
-      - name: Sync n8n encryption key
-        run: |
-          echo "Đồng bộ hóa khóa mã hóa n8n..."
-          ./sync-n8n-encryption.sh
-          echo "✅ Đã đồng bộ hóa khóa mã hóa"
-          
       - name: Create .env file from secrets
         run: |
           echo "Creating .env file..."
           
-          # Đọc khóa mã hóa từ file .env đã được cập nhật bởi script đồng bộ hóa
-          if [ -f .env ] && grep -q "N8N_ENCRYPTION_KEY" .env; then
-            N8N_ENCRYPTION_KEY_VALUE=$(grep "N8N_ENCRYPTION_KEY" .env | cut -d'=' -f2)
-            echo "🔑 Sử dụng khóa mã hóa đã đồng bộ hóa"
-          else
-            # Fallback nếu script đồng bộ không thành công
-            N8N_ENCRYPTION_KEY_VALUE="${{ secrets.N8N_ENCRYPTION_KEY }}"
-            echo "🔑 Sử dụng khóa mã hóa từ GitHub Secrets"
-          fi
+          # Luôn sử dụng khóa mã hóa từ GitHub Secrets
+          N8N_ENCRYPTION_KEY_VALUE="${{ secrets.N8N_ENCRYPTION_KEY }}"
+          echo "🔑 Sử dụng khóa mã hóa từ GitHub Secrets"
           
           # Tạo file .env từ GitHub Secrets và Variables
           cat > .env << EOF
@@ -54,7 +38,6 @@ jobs:
           N8N_BASIC_AUTH_USER=${{ secrets.N8N_BASIC_AUTH_USER || 'admin' }}
           N8N_BASIC_AUTH_PASSWORD=${{ secrets.N8N_BASIC_AUTH_PASSWORD }}
           N8N_ENCRYPTION_KEY=$N8N_ENCRYPTION_KEY_VALUE
-          N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
           DB_POSTGRESDB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           WEBHOOK_URL=${{ vars.WEBHOOK_URL }}
           
@@ -90,13 +73,13 @@ jobs:
           echo "Running docker-compose commands..."
           echo "Running docker-compose down:"
           docker-compose down
-          echo "Down exit code: $? "
+          echo "Down exit code: $?"
           echo "Running docker-compose pull:"
           docker-compose pull
-          echo "Pull exit code: $? "
+          echo "Pull exit code: $?"
           echo "Running docker-compose up -d:"
           docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d
-          echo "Up exit code: $? "
+          echo "Up exit code: $?"
           
       # Gửi thông báo Telegram (luôn gửi dù thành công hay thất bại)
       - name: Send notification
@@ -105,7 +88,7 @@ jobs:
           if [[ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" && ! -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]]; then
             # Tạo link đến GitHub Action run hiện tại
             ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
+            
             # Kiểm tra trạng thái của job
             if [ "${{ job.status }}" == "success" ]; then
               # Thông báo thành công
