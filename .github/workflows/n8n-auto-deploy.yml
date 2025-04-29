@@ -19,9 +19,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set execution permission for scripts
+        run: |
+          chmod +x *.sh
+          
+      - name: Fix n8n permissions
+        run: |
+          echo "Cấu hình quyền truy cập file cho n8n..."
+          ./fix-n8n-permissions.sh
+          echo "✅ Đã cấu hình quyền file"
+          
       - name: Create .env file from secrets
         run: |
-          echo "Creating .env file..."          
+          echo "Creating .env file..."
+          
           # Tạo file .env từ GitHub Secrets và Variables
           cat > .env << EOF
           # PostgreSQL
@@ -33,6 +44,7 @@ jobs:
           N8N_BASIC_AUTH_USER=${{ secrets.N8N_BASIC_AUTH_USER || 'admin' }}
           N8N_BASIC_AUTH_PASSWORD=${{ secrets.N8N_BASIC_AUTH_PASSWORD }}
           N8N_ENCRYPTION_KEY=${{ secrets.N8N_ENCRYPTION_KEY }}
+          N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
           DB_POSTGRESDB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           WEBHOOK_URL=${{ vars.WEBHOOK_URL }}
           
@@ -68,13 +80,13 @@ jobs:
           echo "Running docker-compose commands..."
           echo "Running docker-compose down:"
           docker-compose down
-          echo "Down exit code: $?"
+          echo "Down exit code: $?" 
           echo "Running docker-compose pull:"
           docker-compose pull
-          echo "Pull exit code: $?"
+          echo "Pull exit code: $?" 
           echo "Running docker-compose up -d:"
           docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d
-          echo "Up exit code: $?"
+          echo "Up exit code: $?" 
           
       # Gửi thông báo Telegram (luôn gửi dù thành công hay thất bại)
       - name: Send notification
@@ -83,7 +95,7 @@ jobs:
           if [[ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" && ! -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]]; then
             # Tạo link đến GitHub Action run hiện tại
             ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            
+
             # Kiểm tra trạng thái của job
             if [ "${{ job.status }}" == "success" ]; then
               # Thông báo thành công
