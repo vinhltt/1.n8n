@@ -79,7 +79,7 @@ jobs:
           # Thực hiện pull và restart
           echo "Running docker-compose commands..."
           echo "Running docker-compose down:"
-          docker-compose down
+          docker-compose down -v
           echo "Down exit code: $?" 
           echo "Running docker-compose pull:"
           docker-compose pull
