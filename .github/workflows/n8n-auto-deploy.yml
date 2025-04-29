@@ -21,13 +21,7 @@ jobs:
 
       - name: Create .env file from secrets
         run: |
-          echo "Creating .env file..."
-          
-          # Luôn sử dụng khóa mã hóa từ GitHub Secrets
-          N8N_ENCRYPTION_KEY_VALUE="${{ secrets.N8N_ENCRYPTION_KEY }}"
-          echo "🔑 Sử dụng khóa mã hóa từ GitHub Secrets"
-          echo $N8N_ENCRYPTION_KEY_VALUE
-          
+          echo "Creating .env file..."          
           # Tạo file .env từ GitHub Secrets và Variables
           cat > .env << EOF
           # PostgreSQL
@@ -38,7 +32,7 @@ jobs:
           # n8n
           N8N_BASIC_AUTH_USER=${{ secrets.N8N_BASIC_AUTH_USER || 'admin' }}
           N8N_BASIC_AUTH_PASSWORD=${{ secrets.N8N_BASIC_AUTH_PASSWORD }}
-          N8N_ENCRYPTION_KEY=$N8N_ENCRYPTION_KEY_VALUE
+          N8N_ENCRYPTION_KEY=${{ secrets.N8N_ENCRYPTION_KEY }}
           DB_POSTGRESDB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           WEBHOOK_URL=${{ vars.WEBHOOK_URL }}
           
