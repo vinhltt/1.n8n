@@ -108,11 +108,11 @@ jobs:
             exit 1
           fi
 
-      - name: Deploy n8n
+      - name: Deploy n8n with comprehensive fix
         run: |
-          echo "Deploying n8n..."
+          echo "Deploying n8n with comprehensive fix for encryption key issue..."
           
-          # Lưu khóa mã hóa từ .env để sử dụng sau
+          # Lấy khóa mã hóa từ .env
           N8N_KEY=$(grep "N8N_ENCRYPTION_KEY" .env | cut -d'=' -f2)
           if [ -z "$N8N_KEY" ]; then
             echo "❌ Không tìm thấy N8N_ENCRYPTION_KEY trong file .env."
@@ -123,44 +123,166 @@ jobs:
           MASKED_KEY="${N8N_KEY:0:3}...${N8N_KEY: -3}"
           echo "Khóa mã hóa (.env): $MASKED_KEY (đã ẩn phần giữa)"
           
-          # Bước 1: Tắt container hiện tại nhưng KHÔNG xóa volume
-          echo "Đang tắt container hiện tại..."
+          # Bước 1: Dừng tất cả container hiện tại
+          echo "Đang dừng tất cả container..."
           docker-compose down
+          echo "✅ Đã dừng tất cả container"
           
-          # Bước 2: Cập nhật file config trong volume trước khi khởi động lại
-          echo "Đang cập nhật file config trong volume..."
+          # Bước 2: Tạo file cấu hình tạm thời để cập nhật volume
+          echo "Đang tạo file cấu hình tạm thời..."
+          CONFIG_DIR=$(pwd)/.n8n_temp
+          mkdir -p $CONFIG_DIR
+          CONFIG_FILE="$CONFIG_DIR/config"
+          echo "{\"encryptionKey\": \"$N8N_KEY\"}" > "$CONFIG_FILE"
+          echo "✅ Đã tạo file cấu hình tạm thời"
           
-          # Không sử dụng mount từ /tmp trên Windows, thay vào đó truyền trực tiếp nội dung qua bash
-          echo "Tạo container tạm để cập nhật file config trong volume..."
-          docker run --rm -v n8n_data:/data alpine sh -c "mkdir -p /data/.n8n && echo '{\"encryptionKey\": \"$N8N_KEY\"}' > /data/.n8n/config && chmod 644 /data/.n8n/config"
-          
-          echo "✅ Đã cập nhật file config trong volume"
-          
-          # Bước 3: Cập nhật images
-          echo "Đang cập nhật images..."
-          docker-compose pull
-          
-          # Bước 4: Khởi động lại với file .env được tạo bởi workflow
-          echo "Đang khởi động container..."
-          docker-compose --env-file .env -f docker-compose.yml -f docker-compose.override.yml up -d
-          UP_EXIT_CODE=$?
-          
-          # Hiển thị kết quả
-          if [ $UP_EXIT_CODE -ne 0 ]; then
-            echo "❌ Lỗi khi khởi động container. Exit code: $UP_EXIT_CODE"
-            echo "Hiển thị logs của n8n:"
-            docker-compose logs n8n
-            exit $UP_EXIT_CODE
+          # Bước 3: Cập nhật file cấu hình trong volume
+          echo "Đang cập nhật file cấu hình trong volume..."
+          if ! docker volume inspect n8n_data > /dev/null 2>&1; then
+            echo "⚠️ Volume n8n_data không tồn tại, sẽ được tạo khi khởi động container"
           else
-            echo "✅ Các container đã được khởi động thành công"
+            echo "Volume n8n_data tồn tại, đang cập nhật file cấu hình..."
+            # Sử dụng alpine để cập nhật file config trong volume
+            docker run --rm -v n8n_data:/data -v $CONFIG_DIR:/config alpine sh -c "mkdir -p /data/.n8n && cp /config/config /data/.n8n/config && chmod 644 /data/.n8n/config && echo '✅ File cấu hình đã được cập nhật'"
+            echo "✅ Đã cập nhật file cấu hình trong volume n8n_data"
           fi
           
-          # Đợi container n8n khởi động hoàn tất
-          echo "Đang đợi container n8n khởi động..."
-          sleep 10
+          # Xóa thư mục tạm
+          rm -rf $CONFIG_DIR
           
-          # Kiểm tra logs để xác nhận không còn lỗi
-          echo "Kiểm tra logs n8n để xác nhận không còn lỗi:"
+          # Bước 4: Chuẩn bị docker-compose-fix.yml để đảm bảo tất cả các biến môi trường đúng
+          echo "Đang tạo file docker-compose-fix.yml tạm thời..."
+          cat > docker-compose-fix.yml << EOF
+version: '3.8'
+services:
+  postgresdb:
+    image: postgres:15
+    container_name: postgresdb
+    restart: always
+    environment:
+      POSTGRES_DB: \${POSTGRES_DB}
+      POSTGRES_USER: \${POSTGRES_USER}
+      POSTGRES_PASSWORD: \${POSTGRES_PASSWORD}
+    volumes:
+      - postgresdb_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \$\$POSTGRES_USER -d \$\$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n_main
+    restart: always
+    environment:
+      - TZ=\${TZ}
+      - GENERIC_TIMEZONE=\${GENERIC_TIMEZONE}
+      - N8N_ENCRYPTION_KEY=\${N8N_ENCRYPTION_KEY}
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgresdb
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=\${POSTGRES_DB}
+      - DB_POSTGRESDB_USER=\${POSTGRES_USER}
+      - DB_POSTGRESDB_PASSWORD=\${POSTGRES_PASSWORD}
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=\${N8N_BASIC_AUTH_USER}
+      - N8N_BASIC_AUTH_PASSWORD=\${N8N_BASIC_AUTH_PASSWORD}
+      - N8N_HOST=\${N8N_DOMAIN}
+      - NODE_ENV=production
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - WEBHOOK_URL=\${WEBHOOK_URL}
+      - EXECUTIONS_DATA_PRUNE=\${EXECUTIONS_DATA_PRUNE}
+      - EXECUTIONS_DATA_MAX_AGE=\${EXECUTIONS_DATA_MAX_AGE}
+      - EXECUTIONS_DATA_PRUNE_MAX_COUNT=\${EXECUTIONS_DATA_PRUNE_MAX_COUNT}
+      - N8N_DEFAULT_BINARY_DATA_MODE=\${N8N_DEFAULT_BINARY_DATA_MODE}
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      - postgresdb
+    command: n8n start --tunnel
+    
+  cloudflared-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared-tunnel-service
+    restart: unless-stopped
+    environment:
+      - CLOUDFLARE_TUNNEL_TOKEN=\${CLOUDFLARE_TUNNEL_TOKEN}
+      - N8N_DOMAIN=\${N8N_DOMAIN}
+      - NO_AUTOUPDATE=true
+    volumes:
+      - ./cloudflared-config:/etc/cloudflared
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - n8n
+    command: tunnel --no-autoupdate run --token \${CLOUDFLARE_TUNNEL_TOKEN}
+
+volumes:
+  n8n_data:
+    name: n8n_data
+  postgresdb_data:
+    name: postgresdb_data
+EOF
+          echo "✅ Đã tạo file docker-compose-fix.yml"
+          
+          # Bước 5: Khởi động với file docker-compose-fix.yml
+          echo "Đang khởi động container với file docker-compose-fix.yml..."
+          docker-compose -f docker-compose-fix.yml --env-file .env up -d
+          UP_RESULT=$?
+          
+          if [ $UP_RESULT -ne 0 ]; then
+            echo "❌ Lỗi khi khởi động container với docker-compose-fix.yml. Mã lỗi: $UP_RESULT"
+            echo "Đang thử khởi động lại với file docker-compose gốc..."
+            docker-compose --env-file .env -f docker-compose.yml -f docker-compose.override.yml up -d
+            exit $UP_RESULT
+          else
+            echo "✅ Đã khởi động container thành công với docker-compose-fix.yml"
+          fi
+          
+          # Bước 6: Đợi container khởi động và kiểm tra logs
+          echo "Đang đợi container khởi động (15 giây)..."
+          sleep 15
+          
+          # Kiểm tra xem n8n có đang chạy không
+          if ! docker ps | grep -q "n8n_main"; then
+            echo "❌ Container n8n_main không chạy sau khi khởi động"
+            echo "Đang thử khởi động lại với file docker-compose gốc..."
+            docker-compose --env-file .env -f docker-compose.yml -f docker-compose.override.yml up -d
+            exit 1
+          fi
+          
+          # Kiểm tra logs để tìm lỗi Mismatching encryption keys
+          echo "Đang kiểm tra logs để xác nhận không còn lỗi 'Mismatching encryption keys'..."
+          if docker logs n8n_main | grep -q "Mismatching encryption keys"; then
+            echo "⚠️ Vẫn còn lỗi 'Mismatching encryption keys'. Đang thử giải pháp cuối cùng..."
+            
+            # Giải pháp cuối cùng: Xóa volume và khởi động lại
+            echo "Đang dừng container và xóa volume n8n_data..."
+            docker-compose down
+            docker volume rm n8n_data
+            echo "✅ Đã xóa volume n8n_data"
+            
+            # Khởi động lại với file docker-compose gốc (volume sẽ được tạo mới)
+            echo "Đang khởi động lại với file docker-compose gốc sau khi xóa volume..."
+            docker-compose --env-file .env -f docker-compose.yml -f docker-compose.override.yml up -d
+          else
+            echo "✅ Không tìm thấy lỗi 'Mismatching encryption keys' trong logs"
+            
+            # Chuyển về docker-compose gốc nếu mọi thứ đã OK
+            echo "Đang chuyển về docker-compose gốc..."
+            docker-compose down
+            docker-compose --env-file .env -f docker-compose.yml -f docker-compose.override.yml up -d
+          fi
+          
+          # Xóa file docker-compose-fix.yml
+          rm -f docker-compose-fix.yml
+          
+          # Hiển thị logs cuối cùng
+          echo "Kiểm tra logs n8n cuối cùng:"
+          sleep 5
           docker logs --tail 20 n8n_main
 
       # Gửi thông báo Telegram (luôn gửi dù thành công hay thất bại)
