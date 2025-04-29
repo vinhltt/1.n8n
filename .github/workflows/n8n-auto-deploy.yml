@@ -83,7 +83,7 @@ jobs:
           echo "Down exit code: $?" 
           echo "Running docker-compose pull:"
           docker-compose pull          
-          docker-compose --env-file .env run --rm n8n_main \
+          docker-compose --env-file .env run --rm n8n \
             sh -c 'printf "{\"encryptionKey\":\"%s\"}" "$N8N_ENCRYPTION_KEY" \
              > /home/node/.n8n/config'
           echo "Pull exit code: $?" 
