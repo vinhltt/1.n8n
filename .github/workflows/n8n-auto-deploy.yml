@@ -23,6 +23,31 @@ jobs:
         run: |
           chmod +x *.sh
           
+      - name: Check n8n encryption key
+        run: |
+          echo "Checking for n8n encryption key in the existing container..."
+          
+          # Check if n8n container exists and is running
+          if docker ps --filter "name=n8n_main" --format "{{.Names}}" | grep -q "n8n_main"; then
+            echo "Found running n8n container, extracting encryption key..."
+            
+            # Extract the encryption key from the container
+            CONTAINER_KEY=$(docker exec n8n_main sh -c 'cat /home/node/.n8n/config 2>/dev/null | grep -o "\"encryptionKey\": \"[^\"]*\"" | cut -d"\"" -f4')
+            
+            if [ -n "$CONTAINER_KEY" ]; then
+              echo "✅ Successfully extracted encryption key from container"
+              echo "N8N_ENCRYPTION_KEY=$CONTAINER_KEY" > .env.key
+              echo "⚠️ IMPORTANT: Make sure this key is saved in GitHub Secrets!"
+              echo "If your GitHub Secret is different, update it to match the extracted key"
+              echo "Or you'll continue to see 'Mismatching encryption keys' errors"
+            else
+              echo "❌ Could not extract encryption key from container"
+              echo "Will proceed with the key from GitHub Secrets"
+            fi
+          else
+            echo "No running n8n container found, will use key from GitHub Secrets"
+          fi
+          
       - name: Fix n8n permissions
         run: |
           echo "Cấu hình quyền truy cập file cho n8n..."
@@ -32,6 +57,13 @@ jobs:
       - name: Create .env file from secrets
         run: |
           echo "Creating .env file..."
+          
+          # Check if we have an extracted key from container
+          EXTRACTED_KEY=""
+          if [ -f .env.key ]; then
+            EXTRACTED_KEY=$(grep "N8N_ENCRYPTION_KEY" .env.key | cut -d'=' -f2)
+            echo "Found extracted encryption key from container"
+          fi
           
           # Tạo file .env từ GitHub Secrets và Variables
           cat > .env << EOF
@@ -43,7 +75,8 @@ jobs:
           # n8n
           N8N_BASIC_AUTH_USER=${{ secrets.N8N_BASIC_AUTH_USER || 'admin' }}
           N8N_BASIC_AUTH_PASSWORD=${{ secrets.N8N_BASIC_AUTH_PASSWORD }}
-          N8N_ENCRYPTION_KEY=${{ secrets.N8N_ENCRYPTION_KEY }}
+          # Use extracted key if available, otherwise use the one from secrets
+          N8N_ENCRYPTION_KEY=${EXTRACTED_KEY:-${{ secrets.N8N_ENCRYPTION_KEY }}}
           N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
           DB_POSTGRESDB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           WEBHOOK_URL=${{ vars.WEBHOOK_URL }}
@@ -76,11 +109,61 @@ jobs:
         run: |
           echo "Deploying n8n..."
           
-          # Thực hiện pull và restart
-          echo "Running docker-compose commands..."
-          docker-compose down -v && docker-compose pull && docker-compose --env-file .env -f docker-compose.yml -f docker-compose.override.yml up -d
-          echo "Up exit code: $?" 
+          # Đảm bảo khóa mã hóa trong file config khớp với .env trước khi triển khai
+          if docker ps --filter "name=n8n_main" --format "{{.Names}}" | grep -q "n8n_main"; then
+            echo "Container n8n đang chạy, chuẩn bị cập nhật file config..."
+            ENV_KEY=$(grep "N8N_ENCRYPTION_KEY" .env | cut -d'=' -f2)
+            
+            if [ -n "$ENV_KEY" ]; then
+              echo "Đang cập nhật file config trong container..."
+              # Tạo file config tạm thời
+              CONFIG_JSON="{\"encryptionKey\": \"$ENV_KEY\"}"
+              echo "$CONFIG_JSON" > /tmp/n8n_config.json
+              
+              # Cập nhật file config trong container
+              docker cp /tmp/n8n_config.json n8n_main:/home/node/.n8n/config
+              rm /tmp/n8n_config.json
+              
+              # Sửa quyền
+              docker exec -u root n8n_main sh -c "chown node:node /home/node/.n8n/config && chmod 644 /home/node/.n8n/config"
+              echo "✅ Đã cập nhật file config với khóa mã hóa từ .env"
+            fi
+          fi
           
+          # Hiển thị khóa mã hóa (đã che) để debug
+          ENV_KEY=$(grep "N8N_ENCRYPTION_KEY" .env | cut -d'=' -f2)
+          if [ -n "$ENV_KEY" ]; then
+            MASKED_KEY="${ENV_KEY:0:3}...${ENV_KEY: -3}"
+            echo "Khóa mã hóa (.env): $MASKED_KEY (đã ẩn phần giữa)"
+          else
+            echo "❌ CẢNH BÁO: Không tìm thấy khóa mã hóa trong file .env"
+          fi
+          
+          # Thực hiện pull và restart - thay đổi thứ tự lệnh
+          echo "Running docker-compose commands..."
+          
+          # Bước 1: Tắt các container hiện tại mà không xóa volume (-v)
+          docker-compose down
+          
+          # Bước 2: Cập nhật images
+          docker-compose pull
+          
+          # Bước 3: Khởi động với file .env được tạo bởi workflow
+          docker-compose --env-file .env -f docker-compose.yml -f docker-compose.override.yml up -d
+          UP_EXIT_CODE=$?
+          
+          echo "Up exit code: $UP_EXIT_CODE"
+          
+          # Bước 4: Hiển thị logs để debug nếu có lỗi
+          if [ $UP_EXIT_CODE -ne 0 ]; then
+            echo "❌ Lỗi khi khởi động container. Hiển thị logs:"
+            docker-compose logs n8n
+          else
+            echo "✅ Containers đã được khởi động thành công"
+            echo "Kiểm tra logs n8n:"
+            docker logs --tail 20 n8n_main
+          fi
+
       # Gửi thông báo Telegram (luôn gửi dù thành công hay thất bại)
       - name: Send notification
         if: always()  # Thay đổi từ success() thành always() để luôn gửi thông báo
