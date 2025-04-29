@@ -74,7 +74,8 @@ jobs:
           docker-compose pull
           echo "Pull exit code: $?"
           echo "Running docker-compose up -d:"
-          docker-compose --env-file ./.env -f docker-compose.yml -f docker-compose.override.yml up -d
+          docker-compose --env-file .env -f docker-compose.yml -f docker-compose.override.yml up -d
+
           echo "Up exit code: $?"
           
       # Gửi thông báo Telegram (luôn gửi dù thành công hay thất bại)
