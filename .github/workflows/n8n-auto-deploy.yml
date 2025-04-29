@@ -26,6 +26,7 @@ jobs:
           # Luôn sử dụng khóa mã hóa từ GitHub Secrets
           N8N_ENCRYPTION_KEY_VALUE="${{ secrets.N8N_ENCRYPTION_KEY }}"
           echo "🔑 Sử dụng khóa mã hóa từ GitHub Secrets"
+          echo "$N8N_ENCRYPTION_KEY_VALUE"
           
           # Tạo file .env từ GitHub Secrets và Variables
           cat > .env << EOF
