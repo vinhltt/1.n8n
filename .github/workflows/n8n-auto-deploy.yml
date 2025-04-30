@@ -48,10 +48,6 @@ jobs:
           EXECUTIONS_DATA_PRUNE=${{ secrets.EXECUTIONS_DATA_PRUNE || 'true' }}
           EXECUTIONS_DATA_MAX_AGE=${{ secrets.EXECUTIONS_DATA_MAX_AGE || '720' }}
           EXECUTIONS_DATA_PRUNE_MAX_COUNT=${{ secrets.EXECUTIONS_DATA_PRUNE_MAX_COUNT || '50000' }}
-          
-          # Cloudflare Tunnel
-          CLOUDFLARE_TUNNEL_TOKEN=${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
-          N8N_DOMAIN=${{ vars.N8N_DOMAIN }}
           EOF
           
           # Hiển thị thông báo thành công (không hiển thị nội dung của file vì bảo mật)

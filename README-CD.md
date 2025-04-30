@@ -23,7 +23,6 @@ GitHub Action workflow (`n8n-auto-deploy.yml`) sẽ tự động được kích 
   - Đăng nhập vào Cloudflare Zero Trust dashboard: https://one.dash.cloudflare.com/
   - Chọn Access > Tunnels > Create a tunnel
   - Đặt tên cho tunnel (ví dụ: "n8n-tunnel")
-  - Lưu lại token được cung cấp để sử dụng như biến môi trường `CLOUDFLARE_TUNNEL_TOKEN`
 
 2. **Cấu hình DNS cho các endpoint**:
   - Tạo một bản ghi CNAME cho n8n của bạn:
@@ -56,11 +55,6 @@ GitHub Action workflow (`n8n-auto-deploy.yml`) sẽ tự động được kích 
   - `DEPLOY_PATH`: Đường dẫn đến thư mục chứa docker-compose files trên server
     ```
     /home/user/n8n hoặc đường dẫn khác
-    ```
-
-  - `CLOUDFLARE_TUNNEL_TOKEN`: Token của Cloudflare Tunnel
-    ```
-    eyJhbGciOiJSUzI1NiIsImtpZCI6IkNsb3VkZmxhcmUgVH... (token từ bước tạo tunnel)
     ```
 
   - (Tùy chọn) `TELEGRAM_BOT_TOKEN`: Token bot Telegram nếu muốn nhận thông báo
