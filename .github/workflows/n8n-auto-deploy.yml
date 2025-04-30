@@ -23,6 +23,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Clean existing n8n data
+        run: |
+          # Lưu ý: điều này sẽ xóa tất cả dữ liệu n8n hiện tại
+          rm -rf ./n8n_data
+          mkdir -p ./n8n_data
+          mkdir -p ./ssh
+
       - name: Create .env file from secrets
         run: |
           echo "Creating .env file..."
