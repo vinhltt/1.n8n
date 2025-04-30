@@ -9,6 +9,7 @@ on:
       - 'cloudflared-config/**'
       - 'workflows/**'
       - '.github/workflows/**'
+      - 'deploy-n8n.sh'
   workflow_dispatch:
     # Cho phép kích hoạt thủ công
 
@@ -67,23 +68,22 @@ jobs:
             echo "❌ Failed to create .env file"
             exit 1
           fi
-
-      - name: Deploy n8n
-        run: |
-          echo "Deploying n8n..."
           
-          # Thực hiện pull và restart
-          echo "Running docker-compose commands..."
-          echo "Running docker-compose down:"
-          docker-compose down -v
-          echo "Down exit code: $?"
-          echo "Running docker-compose pull:"
-          docker-compose pull
-          echo "Pull exit code: $?"
-          echo "Running docker-compose up -d:"
-          docker-compose up -d
+      - name: Prepare deployment script
+        run: |
+          # Cấp quyền thực thi cho script triển khai
+          chmod +x ./deploy-n8n.sh
+          echo "✅ Deployment script is ready"
 
-          echo "Up exit code: $?"
+      - name: Deploy n8n using script
+        run: |
+          echo "🚀 Deploying n8n using deployment script..."
+          
+          # Dừng container hiện tại (nếu có)
+          docker-compose down -v
+          
+          # Chạy script triển khai
+          ./deploy-n8n.sh
           
       # Gửi thông báo Telegram (luôn gửi dù thành công hay thất bại)
       - name: Send notification
