@@ -25,9 +25,8 @@ services:
     ports:
       - "5678:5678"
     volumes:
-      - ./n8n_data:/home/node/.n8n # Sử dụng Docker volume để lưu dữ liệu
+      - n8n_data:/home/node/.n8n # Sử dụng Docker named volume thay vì bind mount
       - ./ssh:/home/node/.ssh # Mount thư mục .ssh từ host vào container
-      # Hoặc map thư mục local: - ./n8n_data:/home/node/.n8n
     depends_on:
       - postgresdb # Đảm bảo Postgres khởi động trước n8n
     environment:
