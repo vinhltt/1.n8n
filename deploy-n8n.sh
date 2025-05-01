@@ -1,5 +1,6 @@
 #!/bin/bash
 # deploy-n8n.sh - Script triển khai n8n với khả năng xử lý lỗi nâng cao
+# Phiên bản cải tiến: Giữ nguyên dữ liệu, chỉ sửa file config nếu cần
 
 # Hiển thị banner
 echo "=============================================="
@@ -20,24 +21,44 @@ handle_error() {
 # 1. Chuẩn bị môi trường
 log "🧹 Đang chuẩn bị môi trường..."
 
-# Tạo thư mục n8n_data trước để sở hữu file config
+# Tạo thư mục n8n_data trước nếu chưa tồn tại
 if [ ! -d "./n8n_data" ]; then
   mkdir -p ./n8n_data
   log "✅ Đã tạo thư mục n8n_data"
 fi
 
-# Tạo file config trước khi khởi động container, với giá trị từ .env
-if [ -f ".env" ]; then
-  CLEAN_KEY=$(grep "N8N_ENCRYPTION_KEY" .env | cut -d '=' -f2 | xargs)
-  if [ ! -z "$CLEAN_KEY" ]; then
-    log "📝 Tạo file config với encryptionKey từ .env..."
-    echo "{\"encryptionKey\": \"$CLEAN_KEY\"}" > ./n8n_data/config
-    log "✅ Đã tạo file config"
+# Sao lưu file config hiện tại nếu có
+if [ -f "./n8n_data/config" ]; then
+  log "📦 Sao lưu file config hiện tại..."
+  cp "./n8n_data/config" "./n8n_data/config.bak"
+  log "✅ Đã sao lưu file config"
+fi
+
+# Kiểm tra file config hiện tại xem có chứa chú thích không mong muốn không
+CONFIG_ISSUE=false
+if [ -f "./n8n_data/config" ]; then
+  if grep -q "# <<<=== THAY BẰNG KHÓA MẠNH CỦA BẠN" "./n8n_data/config"; then
+    log "⚠️ Phát hiện chú thích không mong muốn trong file config hiện tại"
+    CONFIG_ISSUE=true
+  fi
+fi
+
+# CHỈ tạo file config mới nếu không tồn tại hoặc có vấn đề
+if [ ! -f "./n8n_data/config" ] || [ "$CONFIG_ISSUE" = true ]; then
+  if [ -f ".env" ]; then
+    CLEAN_KEY=$(grep "N8N_ENCRYPTION_KEY" .env | cut -d '=' -f2 | xargs)
+    if [ ! -z "$CLEAN_KEY" ]; then
+      log "📝 Tạo file config với encryptionKey từ .env..."
+      echo "{\"encryptionKey\": \"$CLEAN_KEY\"}" > ./n8n_data/config
+      log "✅ Đã tạo file config mới"
+    else
+      log "⚠️ Không tìm thấy N8N_ENCRYPTION_KEY trong file .env"
+    fi
   else
-    log "⚠️ Không tìm thấy N8N_ENCRYPTION_KEY trong file .env"
+    log "⚠️ Không tìm thấy file .env"
   fi
 else
-  log "⚠️ Không tìm thấy file .env"
+  log "✅ File config hiện tại không có vấn đề, giữ nguyên"
 fi
 
 # 2. Pull images mới nhất
@@ -50,12 +71,8 @@ log "⏹️ Dừng containers hiện tại..."
 docker-compose down || true
 log "✅ Đã dừng các containers hiện tại"
 
-# 4. Kiểm tra và xóa volumes n8n_data nếu cần
-log "🔍 Kiểm tra volumes Docker..."
-if docker volume ls | grep -q "n8n_data"; then
-  log "🗑️ Xóa volume n8n_data cũ..."
-  docker volume rm n8n_data || true
-fi
+# 4. GIỮ NGUYÊN VOLUMES - Không xóa volumes nữa
+log "✅ Giữ nguyên dữ liệu n8n hiện có"
 
 # 5. Khởi động container
 log "🚀 Đang khởi động containers..."
