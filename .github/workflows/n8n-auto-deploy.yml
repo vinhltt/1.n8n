@@ -24,12 +24,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Clean existing n8n data
+      - name: Prepare n8n directories
         run: |
-          # Lưu ý: điều này sẽ xóa tất cả dữ liệu n8n hiện tại
-          rm -rf ./n8n_data
+          # Tạo thư mục n8n_data và ssh nếu chưa tồn tại (không xóa dữ liệu cũ)
           mkdir -p ./n8n_data
           mkdir -p ./ssh
+          echo "✅ Đã chuẩn bị thư mục, giữ nguyên dữ liệu n8n hiện có"
 
       - name: Create .env file from secrets
         run: |
@@ -79,8 +79,8 @@ jobs:
         run: |
           echo "🚀 Deploying n8n using deployment script..."
           
-          # Dừng container hiện tại (nếu có)
-          docker-compose down -v
+          # Dừng container hiện tại (nếu có) - không xóa volumes
+          docker-compose down
           
           # Chạy script triển khai
           ./deploy-n8n.sh
