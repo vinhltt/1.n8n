@@ -43,17 +43,17 @@ GitHub Action workflow (`n8n-auto-deploy.yml`) sẽ tự động được kích 
 
 2. Thêm các secrets sau:
   - `SSH_PRIVATE_KEY`: Khóa SSH private để xác thực với server
-    ```
+    ```bash title="SSH_PRIVATE_KEY"
     # Nội dung của file ~/.ssh/id_rsa
     ```
 
   - `SSH_USER`: Tên người dùng SSH
-    ```
+    ```bash title="SSH_USER"
     ubuntu, root, hoặc tên người dùng của bạn
     ```
 
   - `DEPLOY_PATH`: Đường dẫn đến thư mục chứa docker-compose files trên server
-    ```
+    ```bash title="DEPLOY_PATH"
     /home/user/n8n hoặc đường dẫn khác
     ```
 
@@ -66,7 +66,7 @@ GitHub Action workflow (`n8n-auto-deploy.yml`) sẽ tự động được kích 
 
 Đảm bảo server của bạn đã cài đặt Docker và Docker Compose:
 
-```bash
+```bash title="Cài đặt Docker và Docker Compose"
 # Cài đặt Docker
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
@@ -80,7 +80,7 @@ sudo apt-get install -y docker-compose-plugin
 
 Nếu SSH server chưa được cài đặt (đặc biệt là khi gặp lỗi "Connection refused"), hãy cài đặt và kích hoạt nó:
 
-```bash
+```bash title="Cài đặt SSH Server"
 # Cài đặt SSH server
 sudo apt update
 sudo apt install -y openssh-server
@@ -98,7 +98,7 @@ ssh localhost
 
 Nếu gặp vấn đề khi kết nối, hãy kiểm tra cấu hình SSH:
 
-```bash
+```bash title="Kiểm tra cấu hình SSH"
 # Kiểm tra cấu hình SSH
 cat /etc/ssh/sshd_config | grep "Port"
 
@@ -111,7 +111,7 @@ sudo ufw status
 
 Đảm bảo server của bạn có SSH key được cấu hình:
 
-```bash
+```bash title="Thiết lập SSH key"
 # Tạo thư mục .ssh nếu chưa tồn tại
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh
@@ -125,7 +125,7 @@ chmod 600 ~/.ssh/authorized_keys
 
 Tạo thư mục để chứa các file docker-compose trên server:
 
-```bash
+```bash title="Tạo thư mục triển khai"
 mkdir -p /đường/dẫn/đến/thư/mục/triển/khai
 ```
 

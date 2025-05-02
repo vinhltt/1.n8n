@@ -21,7 +21,7 @@ File này hướng dẫn cách thiết lập GitHub Self-hosted Runner trên ser
   - Làm theo hướng dẫn để tải xuống và cài đặt runner
 
 3. **Thực thi script cài đặt trên server**:
-  ```bash
+  ```bash title="Cài đặt GitHub Runner"
   # Tải xuống
   mkdir actions-runner && cd actions-runner
   curl -o actions-runner-linux-x64-2.311.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.311.0/actions-runner-linux-x64-2.311.0.tar.gz
@@ -38,7 +38,7 @@ File này hướng dẫn cách thiết lập GitHub Self-hosted Runner trên ser
   ```
 
 4. **Đảm bảo runner có quyền chạy Docker**:
-  ```bash
+  ```bash title="Cấp quyền Docker"
   # Thêm user vào nhóm docker
   sudo usermod -aG docker $USER
   
@@ -50,7 +50,7 @@ File này hướng dẫn cách thiết lập GitHub Self-hosted Runner trên ser
 
 Sau khi thiết lập runner, cập nhật file GitHub Actions workflow để sử dụng self-hosted runner:
 
-```yaml
+```yaml title="GitHub Actions Workflow"
 name: Deploy n8n
 
 on:
