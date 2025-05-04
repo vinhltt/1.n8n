@@ -21,6 +21,9 @@ services:
 
   n8n:
     container_name: n8n_main  # Tên container tùy chọn
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: always
     ports:
       - "5678:5678"

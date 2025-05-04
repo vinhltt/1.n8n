@@ -61,30 +61,35 @@ else
   log "✅ File config hiện tại không có vấn đề, giữ nguyên"
 fi
 
-# 2. Pull images mới nhất
+# 2. Build image n8n với các thư viện bổ sung từ Dockerfile
+log "🔨 Đang build image n8n với các thư viện bổ sung..."
+docker-compose build n8n || handle_error "Không thể build image n8n"
+log "✅ Đã build image n8n thành công"
+
+# 3. Pull images mới nhất cho các dịch vụ khác
 log "🔄 Đang pull images mới nhất..."
 docker-compose pull || handle_error "Không thể pull images"
 log "✅ Đã pull images thành công"
 
-# 3. Dừng container hiện tại (nếu có)
+# 4. Dừng container hiện tại (nếu có)
 log "⏹️ Dừng containers hiện tại..."
 docker-compose down || true
 log "✅ Đã dừng các containers hiện tại"
 
-# 4. GIỮ NGUYÊN VOLUMES - Không xóa volumes nữa
+# 5. GIỮ NGUYÊN VOLUMES - Không xóa volumes nữa
 log "✅ Giữ nguyên dữ liệu n8n hiện có"
 
-# 5. Khởi động container
+# 6. Khởi động container
 log "🚀 Đang khởi động containers..."
 docker-compose up -d || handle_error "Không thể khởi động containers"
 log "✅ Đã khởi động containers thành công"
 
-# 6. Đợi n8n khởi động
+# 7. Đợi n8n khởi động
 log "⏳ Đang đợi n8n khởi động..."
 sleep 15
 log "✅ Đã đợi đủ thời gian cho n8n khởi động"
 
-# 7. Kiểm tra trạng thái container
+# 8. Kiểm tra trạng thái container
 log "🔍 Kiểm tra trạng thái container n8n..."
 if ! docker ps | grep -q "n8n_main"; then
   log "⚠️ Container n8n_main không đang chạy, kiểm tra logs..."
@@ -93,7 +98,7 @@ if ! docker ps | grep -q "n8n_main"; then
 fi
 log "✅ Container n8n_main đang chạy"
 
-# 8. Kiểm tra file config
+# 9. Kiểm tra file config
 log "🔍 Kiểm tra file config của n8n..."
 CONFIG_CONTENT=$(docker exec n8n_main cat /home/node/.n8n/config 2>/dev/null)
 if [ $? -ne 0 ]; then
@@ -158,11 +163,20 @@ else
   log "✅ Không tìm thấy chú thích không mong muốn trong file config"
 fi
 
-# 10. Kiểm tra trạng thái các container
+# 10. Kiểm tra thư viện msoffcrypto-tool
+log "🔍 Kiểm tra cài đặt thư viện msoffcrypto-tool..."
+if docker exec n8n_main bash -c "pip3 list | grep -q msoffcrypto-tool"; then
+  MSOFFCRYPTO_VERSION=$(docker exec n8n_main bash -c "pip3 list | grep msoffcrypto-tool" | awk '{print $2}')
+  log "✅ Thư viện msoffcrypto-tool đã được cài đặt (phiên bản $MSOFFCRYPTO_VERSION)"
+else
+  log "⚠️ Thư viện msoffcrypto-tool chưa được cài đặt đúng cách"
+fi
+
+# 11. Kiểm tra trạng thái các container
 log "🔍 Kiểm tra trạng thái các container..."
 docker-compose ps
 
-# 11. Hiển thị URL truy cập n8n
+# 12. Hiển thị URL truy cập n8n
 log "🌐 n8n đã được triển khai thành công và có thể truy cập tại:"
 echo "   http://localhost:5678"
 if [ ! -z "$WEBHOOK_URL" ]; then
