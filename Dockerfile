@@ -7,8 +7,9 @@ USER root
 
 # Cài đặt Python và pip sử dụng apk (Alpine Linux package manager)
 # và sau đó cài đặt msoffcrypto-tool
+# Sử dụng --break-system-packages để giải quyết vấn đề với PEP 668
 RUN apk add --no-cache python3 py3-pip && \
-    pip3 install --no-cache-dir msoffcrypto-tool && \
+    pip3 install --no-cache-dir --break-system-packages msoffcrypto-tool && \
     # Đảm bảo các công cụ cơ bản được cài đặt
     apk add --no-cache bash curl && \
     # Xóa cache để giảm kích thước image
