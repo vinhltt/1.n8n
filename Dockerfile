@@ -5,12 +5,14 @@ FROM docker.n8n.io/n8nio/n8n
 # Chuyển sang người dùng root để cài đặt gói
 USER root
 
-# Cài đặt các dependencies cần thiết và msoffcrypto-tool
-RUN apt-get update && \
-    apt-get install -y python3 python3-pip && \
-    pip3 install msoffcrypto-tool && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Cài đặt Python và pip sử dụng apk (Alpine Linux package manager)
+# và sau đó cài đặt msoffcrypto-tool
+RUN apk add --no-cache python3 py3-pip && \
+    pip3 install --no-cache-dir msoffcrypto-tool && \
+    # Đảm bảo các công cụ cơ bản được cài đặt
+    apk add --no-cache bash curl && \
+    # Xóa cache để giảm kích thước image
+    rm -rf /var/cache/apk/*
 
 # Trở lại người dùng node (người dùng mặc định trong container n8n)
 USER node
