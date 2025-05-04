@@ -3,13 +3,6 @@ name: Auto Deploy n8n
 on:
   push:
     branches: [ master ]
-    paths:
-      - 'docker-compose.yml'
-      - 'docker-compose.override.yml'
-      - 'cloudflared-config/**'
-      - 'workflows/**'
-      - '.github/workflows/**'
-      - 'deploy-n8n.sh'
   workflow_dispatch:
     # Cho phép kích hoạt thủ công
 
