@@ -27,6 +27,8 @@ services:
     restart: always
     ports:
       - "5678:5678"
+    networks:
+      - default # Sử dụng mạng mặc định đã định nghĩa ở file kia
     volumes:
       - n8n_data:/home/node/.n8n # Sử dụng Docker named volume thay vì bind mount
       - ./ssh:/home/node/.ssh # Mount thư mục .ssh từ host vào container
