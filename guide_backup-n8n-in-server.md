@@ -53,20 +53,23 @@ Trước khi bắt đầu, hãy đảm bảo bạn có các thông tin và file 
     # Lệnh này sẽ giải nén, xóa DB cũ (nếu có), tạo DB mới và nạp dữ liệu
     docker exec -i -e PGPASSWORD=YOUR_DB_PASSWORD postgresdb bash -c ' \
         echo "--- Decompressing backup file ---" && \
-        gunzip /tmp/n8n_restore_db.sql.gz && \
+        gunzip -f /tmp/n8n_restore_db.sql.gz && \
         echo "--- Dropping existing database (n8n_database) if exists ---" && \
         dropdb -U YOUR_DB_USER --if-exists n8n_database && \
         echo "--- Creating new database (n8n_database) ---" && \
         createdb -U YOUR_DB_USER n8n_database && \
         echo "--- Restoring database from /tmp/n8n_restore_db.sql ---" && \
-        psql -U YOUR_DB_USER -d n8n_database < /tmp/n8n_restore_db.sql && \
+        pg_restore -U YOUR_DB_USER -d n8n_database -v /tmp/n8n_restore_db.sql && \
         echo "--- Cleaning up temporary file ---" && \
         rm /tmp/n8n_restore_db.sql && \
         echo "--- Database restore completed ---" \
     '
     ```
     * Lệnh `dropdb --if-exists` sẽ xóa database `n8n_database` hiện có trước khi tạo mới và khôi phục.
+    * `pg_restore` được sử dụng thay vì `psql` vì các file backup thường là định dạng custom PostgreSQL, không phải SQL thuần.
     * Theo dõi output để đảm bảo không có lỗi xảy ra.
+
+    **Lưu ý quan trọng:** Nếu file backup của bạn là định dạng SQL thuần (không phải custom format), bạn sẽ cần sử dụng `psql` thay vì `pg_restore`. Bạn có thể xác định bằng cách kiểm tra thông báo lỗi khi khôi phục. Nếu gặp lỗi "The input is a PostgreSQL custom-format dump", hãy sử dụng `pg_restore` như trong ví dụ.
 
 ### Bước 2: Khôi phục Dữ liệu n8n (Docker Volume `n8n_data`)
 
@@ -111,3 +114,23 @@ docker start n8n_main
     * Các Credentials (thông tin đăng nhập dịch vụ) có còn đó không? (Lưu ý: Bạn có thể cần kích hoạt lại một số credentials).
     * Lịch sử thực thi (Executions) cũ có hiển thị không (nếu bạn không cấu hình tự động xóa chúng)?
 * Nếu mọi thứ hoạt động như mong đợi, quá trình khôi phục đã thành công.
+
+## Sử dụng Script Khôi phục Tự Động
+
+Ngoài hướng dẫn thủ công ở trên, bạn cũng có thể sử dụng script `restore-n8n-db.sh` đã được cấu hình sẵn để khôi phục database:
+
+```bash
+# Di chuyển đến thư mục chứa script
+cd /path/to/your/n8n/folder
+
+# Cấp quyền thực thi nếu cần
+chmod +x restore-n8n-db.sh
+
+# Chạy script khôi phục database (sử dụng đường dẫn mặc định là /tmp/n8n_restore_db.sql.gz)
+./restore-n8n-db.sh
+
+# Hoặc chỉ định đường dẫn đến file backup
+./restore-n8n-db.sh /path/to/your/backup/n8n_db_backup.sql.gz
+```
+
+Script này sẽ tự động xử lý các bước khôi phục database, bao gồm việc phát hiện định dạng file backup và sử dụng công cụ phù hợp (`pg_restore` hoặc `psql`) để khôi phục.

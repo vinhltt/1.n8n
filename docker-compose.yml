@@ -7,6 +7,12 @@ services:
     image: docker.n8n.io/n8nio/n8n  
     container_name: n8n_main # Sử dụng tên container gốc
     
+  pfm_excel_api:
+    build: 
+      context: ./src
+      dockerfile: ExcelApi/Dockerfile
+    container_name: pfm_excel_api
+    
 #network section
 networks:
   default:

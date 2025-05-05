@@ -61,15 +61,15 @@ else
   log "✅ File config hiện tại không có vấn đề, giữ nguyên"
 fi
 
-# 2. Build image n8n với các thư viện bổ sung từ Dockerfile
-log "🔨 Đang build image n8n với các thư viện bổ sung..."
-docker-compose build n8n || handle_error "Không thể build image n8n"
-log "✅ Đã build image n8n thành công"
-
-# 3. Pull images mới nhất cho các dịch vụ khác
+# 2. Pull images mới nhất cho các dịch vụ khác
 log "🔄 Đang pull images mới nhất..."
 docker-compose pull || handle_error "Không thể pull images"
 log "✅ Đã pull images thành công"
+
+# 3. Build images for all services defined in docker-compose.yml
+log "🔨 Đang build images cho tất cả các dịch vụ..."
+docker-compose build || handle_error "Không thể build images"
+log "✅ Đã build images thành công"
 
 # 4. Dừng container hiện tại (nếu có)
 log "⏹️ Dừng containers hiện tại..."
@@ -81,7 +81,7 @@ log "✅ Giữ nguyên dữ liệu n8n hiện có"
 
 # 6. Khởi động container
 log "🚀 Đang khởi động containers..."
-docker-compose up -d || handle_error "Không thể khởi động containers"
+docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d || handle_error "Không thể khởi động containers"
 log "✅ Đã khởi động containers thành công"
 
 # 7. Đợi n8n khởi động

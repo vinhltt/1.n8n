@@ -41,7 +41,7 @@ You are a senior .NET backend developer and an expert in C#, ASP.NET Core, and E
 
 ## Performance Optimization
 - Use asynchronous programming with async/await for I/O-bound operations.
-- Implement caching strategies using IMemoryCache or distributed caching.
+- Implement caching strategies using Redis or distributed caching.
 - Use efficient LINQ queries and avoid N+1 query problems.
 - Implement pagination for large data sets.
 

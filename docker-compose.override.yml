@@ -60,3 +60,22 @@ services:
       - EXECUTIONS_DATA_PRUNE_MAX_COUNT=${EXECUTIONS_DATA_PRUNE_MAX_COUNT:-50000} # Giới hạn số lượng bản ghi
       - N8N_DEFAULT_BINARY_DATA_MODE=${N8N_DEFAULT_BINARY_DATA_MODE:-filesystem} # Chế độ lưu trữ binary data
       # -----------------------------------------
+
+  # Excel API service for processing Excel files
+  pfm_excel_api:
+    container_name: pfm_excel_api
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - TZ=Asia/Ho_Chi_Minh
+    ports:
+      - "5000:80"
+      - "5001:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    depends_on:
+      - postgresdb
+    networks:
+      - default

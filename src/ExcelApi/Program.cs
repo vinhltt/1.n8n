@@ -3,7 +3,7 @@ using ExcelApi.Services;
 using System.Reflection;
 using System.Text;
 
-// Đăng ký Code Page Provider để tránh lỗi encoding 1252 cho ExcelDataReader
+// fix error encoding 1252 cho ExcelDataReader
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +17,6 @@ builder.Services.AddScoped<IExcelProcessingService, ExcelProcessingService>();
 // Add Swagger/OpenAPI services
 builder.Services.AddEndpointsApiExplorer();
 
-// Configure Swagger with proper file upload support
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo

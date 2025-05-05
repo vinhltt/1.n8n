@@ -8,38 +8,32 @@ namespace ExcelApi.Controllers
     /// <summary>
     /// Controller for handling Excel file operations
     /// </summary>
+    /// <remarks>
+    /// Initializes a new instance of the ExcelController
+    /// </remarks>
     [ApiController]
     [Route("api/[controller]")]
-    public class ExcelController : ControllerBase
+    public class ExcelController(IExcelProcessingService excelProcessingService) : ControllerBase
     {
-        private readonly IExcelProcessingService _excelProcessingService;
 
         /// <summary>
-        /// Initializes a new instance of the ExcelController
-        /// </summary>
-        public ExcelController(IExcelProcessingService excelProcessingService)
-        {
-            _excelProcessingService = excelProcessingService;
-        }
-
-        /// <summary>
-        /// Uploads and processes an Excel file
+        /// Uploads and extract data in Excel file
         /// </summary>
         /// <param name="model">The file upload model containing the Excel file and configuration options</param>
         /// <returns>Processed data from the Excel file</returns>
         /// <response code="200">Returns the processed data</response>
         /// <response code="400">If the file is null or empty</response>
         /// <response code="500">If there was an internal error processing the file</response>
-        [HttpPost("upload")]
+        [HttpPost("extract")]
         [Consumes("multipart/form-data")]
         [SwaggerOperation(
-            Summary = "Upload an Excel file",
+            Summary = "Extract data in Excel file",
             Description = "Uploads an Excel file and processes its content. Headers, header row index, and end marker can all be customized."
         )]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UploadExcel([FromForm] FileUploadModel model)
+        public async Task<IActionResult> ExtractDataInExcel([FromForm] FileUploadModel model)
         {
             if (model?.File == null || model.File.Length == 0)
             {
@@ -48,7 +42,7 @@ namespace ExcelApi.Controllers
 
             try
             {
-                var result = await _excelProcessingService.ProcessExcelFileAsync(
+                var result = await excelProcessingService.ProcessExcelFileAsync(
                     model.File, 
                     model.Password, 
                     model.Headers,
