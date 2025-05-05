@@ -8,8 +8,10 @@ Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add services to the container.
-builder.Services.AddControllers();
+// Add NewtonsoftJson support for more flexible JSON handling
+builder.Services.AddControllers().AddNewtonsoftJson();
 
 // Register ExcelProcessingService
 builder.Services.AddScoped<IExcelProcessingService, ExcelProcessingService>();
