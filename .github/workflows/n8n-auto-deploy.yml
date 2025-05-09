@@ -28,10 +28,13 @@ jobs:
           # Xác định môi trường
           if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
             ENV_SUFFIX="prod"
+            ENV_DIR="n8n-prod"
           elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             ENV_SUFFIX="staging"
+            ENV_DIR="n8n-staging"
           else
             ENV_SUFFIX="dev"
+            ENV_DIR="n8n-dev"
           fi
           
           # Tạo và xóa thư mục tạm cho môi trường cụ thể
@@ -73,18 +76,21 @@ jobs:
           if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
             ENV_SUFFIX="prod"
             WORKSPACE_DIR="n8n-prod"
+            ENV_FILE="$WORKSPACE_DIR/.env.prod"
           elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             ENV_SUFFIX="staging"
             WORKSPACE_DIR="n8n-staging"
+            ENV_FILE="$WORKSPACE_DIR/.env.staging"
           else
             ENV_SUFFIX="dev"
             WORKSPACE_DIR="n8n-dev"
+            ENV_FILE="$WORKSPACE_DIR/.env.dev"
           fi
           
           echo "Creating .env file for $ENV_SUFFIX environment..."
           
           # Tạo file .env từ GitHub Secrets và Variables
-          cat > "$WORKSPACE_DIR/.env" << EOF
+          cat > "$ENV_FILE" << EOF
           # PostgreSQL
           POSTGRES_USER=${{ secrets.POSTGRES_USER || 'n8n' }}
           POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
@@ -109,8 +115,32 @@ jobs:
           ENVIRONMENT=$ENV_SUFFIX
           EOF
           
-          echo "✅ .env file created successfully for $ENV_SUFFIX environment"
+          # Tạo symlink từ .env đến file .env cụ thể
+          ln -sf "$ENV_FILE" "$WORKSPACE_DIR/.env"
           
+          echo "✅ .env file created successfully for $ENV_SUFFIX environment"
+
+      - name: Build Excel API image
+        run: |
+          # Xác định môi trường và đường dẫn
+          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            WORKSPACE_DIR="n8n-prod"
+          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            WORKSPACE_DIR="n8n-staging"
+          else
+            WORKSPACE_DIR="n8n-dev"
+          fi
+          
+          echo "🔨 Building Excel API image..."
+          
+          # Di chuyển vào thư mục chứa source code Excel API
+          cd "$WORKSPACE_DIR/src/ExcelApi"
+          
+          # Build image
+          docker build -t pfm-excel-api:latest .
+          
+          echo "✅ Excel API image built successfully"
+
       - name: Prepare deployment script
         run: |
           # Xác định môi trường và đường dẫn
@@ -150,6 +180,10 @@ jobs:
           
           # Dừng container hiện tại (nếu có) - không xóa volumes
           docker-compose down
+          
+          # Pull PostgreSQL image trước
+          echo "📥 Pulling PostgreSQL image..."
+          docker pull postgres:15
           
           # Chạy script triển khai
           ./deploy-n8n.$ENV_SUFFIX.sh
