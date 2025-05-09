@@ -2,34 +2,89 @@ name: Auto Deploy n8n
 
 on:
   push:
-    branches: [ master ]
+    branches: 
+      - master
+      - staging
+      - develop
   workflow_dispatch:
-    # Cho phép kích hoạt thủ công
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+          - development
 
 jobs:
   deploy:
-    runs-on: self-hosted  # Chỉ định sử dụng self-hosted runner thay vì ubuntu-latest
+    runs-on: self-hosted
+    environment: ${{ github.ref == 'refs/heads/master' && 'production' || github.ref == 'refs/heads/staging' && 'staging' || 'development' }}
     steps:
       - name: Clean runner temp env files
         run: |
-          rm -f $RUNNER_WORKSPACE/_temp/*
+          # Xác định môi trường
+          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            ENV_SUFFIX="prod"
+          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            ENV_SUFFIX="staging"
+          else
+            ENV_SUFFIX="dev"
+          fi
+          
+          # Tạo và xóa thư mục tạm cho môi trường cụ thể
+          ENV_TEMP_DIR="$RUNNER_WORKSPACE/_temp_$ENV_SUFFIX"
+          rm -rf "$ENV_TEMP_DIR"
+          mkdir -p "$ENV_TEMP_DIR"
+          echo "✅ Đã chuẩn bị thư mục tạm cho môi trường $ENV_SUFFIX"
 
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          path: ${{ github.ref == 'refs/heads/master' && 'n8n-prod' || github.ref == 'refs/heads/staging' && 'n8n-staging' || 'n8n-dev' }}
 
       - name: Prepare n8n directories
         run: |
-          # Tạo thư mục n8n_data và ssh nếu chưa tồn tại (không xóa dữ liệu cũ)
-          mkdir -p ./n8n_data
-          mkdir -p ./ssh
-          echo "✅ Đã chuẩn bị thư mục, giữ nguyên dữ liệu n8n hiện có"
+          # Xác định môi trường và đường dẫn
+          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            ENV_SUFFIX="prod"
+            WORKSPACE_DIR="n8n-prod"
+            N8N_DATA_DIR="n8n_data"
+          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            ENV_SUFFIX="staging"
+            WORKSPACE_DIR="n8n-staging"
+            N8N_DATA_DIR="n8n_data_staging"
+          else
+            ENV_SUFFIX="dev"
+            WORKSPACE_DIR="n8n-dev"
+            N8N_DATA_DIR="n8n_data_dev"
+          fi
+          
+          # Tạo thư mục n8n_data và ssh cho môi trường cụ thể
+          mkdir -p "$WORKSPACE_DIR/$N8N_DATA_DIR"
+          mkdir -p "$WORKSPACE_DIR/ssh"
+          echo "✅ Đã chuẩn bị thư mục cho môi trường $ENV_SUFFIX"
 
       - name: Create .env file from secrets
         run: |
-          echo "Creating .env file..."
+          # Xác định môi trường và đường dẫn
+          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            ENV_SUFFIX="prod"
+            WORKSPACE_DIR="n8n-prod"
+          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            ENV_SUFFIX="staging"
+            WORKSPACE_DIR="n8n-staging"
+          else
+            ENV_SUFFIX="dev"
+            WORKSPACE_DIR="n8n-dev"
+          fi
+          
+          echo "Creating .env file for $ENV_SUFFIX environment..."
           
           # Tạo file .env từ GitHub Secrets và Variables
-          cat > .env << EOF
+          cat > "$WORKSPACE_DIR/.env" << EOF
           # PostgreSQL
           POSTGRES_USER=${{ secrets.POSTGRES_USER || 'n8n' }}
           POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
@@ -49,55 +104,82 @@ jobs:
           EXECUTIONS_DATA_PRUNE=${{ secrets.EXECUTIONS_DATA_PRUNE || 'true' }}
           EXECUTIONS_DATA_MAX_AGE=${{ secrets.EXECUTIONS_DATA_MAX_AGE || '720' }}
           EXECUTIONS_DATA_PRUNE_MAX_COUNT=${{ secrets.EXECUTIONS_DATA_PRUNE_MAX_COUNT || '50000' }}
+          
+          # Environment specific
+          ENVIRONMENT=$ENV_SUFFIX
           EOF
           
-          # Hiển thị thông báo thành công (không hiển thị nội dung của file vì bảo mật)
-          echo "✅ .env file created successfully"
-          
-          # Kiểm tra xem file đã tồn tại chưa
-          if [ -f .env ]; then
-            echo "✅ .env file exists"
-          else
-            echo "❌ Failed to create .env file"
-            exit 1
-          fi
+          echo "✅ .env file created successfully for $ENV_SUFFIX environment"
           
       - name: Prepare deployment script
         run: |
+          # Xác định môi trường và đường dẫn
+          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            ENV_SUFFIX="prod"
+            WORKSPACE_DIR="n8n-prod"
+          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            ENV_SUFFIX="staging"
+            WORKSPACE_DIR="n8n-staging"
+          else
+            ENV_SUFFIX="dev"
+            WORKSPACE_DIR="n8n-dev"
+          fi
+          
           # Cấp quyền thực thi cho script triển khai
-          chmod +x ./deploy-n8n.sh
-          echo "✅ Deployment script is ready"
+          chmod +x "$WORKSPACE_DIR/deploy-n8n.$ENV_SUFFIX.sh"
+          echo "✅ Deployment script is ready for $ENV_SUFFIX environment"
 
       - name: Deploy n8n using script
         run: |
-          echo "🚀 Deploying n8n using deployment script..."
+          # Xác định môi trường và đường dẫn
+          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            ENV_SUFFIX="prod"
+            WORKSPACE_DIR="n8n-prod"
+          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            ENV_SUFFIX="staging"
+            WORKSPACE_DIR="n8n-staging"
+          else
+            ENV_SUFFIX="dev"
+            WORKSPACE_DIR="n8n-dev"
+          fi
+          
+          echo "🚀 Deploying n8n using deployment script for $ENV_SUFFIX environment..."
+          
+          # Di chuyển vào thư mục workspace
+          cd "$WORKSPACE_DIR"
           
           # Dừng container hiện tại (nếu có) - không xóa volumes
           docker-compose down
           
           # Chạy script triển khai
-          ./deploy-n8n.sh
+          ./deploy-n8n.$ENV_SUFFIX.sh
           
-      # Gửi thông báo Telegram (luôn gửi dù thành công hay thất bại)
       - name: Send notification
-        if: always()  # Thay đổi từ success() thành always() để luôn gửi thông báo
+        if: always()
         run: |
           if [[ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" && ! -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]]; then
+            # Xác định môi trường
+            if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+              ENV_SUFFIX="prod"
+            elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+              ENV_SUFFIX="staging"
+            else
+              ENV_SUFFIX="dev"
+            fi
+            
             # Tạo link đến GitHub Action run hiện tại
             ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             
             # Kiểm tra trạng thái của job
             if [ "${{ job.status }}" == "success" ]; then
-              # Thông báo thành công
               STATUS_EMOJI="✅"
-              STATUS_TEXT="Deployed n8n successfully!"
+              STATUS_TEXT="Deployed n8n to $ENV_SUFFIX environment successfully!"
             else
-              # Thông báo thất bại
               STATUS_EMOJI="❌"
-              STATUS_TEXT="Deployment n8n failed!"
+              STATUS_TEXT="Deployment n8n to $ENV_SUFFIX environment failed!"
             fi
             
-            # Gửi thông báo tới Telegram sử dụng JSON để đảm bảo xuống dòng hoạt động chính xác
+            # Gửi thông báo tới Telegram
             curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
               -H "Content-Type: application/json" \
               -d '{
