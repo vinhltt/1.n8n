@@ -51,6 +51,8 @@ jobs:
           echo "✅ Current containers stopped"
 
       - name: Migrate data
+        env:
+          COMPOSE_PROJECT_NAME: ${{ github.event.inputs.new_prefix }}
         run: |
           echo "🔄 Starting migration process..."
           
