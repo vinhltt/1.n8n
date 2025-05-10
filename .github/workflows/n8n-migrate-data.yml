@@ -55,24 +55,31 @@ jobs:
           COMPOSE_PROJECT_NAME: ${{ github.event.inputs.new_prefix }}
         run: |
           echo "🔄 Starting migration process..."
-          
-          # Tạo volumes mới với prefix mới
           docker volume create ${COMPOSE_PROJECT_NAME}_n8n_data
           docker volume create ${COMPOSE_PROJECT_NAME}_postgres_data
-          
-          # Restore data vào volumes mới
+
           echo "Restoring n8n data..."
+          BACKUP_FILE=$(ls -t $(pwd)/backup/n8n_data_backup_*.tar.gz 2>/dev/null | head -1)
+          if [ -z "$BACKUP_FILE" ]; then
+            echo "❌ Không tìm thấy file backup n8n_data!"
+            exit 1
+          fi
           docker run --rm \
             -v $(pwd)/backup:/backup \
             -v ${COMPOSE_PROJECT_NAME}_n8n_data:/target \
-            alpine sh -c "cd /target && tar xzf /backup/$(ls -t /backup/n8n_data_backup_*.tar.gz | head -1)"
-          
+            alpine sh -c "cd /target && tar xzf /backup/$(basename $BACKUP_FILE)"
+
           echo "Restoring PostgreSQL data..."
+          BACKUP_FILE=$(ls -t $(pwd)/backup/postgres_data_backup_*.tar.gz 2>/dev/null | head -1)
+          if [ -z "$BACKUP_FILE" ]; then
+            echo "❌ Không tìm thấy file backup postgres_data!"
+            exit 1
+          fi
           docker run --rm \
             -v $(pwd)/backup:/backup \
             -v ${COMPOSE_PROJECT_NAME}_postgres_data:/target \
-            alpine sh -c "cd /target && tar xzf /backup/$(ls -t /backup/postgres_data_backup_*.tar.gz | head -1)"
-          
+            alpine sh -c "cd /target && tar xzf /backup/$(basename $BACKUP_FILE)"
+
           echo "✅ Data migration completed"
 
       - name: Start new containers
