@@ -74,6 +74,14 @@ log "✅ Đã build images thành công"
 # 4. Dừng container hiện tại (nếu có)
 log "⏹️ Dừng containers hiện tại..."
 docker-compose down || true
+
+# Xóa container pfm_excel_api nếu còn tồn tại
+if docker ps -a --format '{{.Names}}' | grep -q '^pfm_excel_api$'; then
+  log "⚠️ Đang xóa container pfm_excel_api cũ..."
+  docker rm -f pfm_excel_api
+  log "✅ Đã xóa container pfm_excel_api cũ"
+fi
+
 log "✅ Đã dừng các containers hiện tại"
 
 # 5. GIỮ NGUYÊN VOLUMES - Không xóa volumes nữa
