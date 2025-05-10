@@ -80,8 +80,7 @@ log "✅ Đã dừng các containers hiện tại"
 log "✅ Giữ nguyên dữ liệu n8n hiện có"
 
 # 6. Khởi động container
-log "🚀 Đang khởi động containers..."
-docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d || handle_error "Không thể khởi động containers"
+docker-compose -f docker-compose.yml up -d || handle_error "Không thể khởi động containers"
 log "✅ Đã khởi động containers thành công"
 
 # 7. Đợi n8n khởi động
