@@ -29,7 +29,7 @@ services:
     networks:
       - default
     volumes:
-      - n8n_data:/home/node/.n8n
+      - ${COMPOSE_PROJECT_NAME}_n8n_data:/home/node/.n8n
       - ./ssh:/home/node/.ssh
     depends_on:
       - postgresdb
@@ -71,16 +71,12 @@ services:
 #network section
 networks:
   default:
-    name: n8n-network
+    name: ${COMPOSE_PROJECT_NAME}-n8n-network
     driver: bridge
     
 #volumes sect    external: true # Đánh dấu network là external để sử dụng network hiện có
     
 #volumes section
 volumes:
-  n8n_data: 
-    # Bỏ external: true để Docker tự tạo volume nếu chưa tồn tại
-    name: n8n_data
-  postgresdb_data: 
-    # Bỏ external: true để Docker tự tạo volume nếu chưa tồn tại
-    name: postgresdb_data
+  ${COMPOSE_PROJECT_NAME}_n8n_data:
+  ${COMPOSE_PROJECT_NAME}_postgres_data:
