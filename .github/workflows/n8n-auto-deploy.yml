@@ -76,15 +76,15 @@ jobs:
           if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
             ENV_SUFFIX="prod"
             WORKSPACE_DIR="n8n-prod"
-            ENV_FILE="$WORKSPACE_DIR/.env.prod"
+            ENV_FILE="$WORKSPACE_DIR/.env"
           elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             ENV_SUFFIX="staging"
             WORKSPACE_DIR="n8n-staging"
-            ENV_FILE="$WORKSPACE_DIR/.env.staging"
+            ENV_FILE="$WORKSPACE_DIR/.env"
           else
             ENV_SUFFIX="dev"
             WORKSPACE_DIR="n8n-dev"
-            ENV_FILE="$WORKSPACE_DIR/.env.dev"
+            ENV_FILE="$WORKSPACE_DIR/.env"
           fi
           
           echo "Creating .env file for $ENV_SUFFIX environment..."
