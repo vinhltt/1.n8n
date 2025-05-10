@@ -9,6 +9,7 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted  # Chỉ định sử dụng self-hosted runner thay vì ubuntu-latest
+    environment: production  # Thêm môi trường production
     steps:
       - name: Clean runner temp env files
         run: |
@@ -28,8 +29,11 @@ jobs:
         run: |
           echo "Creating .env file..."
           
-          # Tạo file .env từ GitHub Secrets và Variables
+          # Tạo file .env từ GitHub Secrets và Variables của môi trường
           cat > .env << EOF
+          # Project name
+          COMPOSE_PROJECT_NAME=${{ vars.COMPOSE_PROJECT_NAME || 'n8n' }}
+          
           # PostgreSQL
           POSTGRES_USER=${{ secrets.POSTGRES_USER || 'n8n' }}
           POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
