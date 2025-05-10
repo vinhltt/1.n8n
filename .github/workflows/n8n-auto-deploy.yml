@@ -115,9 +115,6 @@ jobs:
           ENVIRONMENT=$ENV_SUFFIX
           EOF
           
-          # Tạo symlink từ .env đến file .env cụ thể
-          ln -sf "$ENV_FILE" "$WORKSPACE_DIR/.env"
-          
           echo "✅ .env file created successfully for $ENV_SUFFIX environment"
 
       - name: Build Excel API image
