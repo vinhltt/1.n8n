@@ -1,18 +1,73 @@
 services:
   postgresdb:
-    image: postgres:15 # Hoặc dùng postgres:latest
-    container_name: postgresdb # Sử dụng tên container gốc
+    image: postgres:15
+    container_name: postgresdb
+    restart: always
+    environment:
+      POSTGRES_DB: n8n_database
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgresdb_data:/var/lib/postgresql/data
+    ports:
+      - "15432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   n8n:
-    image: docker.n8n.io/n8nio/n8n  
-    container_name: n8n_main # Sử dụng tên container gốc
-    
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n_main
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5678:5678"
+    networks:
+      - default
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./ssh:/home/node/.ssh
+    depends_on:
+      - postgresdb
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-Asia/Ho_Chi_Minh}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgresdb
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
+      - DB_POSTGRESDB_USER=${POSTGRES_USER}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE:-true}
+      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
+      - WEBHOOK_URL=${WEBHOOK_URL:-}
+      - EXECUTIONS_DATA_PRUNE=${EXECUTIONS_DATA_PRUNE:-true}
+      - EXECUTIONS_DATA_MAX_AGE=${EXECUTIONS_DATA_MAX_AGE:-720}
+      - EXECUTIONS_DATA_PRUNE_MAX_COUNT=${EXECUTIONS_DATA_PRUNE_MAX_COUNT:-50000}
+      - N8N_DEFAULT_BINARY_DATA_MODE=${N8N_DEFAULT_BINARY_DATA_MODE:-filesystem}
+
   pfm_excel_api:
     build: 
       context: ./src
       dockerfile: ExcelApi/Dockerfile
     container_name: pfm_excel_api
-    
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - TZ=Asia/Ho_Chi_Minh
+    ports:
+      - "5000:80"
+      - "5001:443"
+    networks:
+      - default
+
 #network section
 networks:
   default:

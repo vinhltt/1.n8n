@@ -1,0 +1,123 @@
+name: Migrate n8n Data
+
+on:
+  workflow_dispatch:
+    inputs:
+      new_prefix:
+        description: 'New prefix for n8n (e.g., prod_n8n)'
+        required: true
+        type: string
+
+jobs:
+  migrate:
+    runs-on: self-hosted
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create .env file for migration
+        run: |
+          echo "Creating .env file for migration..."
+          cat > .env << EOF
+          COMPOSE_PROJECT_NAME=${{ github.event.inputs.new_prefix }}
+          EOF
+
+      - name: Backup current data
+        run: |
+          echo "📦 Creating backup of current data..."
+          
+          # Tạo thư mục backup nếu chưa tồn tại
+          mkdir -p ./backup
+          
+          # Backup volumes hiện tại
+          docker run --rm \
+            -v n8n_data:/source:ro \
+            -v $(pwd)/backup:/backup \
+            alpine tar czf /backup/n8n_data_backup_$(date +%Y%m%d_%H%M%S).tar.gz -C /source .
+
+          # Backup PostgreSQL data
+          docker run --rm \
+            -v n8n_postgres_data:/source:ro \
+            -v $(pwd)/backup:/backup \
+            alpine tar czf /backup/postgres_data_backup_$(date +%Y%m%d_%H%M%S).tar.gz -C /source .
+
+          echo "✅ Backup completed successfully"
+
+      - name: Stop current containers
+        run: |
+          echo "🛑 Stopping current containers..."
+          docker-compose down
+          echo "✅ Current containers stopped"
+
+      - name: Migrate data
+        run: |
+          echo "🔄 Starting migration process..."
+          
+          # Tạo volumes mới với prefix mới
+          docker volume create ${COMPOSE_PROJECT_NAME}_n8n_data
+          docker volume create ${COMPOSE_PROJECT_NAME}_postgres_data
+          
+          # Restore data vào volumes mới
+          echo "Restoring n8n data..."
+          docker run --rm \
+            -v $(pwd)/backup:/backup \
+            -v ${COMPOSE_PROJECT_NAME}_n8n_data:/target \
+            alpine sh -c "cd /target && tar xzf /backup/$(ls -t /backup/n8n_data_backup_*.tar.gz | head -1)"
+          
+          echo "Restoring PostgreSQL data..."
+          docker run --rm \
+            -v $(pwd)/backup:/backup \
+            -v ${COMPOSE_PROJECT_NAME}_postgres_data:/target \
+            alpine sh -c "cd /target && tar xzf /backup/$(ls -t /backup/postgres_data_backup_*.tar.gz | head -1)"
+          
+          echo "✅ Data migration completed"
+
+      - name: Start new containers
+        run: |
+          echo "🚀 Starting new containers with new prefix..."
+          docker-compose up -d
+          echo "✅ New containers started"
+
+      - name: Verify migration
+        run: |
+          echo "🔍 Verifying migration..."
+          
+          # Kiểm tra containers mới
+          if docker ps | grep -q "${COMPOSE_PROJECT_NAME}"; then
+            echo "✅ New containers are running"
+          else
+            echo "❌ New containers are not running"
+            exit 1
+          fi
+          
+          # Kiểm tra volumes mới
+          if docker volume ls | grep -q "${COMPOSE_PROJECT_NAME}_n8n_data"; then
+            echo "✅ New volumes are created"
+          else
+            echo "❌ New volumes are not created"
+            exit 1
+          fi
+
+      - name: Send notification
+        if: always()
+        run: |
+          if [[ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" && ! -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]]; then
+            ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            
+            if [ "${{ job.status }}" == "success" ]; then
+              STATUS_EMOJI="✅"
+              STATUS_TEXT="Data migration completed successfully!"
+            else
+              STATUS_EMOJI="❌"
+              STATUS_TEXT="Data migration failed!"
+            fi
+            
+            curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+              -H "Content-Type: application/json" \
+              -d '{
+                "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
+                "text": "'"$STATUS_EMOJI"' *'"$STATUS_TEXT"'*\nNew prefix: '"${{ github.event.inputs.new_prefix }}"'\n[View Migration Details]('"$ACTION_URL"')",
+                "parse_mode": "Markdown"
+              }'
+          fi 
