@@ -6,11 +6,23 @@ on:
   workflow_dispatch:
     # Cho phép kích hoạt thủ công
 
+# Chia group concurrency theo từng branch (mỗi branch sẽ có hàng đợi riêng)
+# Nếu có workflow mới trên cùng một branch, workflow cũ sẽ bị cancel, chỉ giữ lại workflow mới nhất
+concurrency:
+  group: n8n-deploy-${{ github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: self-hosted  # Chỉ định sử dụng self-hosted runner thay vì ubuntu-latest
     environment: ${{ github.ref_name == 'master' && 'production' ||  github.ref_name == 'develop' && 'development' ||  github.ref_name == 'staging' && 'staging' }}
     steps:
+      - name: Set deploy dir
+        run: echo "DEPLOY_DIR=deploy_${GITHUB_REF_NAME}" >> $GITHUB_ENV
+
+      - name: Prepare deploy dir
+        run: mkdir -p $DEPLOY_DIR
+
       - name: Clean runner temp env files
         run: |
           rm -f $RUNNER_WORKSPACE/_temp/*
