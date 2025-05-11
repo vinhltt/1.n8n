@@ -21,6 +21,26 @@ jobs:
           echo "Creating .env file for migration..."
           cat > .env << EOF
           COMPOSE_PROJECT_NAME=${{ github.event.inputs.new_prefix }}
+          
+          # PostgreSQL
+          POSTGRES_USER=${{ secrets.POSTGRES_USER || 'n8n' }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB=${{ secrets.POSTGRES_DB || 'n8n_database' }}
+          
+          # n8n
+          N8N_BASIC_AUTH_USER=${{ secrets.N8N_BASIC_AUTH_USER || 'admin' }}
+          N8N_BASIC_AUTH_PASSWORD=${{ secrets.N8N_BASIC_AUTH_PASSWORD }}
+          N8N_ENCRYPTION_KEY=${{ secrets.N8N_ENCRYPTION_KEY }}
+          DB_POSTGRESDB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          WEBHOOK_URL=${{ vars.WEBHOOK_URL }}
+          
+          # Timezone & other settings
+          GENERIC_TIMEZONE=${{ secrets.GENERIC_TIMEZONE || 'Asia/Ho_Chi_Minh' }}
+          TZ=${{ secrets.TZ || 'Asia/Ho_Chi_Minh' }}
+          N8N_DEFAULT_BINARY_DATA_MODE=${{ secrets.N8N_DEFAULT_BINARY_DATA_MODE || 'filesystem' }}
+          EXECUTIONS_DATA_PRUNE=${{ secrets.EXECUTIONS_DATA_PRUNE || 'true' }}
+          EXECUTIONS_DATA_MAX_AGE=${{ secrets.EXECUTIONS_DATA_MAX_AGE || '720' }}
+          EXECUTIONS_DATA_PRUNE_MAX_COUNT=${{ secrets.EXECUTIONS_DATA_PRUNE_MAX_COUNT || '50000' }}
           EOF
 
       - name: Backup current data
@@ -85,7 +105,7 @@ jobs:
       - name: Start new containers
         run: |
           echo "🚀 Starting new containers with new prefix..."
-          docker-compose up -d
+          docker-compose -p ${COMPOSE_PROJECT_NAME} up  -d
           echo "✅ New containers started"
 
       - name: Verify migration
