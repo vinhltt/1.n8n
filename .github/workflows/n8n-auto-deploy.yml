@@ -73,6 +73,9 @@ jobs:
           EXECUTIONS_DATA_PRUNE=${{ secrets.EXECUTIONS_DATA_PRUNE || 'true' }}
           EXECUTIONS_DATA_MAX_AGE=${{ secrets.EXECUTIONS_DATA_MAX_AGE || '720' }}
           EXECUTIONS_DATA_PRUNE_MAX_COUNT=${{ secrets.EXECUTIONS_DATA_PRUNE_MAX_COUNT || '50000' }}
+          
+          # Backup settings
+          N8N_BACKUP_DIR_HOST=${{ secrets.N8N_BACKUP_DIR_HOST }}
           EOF
           
           # Hiển thị thông báo thành công (không hiển thị nội dung của file vì bảo mật)

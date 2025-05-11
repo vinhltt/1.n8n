@@ -21,9 +21,33 @@ source <(sed 's/\r$//' "$ENV_FILE")
 set +a
 
 # 3) Biến cấu hình, báo lỗi nếu thiếu
-POSTGRES_CONTAINER=${POSTGRES_CONTAINER:-postgresdb}
+# --- Lấy tên container PostgreSQL thực tế ---
+if [ -z "${POSTGRES_CONTAINER:-}" ]; then
+  # Thử lấy tên service postgres từ docker-compose.yml (ưu tiên postgresdb)
+  if command -v docker-compose &>/dev/null; then
+    POSTGRES_SERVICE=$(docker-compose ps --services | grep -E '^postgres(db)?$' | head -n1)
+    # Lấy container ID từ service
+    POSTGRES_CONTAINER_ID=$(docker-compose ps -q "$POSTGRES_SERVICE")
+  else
+    POSTGRES_SERVICE=$(docker compose ps --services | grep -E '^postgres(db)?$' | head -n1)
+    POSTGRES_CONTAINER_ID=$(docker compose ps -q "$POSTGRES_SERVICE")
+  fi
+  if [ -z "$POSTGRES_CONTAINER_ID" ]; then
+    echo "Lỗi: Không xác định được container PostgreSQL từ docker-compose." >&2; exit 1;
+  fi
+  # Lấy tên container thực tế từ container ID
+  POSTGRES_CONTAINER=$(docker ps --filter id="$POSTGRES_CONTAINER_ID" --format '{{.Names}}')
+  if [ -z "$POSTGRES_CONTAINER" ]; then
+    echo "Lỗi: Không lấy được tên container PostgreSQL từ ID." >&2; exit 1;
+  fi
+fi
+POSTGRES_CONTAINER=${POSTGRES_CONTAINER}
 DB_NAME=${POSTGRES_DB:-n8n_database}
-N8N_VOLUME_NAME=${N8N_VOLUME_NAME:-n8n_data}
+if [ -z "${N8N_VOLUME_NAME:-}" ]; then
+  # Lấy prefix từ tên container PostgreSQL, ví dụ: pfm_prod-postgresdb-1
+  PREFIX=$(echo "$POSTGRES_CONTAINER" | sed -E 's/-postgres(db)?-[0-9]+$//')
+  N8N_VOLUME_NAME="${PREFIX}_n8n_data"
+fi
 RETENTION_DAYS=${N8N_RETENTION_DAYS:-7}
 
 : "${POSTGRES_USER:?Lỗi: POSTGRES_USER chưa đặt}"
@@ -45,7 +69,7 @@ TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 RUN_DIR="$BACKUP_DIR/$TIMESTAMP"
 mkdir -p "$RUN_DIR"
 
-LOG_FILE="$RUN_DIR/backup-${TIMESTAMP}.log"
+LOG_FILE="$RUN_DIR/backup.log"
 
 # Redirect stdout & stderr của toàn bộ script vào cả console và file log
 exec > >(tee -a "$LOG_FILE") 2>&1
@@ -61,7 +85,7 @@ echo "------------------------------------------------------------------"
 FAILED=0
 
 # 6.1) Dump PostgreSQL
-DB_FILE="n8n_db_backup_${TIMESTAMP}.sql.gz"
+DB_FILE="n8n_db_backup.sql.gz"
 echo "[*] Dumping PostgreSQL …"
 if docker exec -i \
      -e PGPASSWORD="$DB_PASSWORD" \
@@ -75,7 +99,7 @@ else
 fi
 
 # 6.2) Archive Docker volume
-VOL_FILE="n8n_data_backup_${TIMESTAMP}.tar.gz"
+VOL_FILE="n8n_data_backup.tar.gz"
 echo "[*] Archiving Docker volume …"
 if docker run --rm \
      -v "${N8N_VOLUME_NAME}:/volume_data:ro" \
