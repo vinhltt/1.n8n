@@ -38,6 +38,7 @@ jobs:
           POSTGRES_USER=${{ secrets.POSTGRES_USER || 'n8n' }}
           POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB=${{ secrets.POSTGRES_DB || 'n8n_database' }}
+          POSTGRES_EXTERNAL_PORT=${{ vars.POSTGRES_EXTERNAL_PORT || '5432' }}
           
           # n8n
           N8N_BASIC_AUTH_USER=${{ secrets.N8N_BASIC_AUTH_USER || 'admin' }}
@@ -45,6 +46,11 @@ jobs:
           N8N_ENCRYPTION_KEY=${{ secrets.N8N_ENCRYPTION_KEY }}
           DB_POSTGRESDB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           WEBHOOK_URL=${{ vars.WEBHOOK_URL }}
+          N8N_EXTERNAL_PORT=${{ vars.N8N_EXTERNAL_PORT || '5678' }}
+
+          # Excel API
+          EXCEL_API_HTTP_PORT=${{ vars.EXCEL_API_HTTP_PORT || '8080' }}
+          EXCEL_API_HTTPS_PORT=${{ vars.EXCEL_API_HTTPS_PORT || '8443' }}
           
           # Timezone & other settings
           GENERIC_TIMEZONE=${{ secrets.GENERIC_TIMEZONE || 'Asia/Ho_Chi_Minh' }}
