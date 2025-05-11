@@ -12,55 +12,23 @@ jobs:
     runs-on: self-hosted
     name: Daily n8n Backup (Production Only)
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # Bỏ bước checkout code, sử dụng luôn thư mục deploy production
+      - name: Thiết lập biến thư mục deploy production
+        run: echo "DEPLOY_DIR=deploy_${GITHUB_REF_NAME}" >> $GITHUB_ENV
 
-      - name: Create .env file from secrets
+      - name: Kiểm tra file .env và script backup-n8n.sh
         run: |
-          echo "Creating .env file for backup..."
-          cat > .env << EOF
-          # Project name
-          COMPOSE_PROJECT_NAME=${{ vars.COMPOSE_PROJECT_NAME || 'n8n' }}
-
-          # PostgreSQL
-          POSTGRES_USER=${{ secrets.POSTGRES_USER || 'n8n' }}
-          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB=${{ secrets.POSTGRES_DB || 'n8n_database' }}
-          POSTGRES_EXTERNAL_PORT=${{ vars.POSTGRES_EXTERNAL_PORT || '5432' }}
-
-          # n8n
-          N8N_BASIC_AUTH_USER=${{ secrets.N8N_BASIC_AUTH_USER || 'admin' }}
-          N8N_BASIC_AUTH_PASSWORD=${{ secrets.N8N_BASIC_AUTH_PASSWORD }}
-          N8N_ENCRYPTION_KEY=${{ secrets.N8N_ENCRYPTION_KEY }}
-          DB_POSTGRESDB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-          WEBHOOK_URL=${{ vars.WEBHOOK_URL }}
-          N8N_EXTERNAL_PORT=${{ vars.N8N_EXTERNAL_PORT || '5678' }}
-
-          # Excel API
-          EXCEL_API_HTTP_PORT=${{ vars.EXCEL_API_HTTP_PORT || '8080' }}
-          EXCEL_API_HTTPS_PORT=${{ vars.EXCEL_API_HTTPS_PORT || '8443' }}
-
-          # Timezone & other settings
-          GENERIC_TIMEZONE=${{ secrets.GENERIC_TIMEZONE || 'Asia/Ho_Chi_Minh' }}
-          TZ=${{ secrets.TZ || 'Asia/Ho_Chi_Minh' }}
-          N8N_DEFAULT_BINARY_DATA_MODE=${{ secrets.N8N_DEFAULT_BINARY_DATA_MODE || 'filesystem' }}
-          EXECUTIONS_DATA_PRUNE=${{ secrets.EXECUTIONS_DATA_PRUNE || 'true' }}
-          EXECUTIONS_DATA_MAX_AGE=${{ secrets.EXECUTIONS_DATA_MAX_AGE || '720' }}
-          EXECUTIONS_DATA_PRUNE_MAX_COUNT=${{ secrets.EXECUTIONS_DATA_PRUNE_MAX_COUNT || '50000' }}
-
-          # Backup settings
-          N8N_BACKUP_DIR_HOST=${{ secrets.N8N_BACKUP_DIR_HOST }}
-          EOF
-
-          if [ -f .env ]; then
-            echo "✅ .env file exists"
-          else
-            echo "❌ Failed to create .env file"
-            exit 1
+          cd $DEPLOY_DIR
+          if [ ! -f .env ]; then
+            echo "❌ Không tìm thấy file .env trong $DEPLOY_DIR"; exit 1;
+          fi
+          if [ ! -f backup-n8n.sh ]; then
+            echo "❌ Không tìm thấy script backup-n8n.sh trong $DEPLOY_DIR"; exit 1;
           fi
 
-      - name: Run backup script
+      - name: Thực thi backup
         run: |
+          cd $DEPLOY_DIR
           echo "🔒 Đang backup dữ liệu n8n cho môi trường production..."
-          bash $GITHUB_WORKSPACE/backup-n8n.sh
+          bash ./backup-n8n.sh
           echo "✅ Đã backup dữ liệu n8n thành công" 
