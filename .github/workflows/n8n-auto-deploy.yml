@@ -2,14 +2,18 @@ name: Auto Deploy n8n
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master, develop, staging ]
   workflow_dispatch:
     # Cho phép kích hoạt thủ công
 
 jobs:
   deploy:
     runs-on: self-hosted  # Chỉ định sử dụng self-hosted runner thay vì ubuntu-latest
-    environment: production  # Thêm môi trường production
+    environment: ${{ 
+      github.ref_name == 'master' && 'production' || 
+      github.ref_name == 'develop' && 'development' || 
+      github.ref_name == 'staging' && 'staging' 
+    }}
     steps:
       - name: Clean runner temp env files
         run: |
