@@ -4,11 +4,11 @@ services:
     container_name: postgresdb
     restart: always
     environment:
-      POSTGRES_DB: n8n_database
+      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ${COMPOSE_PROJECT_NAME}_postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "15432:5432"
     healthcheck:
@@ -29,7 +29,7 @@ services:
     networks:
       - default
     volumes:
-      - ${COMPOSE_PROJECT_NAME}_n8n_data:/home/node/.n8n
+      - n8n_data:/home/node/.n8n
       - ./ssh:/home/node/.ssh
     depends_on:
       - postgresdb
@@ -71,5 +71,9 @@ services:
 #network section
 networks:
   default:
-    name: ${COMPOSE_PROJECT_NAME}-n8n-network
+    name: n8n-network
     driver: bridge
+
+volumes:
+  postgres_data:
+  n8n_data:
