@@ -28,7 +28,9 @@ jobs:
           rm -f $RUNNER_WORKSPACE/_temp/*
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          path: ${{ env.DEPLOY_DIR }}
 
       - name: Prepare n8n directories
         run: |
@@ -83,7 +85,8 @@ jobs:
             echo "❌ Failed to create .env file"
             exit 1
           fi
-          
+        working-directory: ${{ env.DEPLOY_DIR }}
+
       - name: Chuẩn bị môi trường và config n8n
         run: |
           echo "🧹 Đang chuẩn bị môi trường..."
@@ -123,6 +126,7 @@ jobs:
           else
             echo "✅ File config hiện tại không có vấn đề, giữ nguyên"
           fi
+        working-directory: ${{ env.DEPLOY_DIR }}
 
       - name: Pull và build docker images
         run: |
@@ -132,17 +136,12 @@ jobs:
           echo "🔨 Đang build images cho tất cả các dịch vụ..."
           docker-compose build
           echo "✅ Đã build images thành công"
+        working-directory: ${{ env.DEPLOY_DIR }}
 
       - name: Dừng và xóa container cũ (nếu có)
         run: |
           echo "⏹️ Dừng containers hiện tại..."
           docker-compose down || true
-          # Xóa container pfm_excel_api nếu còn tồn tại
-          if docker ps -a --format '{{.Names}}' | grep -q '^pfm_excel_api$'; then
-            echo "⚠️ Đang xóa container pfm_excel_api cũ..."
-            docker rm -f pfm_excel_api
-            echo "✅ Đã xóa container pfm_excel_api cũ"
-          fi
           echo "✅ Đã dừng các containers hiện tại"
 
       - name: Khởi động lại n8n
@@ -151,53 +150,12 @@ jobs:
           echo "✅ Đã khởi động containers thành công"
           echo "⏳ Đang đợi n8n khởi động..."
           sleep 15
-
-      - name: Kiểm tra trạng thái container n8n_main
-        run: |
-          if ! docker ps | grep -q "n8n_main"; then
-            echo "⚠️ Container n8n_main không đang chạy, kiểm tra logs..."
-            docker logs n8n_main --tail 50
-            exit 1
-          fi
-          echo "✅ Container n8n_main đang chạy"
-
-      - name: Kiểm tra và sửa file config trong container nếu cần
-        run: |
-          CONFIG_CONTENT=$(docker exec n8n_main cat /home/node/.n8n/config 2>/dev/null || echo "")
-          if echo "$CONFIG_CONTENT" | grep -q "# <<<=== THAY BẰNG KHÓA MẠNH CỦA BẠN"; then
-            echo "⚠️ Tìm thấy chú thích không mong muốn trong file config"
-            CLEAN_KEY=$(grep "N8N_ENCRYPTION_KEY" .env | cut -d '=' -f2 | xargs)
-            if [ -z "$CLEAN_KEY" ]; then
-              echo "Không tìm thấy giá trị N8N_ENCRYPTION_KEY trong file .env"
-              exit 1
-            fi
-            echo "{\"encryptionKey\": \"$CLEAN_KEY\"}" > ./n8n_data/config.new
-            docker cp ./n8n_data/config.new n8n_main:/home/node/.n8n/config
-            docker restart n8n_main
-            sleep 30
-            NEW_CONFIG_CONTENT=$(docker exec n8n_main cat /home/node/.n8n/config 2>/dev/null || echo "")
-            if echo "$NEW_CONFIG_CONTENT" | grep -q "# <<<=== THAY BẰNG KHÓA MẠNH CỦA BẠN"; then
-              echo "Vẫn còn chú thích không mong muốn trong file config sau khi sửa"
-              exit 1
-            else
-              echo "✅ Đã sửa file config thành công"
-            fi
-          else
-            echo "✅ Không tìm thấy chú thích không mong muốn trong file config"
-          fi
-
-      - name: Kiểm tra thư viện msoffcrypto-tool trong container
-        run: |
-          if docker exec n8n_main bash -c "pip3 list | grep -q msoffcrypto-tool"; then
-            MSOFFCRYPTO_VERSION=$(docker exec n8n_main bash -c "pip3 list | grep msoffcrypto-tool" | awk '{print $2}')
-            echo "✅ Thư viện msoffcrypto-tool đã được cài đặt (phiên bản $MSOFFCRYPTO_VERSION)"
-          else
-            echo "⚠️ Thư viện msoffcrypto-tool chưa được cài đặt đúng cách"
-          fi
+        working-directory: ${{ env.DEPLOY_DIR }}
 
       - name: Kiểm tra trạng thái các container
         run: |
           docker-compose ps
+        working-directory: ${{ env.DEPLOY_DIR }}
 
       - name: Hiển thị URL truy cập n8n
         run: |
