@@ -62,5 +62,5 @@ jobs:
       - name: Run backup script
         run: |
           echo "🔒 Đang backup dữ liệu n8n cho môi trường production..."
-          bash $GITHUB_WORKSPACE/backup-n8n.sh
+          bash ./backup-n8n.sh
           echo "✅ Đã backup dữ liệu n8n thành công" 
