@@ -56,9 +56,9 @@ services:
       dockerfile: ExcelApi/Dockerfile
     restart: always
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
-      - TZ=Asia/Ho_Chi_Minh
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS:-http://+:80}
+      - TZ=${TZ:-Asia/Ho_Chi_Minh}
     ports:
       - "${EXCEL_API_HTTP_PORT}:80"
       - "${EXCEL_API_HTTPS_PORT}:443"
@@ -68,7 +68,6 @@ services:
 #network section
 networks:
   default:
-    name: n8n-network
     driver: bridge
 
 volumes:
