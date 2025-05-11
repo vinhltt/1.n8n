@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - postgresdb_data:/var/lib/postgresql/data
+      - ${COMPOSE_PROJECT_NAME}_postgres_data:/var/lib/postgresql/data
     ports:
       - "15432:5432"
     healthcheck:
@@ -74,9 +74,5 @@ networks:
     name: ${COMPOSE_PROJECT_NAME}-n8n-network
     driver: bridge
     
-#volumes sect    external: true # Đánh dấu network là external để sử dụng network hiện có
-    
 #volumes section
-volumes:
-  ${COMPOSE_PROJECT_NAME}_n8n_data:
-  ${COMPOSE_PROJECT_NAME}_postgres_data:
+volumes: {}
