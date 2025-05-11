@@ -73,6 +73,3 @@ networks:
   default:
     name: ${COMPOSE_PROJECT_NAME}-n8n-network
     driver: bridge
-    
-#volumes section
-volumes: {}
