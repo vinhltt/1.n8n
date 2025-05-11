@@ -66,22 +66,130 @@ jobs:
             exit 1
           fi
           
-      - name: Prepare deployment script
+      - name: Chuẩn bị môi trường và config n8n
         run: |
-          # Cấp quyền thực thi cho script triển khai
-          chmod +x ./deploy-n8n.sh
-          echo "✅ Deployment script is ready"
+          echo "🧹 Đang chuẩn bị môi trường..."
+          # Tạo thư mục n8n_data nếu chưa có
+          if [ ! -d "./n8n_data" ]; then
+            mkdir -p ./n8n_data
+            echo "✅ Đã tạo thư mục n8n_data"
+          fi
+          # Sao lưu file config nếu có
+          if [ -f "./n8n_data/config" ]; then
+            echo "📦 Sao lưu file config hiện tại..."
+            cp "./n8n_data/config" "./n8n_data/config.bak"
+            echo "✅ Đã sao lưu file config"
+          fi
+          # Kiểm tra file config có chú thích không mong muốn không
+          CONFIG_ISSUE=false
+          if [ -f "./n8n_data/config" ]; then
+            if grep -q "# <<<=== THAY BẰNG KHÓA MẠNH CỦA BẠN" "./n8n_data/config"; then
+              echo "⚠️ Phát hiện chú thích không mong muốn trong file config hiện tại"
+              CONFIG_ISSUE=true
+            fi
+          fi
+          # Chỉ tạo file config mới nếu không tồn tại hoặc có vấn đề
+          if [ ! -f "./n8n_data/config" ] || [ "$CONFIG_ISSUE" = true ]; then
+            if [ -f ".env" ]; then
+              CLEAN_KEY=$(grep "N8N_ENCRYPTION_KEY" .env | cut -d '=' -f2 | xargs)
+              if [ ! -z "$CLEAN_KEY" ]; then
+                echo "📝 Tạo file config với encryptionKey từ .env..."
+                echo "{\"encryptionKey\": \"$CLEAN_KEY\"}" > ./n8n_data/config
+                echo "✅ Đã tạo file config mới"
+              else
+                echo "⚠️ Không tìm thấy N8N_ENCRYPTION_KEY trong file .env"
+              fi
+            else
+              echo "⚠️ Không tìm thấy file .env"
+            fi
+          else
+            echo "✅ File config hiện tại không có vấn đề, giữ nguyên"
+          fi
 
-      - name: Deploy n8n using script
+      - name: Pull và build docker images
         run: |
-          echo "🚀 Deploying n8n using deployment script..."
-          
-          # Dừng container hiện tại (nếu có) - không xóa volumes
-          docker-compose down
-          
-          # Chạy script triển khai
-          ./deploy-n8n.sh
-          
+          echo "🔄 Đang pull images mới nhất..."
+          docker-compose pull
+          echo "✅ Đã pull images thành công"
+          echo "🔨 Đang build images cho tất cả các dịch vụ..."
+          docker-compose build
+          echo "✅ Đã build images thành công"
+
+      - name: Dừng và xóa container cũ (nếu có)
+        run: |
+          echo "⏹️ Dừng containers hiện tại..."
+          docker-compose down || true
+          # Xóa container pfm_excel_api nếu còn tồn tại
+          if docker ps -a --format '{{.Names}}' | grep -q '^pfm_excel_api$'; then
+            echo "⚠️ Đang xóa container pfm_excel_api cũ..."
+            docker rm -f pfm_excel_api
+            echo "✅ Đã xóa container pfm_excel_api cũ"
+          fi
+          echo "✅ Đã dừng các containers hiện tại"
+
+      - name: Khởi động lại n8n
+        run: |
+          docker-compose -f docker-compose.yml up -d
+          echo "✅ Đã khởi động containers thành công"
+          echo "⏳ Đang đợi n8n khởi động..."
+          sleep 15
+
+      - name: Kiểm tra trạng thái container n8n_main
+        run: |
+          if ! docker ps | grep -q "n8n_main"; then
+            echo "⚠️ Container n8n_main không đang chạy, kiểm tra logs..."
+            docker logs n8n_main --tail 50
+            exit 1
+          fi
+          echo "✅ Container n8n_main đang chạy"
+
+      - name: Kiểm tra và sửa file config trong container nếu cần
+        run: |
+          CONFIG_CONTENT=$(docker exec n8n_main cat /home/node/.n8n/config 2>/dev/null || echo "")
+          if echo "$CONFIG_CONTENT" | grep -q "# <<<=== THAY BẰNG KHÓA MẠNH CỦA BẠN"; then
+            echo "⚠️ Tìm thấy chú thích không mong muốn trong file config"
+            CLEAN_KEY=$(grep "N8N_ENCRYPTION_KEY" .env | cut -d '=' -f2 | xargs)
+            if [ -z "$CLEAN_KEY" ]; then
+              echo "Không tìm thấy giá trị N8N_ENCRYPTION_KEY trong file .env"
+              exit 1
+            fi
+            echo "{\"encryptionKey\": \"$CLEAN_KEY\"}" > ./n8n_data/config.new
+            docker cp ./n8n_data/config.new n8n_main:/home/node/.n8n/config
+            docker restart n8n_main
+            sleep 30
+            NEW_CONFIG_CONTENT=$(docker exec n8n_main cat /home/node/.n8n/config 2>/dev/null || echo "")
+            if echo "$NEW_CONFIG_CONTENT" | grep -q "# <<<=== THAY BẰNG KHÓA MẠNH CỦA BẠN"; then
+              echo "Vẫn còn chú thích không mong muốn trong file config sau khi sửa"
+              exit 1
+            else
+              echo "✅ Đã sửa file config thành công"
+            fi
+          else
+            echo "✅ Không tìm thấy chú thích không mong muốn trong file config"
+          fi
+
+      - name: Kiểm tra thư viện msoffcrypto-tool trong container
+        run: |
+          if docker exec n8n_main bash -c "pip3 list | grep -q msoffcrypto-tool"; then
+            MSOFFCRYPTO_VERSION=$(docker exec n8n_main bash -c "pip3 list | grep msoffcrypto-tool" | awk '{print $2}')
+            echo "✅ Thư viện msoffcrypto-tool đã được cài đặt (phiên bản $MSOFFCRYPTO_VERSION)"
+          else
+            echo "⚠️ Thư viện msoffcrypto-tool chưa được cài đặt đúng cách"
+          fi
+
+      - name: Kiểm tra trạng thái các container
+        run: |
+          docker-compose ps
+
+      - name: Hiển thị URL truy cập n8n
+        run: |
+          echo "🌐 n8n đã được triển khai thành công và có thể truy cập tại:"
+          echo "   http://localhost:5678"
+          if [ ! -z "$WEBHOOK_URL" ]; then
+            echo "   hoặc: $WEBHOOK_URL"
+          fi
+          echo "✅ TRIỂN KHAI N8N HOÀN TẤT THÀNH CÔNG"
+
       # Gửi thông báo Telegram (luôn gửi dù thành công hay thất bại)
       - name: Send notification
         if: always()  # Thay đổi từ success() thành always() để luôn gửi thông báo
