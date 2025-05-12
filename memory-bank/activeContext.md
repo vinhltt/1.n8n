@@ -14,7 +14,9 @@
 ## Quyết định quan trọng
 - Ưu tiên tài liệu hóa mọi thay đổi.
 - Mọi workflow, script, pattern đều phải có hướng dẫn rõ ràng.
+- Mọi thành viên phải tuân thủ các rule về microservices, event-driven, bảo mật, logging, monitoring, CI/CD, best practices, backup/disaster recovery, phase triển khai như đã mô tả trong systemPatterns.md.
 
 ## Pattern, insight, lưu ý
 - Memory Bank là nguồn tham chiếu duy nhất cho toàn bộ dự án.
-- Luôn đọc lại toàn bộ Memory Bank trước khi thực hiện task mới. 
+- Luôn đọc lại toàn bộ Memory Bank trước khi thực hiện task mới.
+- Khi phát hiện điểm mới về kiến trúc, bảo mật, vận hành, phải cập nhật ngay vào systemPatterns.md và activeContext.md. 
