@@ -1,22 +1,26 @@
 # activeContext.md
 
 ## Trọng tâm công việc hiện tại
-- Khởi tạo Memory Bank cho dự án.
-- Đảm bảo tài liệu nền tảng đầy đủ, rõ ràng.
+- Hoàn thiện tài liệu BA Design chi tiết cho hệ thống PFM.
+- Đảm bảo Memory Bank phản ánh đầy đủ nghiệp vụ, kiến trúc, yêu cầu chức năng/phi chức năng, tiến độ, insight mới nhất.
 
 ## Thay đổi gần đây
-- Tạo mới các file core: projectbrief.md, productContext.md, systemPatterns.md, techContext.md.
+- Cập nhật lại toàn bộ Memory Bank dựa trên BA Design.
+- Làm rõ phạm vi, mục tiêu, nghiệp vụ, kiến trúc, pattern, công nghệ, ràng buộc kỹ thuật.
 
 ## Bước tiếp theo
-- Bổ sung progress.md để theo dõi tiến độ.
-- Cập nhật khi có thay đổi lớn về kiến trúc, công nghệ hoặc quy trình.
+- Bổ sung chi tiết user stories, acceptance criteria cho từng chức năng.
+- Làm việc với đội UI/UX để hoàn thiện mockup, wireframe.
+- Xác định giải pháp frontend cụ thể.
+- Chuẩn hóa checklist cho từng phase triển khai.
 
 ## Quyết định quan trọng
-- Ưu tiên tài liệu hóa mọi thay đổi.
-- Mọi workflow, script, pattern đều phải có hướng dẫn rõ ràng.
-- Mọi thành viên phải tuân thủ các rule về microservices, event-driven, bảo mật, logging, monitoring, CI/CD, best practices, backup/disaster recovery, phase triển khai như đã mô tả trong systemPatterns.md.
+- Ưu tiên triển khai core service (Identity, Core Finance, Reporting) trước.
+- Import statement: bắt đầu với manual upload, lên kế hoạch tích hợp API ngân hàng/aggregator sau.
+- Đảm bảo mọi service có health check, logging, monitoring, alerting tự động.
+- Định nghĩa rõ acceptance criteria, test coverage >80%.
 
 ## Pattern, insight, lưu ý
-- Memory Bank là nguồn tham chiếu duy nhất cho toàn bộ dự án.
-- Luôn đọc lại toàn bộ Memory Bank trước khi thực hiện task mới.
-- Khi phát hiện điểm mới về kiến trúc, bảo mật, vận hành, phải cập nhật ngay vào systemPatterns.md và activeContext.md. 
+- Mọi thay đổi lớn về nghiệp vụ, kiến trúc, công nghệ đều phải cập nhật vào Memory Bank.
+- Đảm bảo các yêu cầu phi chức năng (NFR) được kiểm thử và giám sát liên tục.
+- Luôn review lại BA Design và Memory Bank trước khi bắt đầu task mới. 
