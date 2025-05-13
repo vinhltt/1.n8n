@@ -31,4 +31,15 @@ jobs:
           cd $DEPLOY_DIR
           echo "🔒 Đang backup dữ liệu n8n cho môi trường production..."
           bash ./backup-n8n.sh
-          echo "✅ Đã backup dữ liệu n8n thành công" 
+          echo "✅ Đã backup dữ liệu n8n thành công"
+
+      - name: Gửi thông báo lỗi backup lên Telegram
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          MESSAGE="❌ Backup n8n thất bại trên branch $GITHUB_REF_NAME lúc $(date '+%Y-%m-%d %H:%M:%S')"
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHAT_ID}" \
+            -d text="$MESSAGE" 
