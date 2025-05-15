@@ -1,0 +1,159 @@
+using CoreFinance.Contracts.BaseEfModels;
+
+namespace CoreFinance.Domain;
+
+public enum CategoryType
+{
+    Income,
+    Expense,
+    Transfer,
+    Fee,
+    Other
+}
+
+public class Transaction : BaseEntity<Guid>
+{
+    /// <summary>
+    ///     Foreign key linking to account (EN)
+    ///     Khóa ngoại liên kết với tài khoản (VI)
+    /// </summary>
+    public Guid AccountId { get; set; }
+
+    /// <summary>
+    ///     Foreign key linking to user (EN)
+    ///     Khóa ngoại liên kết với người dùng (VI)
+    /// </summary>
+    public Guid UserId { get; set; }
+
+    /// <summary>
+    ///     Transaction date (EN)
+    ///     Ngày giao dịch (VI)
+    /// </summary>
+    public DateTime TransactionDate { get; set; }
+
+    /// <summary>
+    ///     Revenue amount (EN)
+    ///     Số tiền thu vào (VI)
+    /// </summary>
+    public decimal RevenueAmount { get; set; }
+
+    /// <summary>
+    ///     Spent amount (EN)
+    ///     Số tiền chi ra (VI)
+    /// </summary>
+    public decimal SpentAmount { get; set; }
+
+    /// <summary>
+    ///     Transaction description (EN)
+    ///     Mô tả giao dịch (VI)
+    /// </summary>
+    public string? Description { get; set; }
+
+    /// <summary>
+    ///     Balance after transaction (EN)
+    ///     Số dư sau giao dịch (VI)
+    /// </summary>
+    public decimal Balance { get; set; }
+
+    /// <summary>
+    ///     Balance compared to app notification (EN)
+    ///     Số dư so với thông báo giao dịch trên app (VI)
+    /// </summary>
+    public decimal? BalanceCompare { get; set; }
+
+    /// <summary>
+    ///     Available limit (credit card only) (EN)
+    ///     Số tiền khả dụng (chỉ áp dụng cho thẻ tín dụng) (VI)
+    /// </summary>
+    public decimal? AvailableLimit { get; set; }
+
+    /// <summary>
+    ///     Available limit compared to app notification (credit card only) (EN)
+    ///     Số tiền khả dụng so với thông báo giao dịch trên app (chỉ áp dụng cho thẻ tín dụng) (VI)
+    /// </summary>
+    public decimal? AvailableLimitCompare { get; set; }
+
+    /// <summary>
+    ///     Transaction code (EN)
+    ///     Mã giao dịch (VI)
+    /// </summary>
+    public string? TransactionCode { get; set; }
+
+    /// <summary>
+    ///     Synced with MISA (EN)
+    ///     Đánh dấu đã đồng bộ với MISA (VI)
+    /// </summary>
+    public bool SyncMisa { get; set; }
+
+    /// <summary>
+    ///     Synced with SMS (credit card only) (EN)
+    ///     Đánh dấu đã đồng bộ với SMS (chỉ áp dụng cho thẻ tín dụng) (VI)
+    /// </summary>
+    public bool SyncSms { get; set; }
+
+    /// <summary>
+    ///     Marked for Vietnam market (EN)
+    ///     Đánh dấu giao dịch dành cho thị trường Việt Nam (VI)
+    /// </summary>
+    public bool Vn { get; set; }
+
+    /// <summary>
+    ///     Transaction category summary (EN)
+    ///     Tóm tắt danh mục giao dịch (VI)
+    /// </summary>
+    public string? CategorySummary { get; set; }
+
+    /// <summary>
+    ///     Additional note for transaction (EN)
+    ///     Ghi chú bổ sung cho giao dịch (VI)
+    /// </summary>
+    public string? Note { get; set; }
+
+    /// <summary>
+    ///     Import source (e.g. file, app, etc.) (EN)
+    ///     Nguồn nhập giao dịch (ví dụ: import từ file, app, v.v.) (VI)
+    /// </summary>
+    public string? ImportFrom { get; set; }
+
+    /// <summary>
+    ///     Increased credit limit (credit card only) (EN)
+    ///     Hạn mức tín dụng tăng thêm (chỉ áp dụng cho thẻ tín dụng) (VI)
+    /// </summary>
+    public decimal? IncreaseCreditLimit { get; set; }
+
+    /// <summary>
+    ///     Used percent of credit limit (credit card only) (EN)
+    ///     Phần trăm hạn mức đã sử dụng (chỉ áp dụng cho thẻ tín dụng) (VI)
+    /// </summary>
+    public decimal? UsedPercent { get; set; }
+
+    /// <summary>
+    ///     Transaction category type (EN)
+    ///     Loại giao dịch (thu, chi, chuyển khoản, phí, khác) (VI)
+    /// </summary>
+    public CategoryType CategoryType { get; set; }
+
+    /// <summary>
+    ///     Group of transactions (statement period) (EN)
+    ///     Nhóm giao dịch thuộc kỳ sao kê nào (VI)
+    /// </summary>
+    public string? Group { get; set; }
+
+    /// <summary>
+    ///     Created date (EN)
+    ///     Ngày tạo giao dịch (VI)
+    /// </summary>
+    public DateTime CreatedAt { get; set; }
+
+    /// <summary>
+    ///     Last updated date (EN)
+    ///     Ngày cập nhật cuối cùng (VI)
+    /// </summary>
+    public DateTime UpdatedAt { get; set; }
+
+    /// <summary>
+    ///     Navigation property: link to account (EN)
+    ///     Thuộc tính điều hướng: liên kết với tài khoản (VI)
+    /// </summary>
+    public Account? Account { get; set; }
+}

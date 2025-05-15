@@ -1,8 +1,45 @@
+using CoreFinance.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using CoreFinance.Api.Infrastructures.ServicesExtensions;
+using Serilog;
+
+async Task CreateDbIfNotExistsAsync(IHost host)
+{
+    using var scope = host.Services.CreateScope();
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var context = services.GetRequiredService<CoreFinanceDbContext>();
+        await context.Database.MigrateAsync();
+        //var dbInitializer = services.GetService<DbInitializer>();
+        //if (dbInitializer == null)
+        //{
+        //    logger.LogError("dbInitializer is null");
+        //    return;
+        //}
+
+        //await dbInitializer.Seed();
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred creating the DB.");
+    }
+}
+var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", false, true)
+    .AddJsonFile(
+        $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json",
+        true, true)
+    .Build();
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(configuration)
+    .CreateLogger();
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.AddGeneralConfigurations();
+builder.Services.AddInjectedServices();
 
 var app = builder.Build();
 
@@ -10,32 +47,28 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "CoreFinance Api v1");
+        c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+    });
 }
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+//app.UseAuthorization();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapControllers();
 
-app.Run();
+await CreateDbIfNotExistsAsync(app);
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+
+try
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    app.Run();
+}
+finally
+{
+    Log.CloseAndFlush();
 }
