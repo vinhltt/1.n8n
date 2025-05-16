@@ -198,7 +198,7 @@ jobs:
             docker compose down --remove-orphans || true 
             echo "✅ Đã dừng các containers hiện tại"
             echo "🚀 Khởi động lại n8n và các dịch vụ liên quan..."
-            docker compose -f docker compose.yml up -d
+            docker compose up -d
             echo "✅ Đã khởi động containers thành công"
             echo "⏳ Đang đợi n8n khởi động (30 giây)..."
             sleep 30
