@@ -182,28 +182,28 @@ jobs:
           EOF
         shell: bash
 
-      - name: Docker-compose operations on TrueNAS
+      - name: docker compose operations on TrueNAS
         run: |
           ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
             set -e 
             cd ${{ env.TRUENAS_DEPLOY_DIR }}
             echo "🐳 Working with Docker Compose in ${{ env.TRUENAS_DEPLOY_DIR }}"
             echo "🔄 Đang pull images mới nhất..."
-            docker-compose pull
+            docker compose pull
             echo "✅ Đã pull images thành công"
             echo "🔨 Đang build images cho tất cả các dịch vụ (nếu có thay đổi)..."
-            docker-compose build
+            docker compose build
             echo "✅ Đã build images thành công"
             echo "⏹️  Dừng containers hiện tại (nếu đang chạy)..."
-            docker-compose down --remove-orphans || true 
+            docker compose down --remove-orphans || true 
             echo "✅ Đã dừng các containers hiện tại"
             echo "🚀 Khởi động lại n8n và các dịch vụ liên quan..."
-            docker-compose -f docker-compose.yml up -d
+            docker compose -f docker compose.yml up -d
             echo "✅ Đã khởi động containers thành công"
             echo "⏳ Đang đợi n8n khởi động (30 giây)..."
             sleep 30
             echo "📊 Kiểm tra trạng thái các container..."
-            docker-compose ps
+            docker compose ps
           EOF
         shell: bash
 
