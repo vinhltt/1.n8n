@@ -16,7 +16,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest # Sử dụng GitHub-hosted runner
     environment: ${{ github.ref_name == 'master' && 'production' ||  github.ref_name == 'develop' && 'development' ||  github.ref_name == 'staging' && 'staging' }}
-    
+    # Đặt thời gian timeout cho toàn bộ job này là 30 phút
+    timeout-minutes: 30 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
