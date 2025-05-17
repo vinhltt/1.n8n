@@ -20,21 +20,6 @@ services:
     networks: # Thêm network cho postgresdb để n8n có thể thấy
       - default
 
-  redis: # Dịch vụ Redis mới
-    image: redis:latest # Bạn có thể chọn một phiên bản cụ thể nếu muốn
-    restart: always
-    ports: # Mở port Redis ra ngoài nếu bạn cần truy cập trực tiếp (thường không cần cho queue nội bộ)
-      - "${REDIS_EXTERNAL_PORT:-6379}:6379" # Sử dụng biến môi trường hoặc mặc định là 6379
-    volumes:
-      - redis_data:/data # Volume để lưu trữ dữ liệu Redis
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - default
-
   n8n:
     image: docker.n8n.io/n8nio/n8n
     # build: # Nếu bạn có Dockerfile tùy chỉnh cho n8n, hãy giữ lại phần này
@@ -51,8 +36,6 @@ services:
     depends_on: # n8n phụ thuộc vào postgresdb và redis
       postgresdb:
         condition: service_healthy # Chờ postgresdb sẵn sàng
-      redis:
-        condition: service_healthy # Chờ redis sẵn sàng
     environment:
       - TZ=Asia/Ho_Chi_Minh
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-Asia/Ho_Chi_Minh}
@@ -71,10 +54,6 @@ services:
       - EXECUTIONS_DATA_MAX_AGE=${EXECUTIONS_DATA_MAX_AGE:-720}
       - EXECUTIONS_DATA_PRUNE_MAX_COUNT=${EXECUTIONS_DATA_PRUNE_MAX_COUNT:-50000}
       - N8N_DEFAULT_BINARY_DATA_MODE=${N8N_DEFAULT_BINARY_DATA_MODE:-filesystem}
-      - QUEUE_BULL_REDIS_HOST=redis
-      - QUEUE_BULL_REDIS_PORT=6379
-      - QUEUE_BULL_REDIS_DB=0
-      - EXECUTIONS_MODE=queue
 
   pfm_excel_api:
     build: 
@@ -99,4 +78,3 @@ networks:
 volumes:
   postgres_data:
   n8n_data:
-  redis_data: # Volume mới cho Redis
