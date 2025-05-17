@@ -14,58 +14,112 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: self-hosted  # Chỉ định sử dụng self-hosted runner thay vì ubuntu-latest
+    runs-on: ubuntu-latest # Sử dụng GitHub-hosted runner
     environment: ${{ github.ref_name == 'master' && 'production' ||  github.ref_name == 'develop' && 'development' ||  github.ref_name == 'staging' && 'staging' }}
+    # Đặt thời gian timeout cho toàn bộ job này là 30 phút
+    timeout-minutes: 30 
     steps:
-      - name: Set deploy dir
-        run: echo "DEPLOY_DIR=deploy_${GITHUB_REF_NAME}" >> $GITHUB_ENV
-
-      - name: Prepare deploy dir
-        run: mkdir -p $DEPLOY_DIR
-
-      - name: Clean runner temp env files
-        run: |
-          rm -f $RUNNER_WORKSPACE/_temp/*
-
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          path: ${{ env.DEPLOY_DIR }}
 
-      - name: Prepare n8n directories
-        run: |
-          # Tạo thư mục n8n_data và ssh nếu chưa tồn tại (không xóa dữ liệu cũ)
-          mkdir -p ./n8n_data
-          mkdir -p ./ssh
-          echo "✅ Đã chuẩn bị thư mục, giữ nguyên dữ liệu n8n hiện có"
+      - name: Set TrueNAS Deploy Directory Environment Variable
+        run: echo "TRUENAS_DEPLOY_DIR=${{ vars.DEPLOY_PATH_ON_TRUENAS }}/deploy_${GITHUB_REF_NAME}" >> $GITHUB_ENV
+        shell: bash
 
-      - name: Create .env file from secrets
+      - name: Setup Cloudflared and SSH Config
         run: |
-          echo "Creating .env file..."
+          echo "Runner HOME directory is: $HOME" # In thư mục nhà
+          # Cài đặt cloudflared
+          sudo wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared
+          sudo chmod +x /usr/local/bin/cloudflared
+          echo "Cloudflared version: $(cloudflared --version)"
+
+          # Tạo thư mục $HOME/.ssh nếu chưa tồn tại
+          mkdir -p "$HOME/.ssh"
           
-          # Tạo file .env từ GitHub Secrets và Variables của môi trường
-          cat > .env << EOF
+          # Tạo tệp cấu hình SSH sử dụng $HOME
+          echo "Host truenas-cf-tunnel
+            HostName ${{ secrets.TRUENAS_SSH_HOSTNAME_THROUGH_CLOUDFLARED }}
+            ProxyCommand cloudflared access ssh --hostname %h
+            User ${{ secrets.TRUENAS_USER }}
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            LogLevel ERROR" > "$HOME/.ssh/config" # Sử dụng $HOME
+          
+          chmod 600 "$HOME/.ssh/config"
+          echo "✅ SSH config for Cloudflared created at $HOME/.ssh/config"
+        shell: bash
+
+      - name: Add TrueNAS SSH Private Key to SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.TRUENAS_SSH_PRIVATE_KEY }}
+
+      - name: DEBUG - Verify SSH Config File
+        run: |
+          echo "--- Verifying SSH config file ---"
+          if [ -f "$HOME/.ssh/config" ]; then
+            echo "✅ SSH Config file exists at $HOME/.ssh/config"
+            echo "--- Contents of $HOME/.ssh/config ---"
+            cat "$HOME/.ssh/config"
+            echo "-------------------------------------"
+            echo "--- Listing $HOME/.ssh directory ---"
+            ls -la "$HOME/.ssh"
+            echo "------------------------------------"
+          else
+            echo "❌ SSH Config file NOT FOUND at $HOME/.ssh/config"
+            # Cố gắng liệt kê thư mục $HOME nếu có thể để xem cấu trúc
+            echo "--- Listing $HOME directory ---"
+            ls -la "$HOME"
+            echo "-------------------------------"
+            exit 1 # Gây lỗi nếu tệp không tồn tại
+          fi
+        shell: bash
+
+      - name: Prepare deploy directory on TrueNAS
+        run: |
+          # Sử dụng alias 'truenas-cf-tunnel' đã cấu hình
+          # Thêm -F "$HOME/.ssh/config" vào lệnh ssh để chỉ định rõ ràng
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
+            mkdir -p ${{ env.TRUENAS_DEPLOY_DIR }}
+            echo "✅ Prepared TrueNAS deploy directory: ${{ env.TRUENAS_DEPLOY_DIR }}"
+          EOF
+        shell: bash
+
+      - name: Sync project files to TrueNAS
+        run: |
+          # Sử dụng alias 'truenas-cf-tunnel' và chỉ định tệp cấu hình SSH rõ ràng cho rsync
+          # với $HOME
+          rsync -avz -e "ssh -F $HOME/.ssh/config" \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude 'README-Self-Hosted-Runner.md' \
+            --delete \
+            $GITHUB_WORKSPACE/ \
+            truenas-cf-tunnel:"${{ env.TRUENAS_DEPLOY_DIR }}/"
+          echo "✅ Project files synced to TrueNAS"
+        shell: bash
+
+      - name: Create .env file on TrueNAS
+        run: |
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel "cat > ${{ env.TRUENAS_DEPLOY_DIR }}/.env <<EOF
           # Project name
           COMPOSE_PROJECT_NAME=${{ vars.COMPOSE_PROJECT_NAME || 'n8n' }}
-          
           # PostgreSQL
           POSTGRES_USER=${{ secrets.POSTGRES_USER || 'n8n' }}
-          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_PASSWORD='${{ secrets.POSTGRES_PASSWORD }}'
           POSTGRES_DB=${{ secrets.POSTGRES_DB || 'n8n_database' }}
           POSTGRES_EXTERNAL_PORT=${{ vars.POSTGRES_EXTERNAL_PORT || '5432' }}
-          
           # n8n
           N8N_BASIC_AUTH_USER=${{ secrets.N8N_BASIC_AUTH_USER || 'admin' }}
-          N8N_BASIC_AUTH_PASSWORD=${{ secrets.N8N_BASIC_AUTH_PASSWORD }}
-          N8N_ENCRYPTION_KEY=${{ secrets.N8N_ENCRYPTION_KEY }}
-          DB_POSTGRESDB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          N8N_BASIC_AUTH_PASSWORD='${{ secrets.N8N_BASIC_AUTH_PASSWORD }}'
+          N8N_ENCRYPTION_KEY='${{ secrets.N8N_ENCRYPTION_KEY }}'
+          DB_POSTGRESDB_PASSWORD='${{ secrets.POSTGRES_PASSWORD }}'
           WEBHOOK_URL=${{ vars.WEBHOOK_URL }}
           N8N_EXTERNAL_PORT=${{ vars.N8N_EXTERNAL_PORT || '5678' }}
-
           # Excel API
           EXCEL_API_HTTP_PORT=${{ vars.EXCEL_API_HTTP_PORT || '8080' }}
           EXCEL_API_HTTPS_PORT=${{ vars.EXCEL_API_HTTPS_PORT || '8443' }}
-          
           # Timezone & other settings
           GENERIC_TIMEZONE=${{ secrets.GENERIC_TIMEZONE || 'Asia/Ho_Chi_Minh' }}
           TZ=${{ secrets.TZ || 'Asia/Ho_Chi_Minh' }}
@@ -73,127 +127,162 @@ jobs:
           EXECUTIONS_DATA_PRUNE=${{ secrets.EXECUTIONS_DATA_PRUNE || 'true' }}
           EXECUTIONS_DATA_MAX_AGE=${{ secrets.EXECUTIONS_DATA_MAX_AGE || '720' }}
           EXECUTIONS_DATA_PRUNE_MAX_COUNT=${{ secrets.EXECUTIONS_DATA_PRUNE_MAX_COUNT || '50000' }}
-          
           # Backup settings
           N8N_BACKUP_DIR_HOST=${{ secrets.N8N_BACKUP_DIR_HOST }}
           EOF
-          
-          # Hiển thị thông báo thành công (không hiển thị nội dung của file vì bảo mật)
-          echo "✅ .env file created successfully"
-          
-          # Kiểm tra xem file đã tồn tại chưa
-          if [ -f .env ]; then
-            echo "✅ .env file exists"
-          else
-            echo "❌ Failed to create .env file"
-            exit 1
-          fi
-        working-directory: ${{ env.DEPLOY_DIR }}
+          echo '✅ .env file created on TrueNAS at ${{ env.TRUENAS_DEPLOY_DIR }}/.env'"
+        shell: bash
 
-      - name: Chuẩn bị môi trường và config n8n
+      - name: Prepare n8n host mount directories on TrueNAS
         run: |
-          echo "🧹 Đang chuẩn bị môi trường..."
-          # Tạo thư mục n8n_data nếu chưa có
-          if [ ! -d "./n8n_data" ]; then
-            mkdir -p ./n8n_data
-            echo "✅ Đã tạo thư mục n8n_data"
-          fi
-          # Sao lưu file config nếu có
-          if [ -f "./n8n_data/config" ]; then
-            echo "📦 Sao lưu file config hiện tại..."
-            cp "./n8n_data/config" "./n8n_data/config.bak"
-            echo "✅ Đã sao lưu file config"
-          fi
-          # Kiểm tra file config có chú thích không mong muốn không
-          CONFIG_ISSUE=false
-          if [ -f "./n8n_data/config" ]; then
-            if grep -q "# <<<=== THAY BẰNG KHÓA MẠNH CỦA BẠN" "./n8n_data/config"; then
-              echo "⚠️ Phát hiện chú thích không mong muốn trong file config hiện tại"
-              CONFIG_ISSUE=true
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
+            mkdir -p ${{ env.TRUENAS_DEPLOY_DIR }}/n8n_data
+            mkdir -p ${{ env.TRUENAS_DEPLOY_DIR }}/ssh
+            echo "✅ Prepared n8n host mount directories on TrueNAS (within deployment folder)"
+          EOF
+        shell: bash
+
+      - name: Prepare n8n config file on TrueNAS
+        run: |
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
+            set -e 
+            cd ${{ env.TRUENAS_DEPLOY_DIR }}
+            echo "🧹 Đang chuẩn bị môi trường cho file config n8n..."
+            if [ ! -d "./n8n_data" ]; then
+              mkdir -p ./n8n_data
+              echo "✅ Đã tạo thư mục ./n8n_data"
             fi
-          fi
-          # Chỉ tạo file config mới nếu không tồn tại hoặc có vấn đề
-          if [ ! -f "./n8n_data/config" ] || [ "$CONFIG_ISSUE" = true ]; then
-            if [ -f ".env" ]; then
-              CLEAN_KEY=$(grep "N8N_ENCRYPTION_KEY" .env | cut -d '=' -f2 | xargs)
-              if [ ! -z "$CLEAN_KEY" ]; then
-                echo "📝 Tạo file config với encryptionKey từ .env..."
-                echo "{\"encryptionKey\": \"$CLEAN_KEY\"}" > ./n8n_data/config
-                echo "✅ Đã tạo file config mới"
+            if [ -f "./n8n_data/config" ]; then
+              echo "📦 Sao lưu file config hiện tại..."
+              cp "./n8n_data/config" "./n8n_data/config.bak.\$(date +%Y%m%d_%H%M%S)"
+              echo "✅ Đã sao lưu file config"
+            fi
+            CONFIG_ISSUE=false
+            if [ -f "./n8n_data/config" ]; then
+              if grep -q "# <<<=== THAY BẰNG KHÓA MẠNH CỦA BẠN" "./n8n_data/config"; then
+                echo "⚠️ Phát hiện chú thích không mong muốn trong file config hiện tại"
+                CONFIG_ISSUE=true
+              fi
+            fi
+            if [ ! -f "./n8n_data/config" ] || [ "\$CONFIG_ISSUE" = true ]; then
+              if [ -f ".env" ]; then
+                CLEAN_KEY=\$(grep "N8N_ENCRYPTION_KEY=" .env | cut -d '=' -f2- | sed "s/^'//;s/'\$//")
+                if [ ! -z "\$CLEAN_KEY" ] && [ "\$CLEAN_KEY" != "null" ]; then
+                  echo "📝 Tạo file config với encryptionKey từ .env..."
+                  printf '{"encryptionKey": "%s"}\n' "\$CLEAN_KEY" > ./n8n_data/config
+                  echo "✅ Đã tạo file config mới tại ./n8n_data/config"
+                else
+                  echo "⚠️ Không tìm thấy N8N_ENCRYPTION_KEY hợp lệ trong file .env hoặc giá trị rỗng/null"
+                fi
               else
-                echo "⚠️ Không tìm thấy N8N_ENCRYPTION_KEY trong file .env"
+                echo "⚠️ Không tìm thấy file .env để đọc N8N_ENCRYPTION_KEY"
               fi
             else
-              echo "⚠️ Không tìm thấy file .env"
+              echo "✅ File config hiện tại không có vấn đề, giữ nguyên"
             fi
+          EOF
+        shell: bash
+
+      - name: docker compose operations on TrueNAS
+        run: |
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
+            set -e 
+            cd ${{ env.TRUENAS_DEPLOY_DIR }}
+            echo "🐳 Working with Docker Compose in ${{ env.TRUENAS_DEPLOY_DIR }}"
+            echo "🔄 Đang pull images mới nhất..."
+            docker compose pull
+            echo "✅ Đã pull images thành công"
+            echo "🔨 Đang build images cho tất cả các dịch vụ (nếu có thay đổi)..."
+            docker compose build
+            echo "✅ Đã build images thành công"
+            echo "⏹️  Dừng containers hiện tại (nếu đang chạy)..."
+            docker compose down --remove-orphans || true 
+            echo "✅ Đã dừng các containers hiện tại"
+            echo "🚀 Khởi động lại n8n và các dịch vụ liên quan..."
+            docker compose up -d
+            echo "✅ Đã khởi động containers thành công"
+            echo "⏳ Đang đợi n8n khởi động (30 giây)..."
+            sleep 30
+            echo "📊 Kiểm tra trạng thái các container..."
+            docker compose ps
+          EOF
+        shell: bash
+
+      - name: Display n8n URL
+        run: |
+          echo "🌐 n8n đã được triển khai thành công trên TrueNAS."
+          if [ ! -z "${{ vars.WEBHOOK_URL }}" ]; then
+            echo "   Truy cập tại: ${{ vars.WEBHOOK_URL }}"
           else
-            echo "✅ File config hiện tại không có vấn đề, giữ nguyên"
-          fi
-        working-directory: ${{ env.DEPLOY_DIR }}
-
-      - name: Pull và build docker images
-        run: |
-          echo "🔄 Đang pull images mới nhất..."
-          docker-compose pull
-          echo "✅ Đã pull images thành công"
-          echo "🔨 Đang build images cho tất cả các dịch vụ..."
-          docker-compose build
-          echo "✅ Đã build images thành công"
-        working-directory: ${{ env.DEPLOY_DIR }}
-
-      - name: Dừng và xóa container cũ (nếu có)
-        run: |
-          echo "⏹️ Dừng containers hiện tại..."
-          docker-compose down || true
-          echo "✅ Đã dừng các containers hiện tại"
-
-      - name: Khởi động lại n8n
-        run: |
-          docker-compose -f docker-compose.yml up -d
-          echo "✅ Đã khởi động containers thành công"
-          echo "⏳ Đang đợi n8n khởi động..."
-          sleep 15
-        working-directory: ${{ env.DEPLOY_DIR }}
-
-      - name: Kiểm tra trạng thái các container
-        run: |
-          docker-compose ps
-        working-directory: ${{ env.DEPLOY_DIR }}
-
-      - name: Hiển thị URL truy cập n8n
-        run: |
-          echo "🌐 n8n đã được triển khai thành công và có thể truy cập tại:"
-          echo "   http://localhost:5678"
-          if [ ! -z "$WEBHOOK_URL" ]; then
-            echo "   hoặc: $WEBHOOK_URL"
+            echo "   Có thể truy cập tại địa chỉ IP/hostname của TrueNAS và cổng ${{ vars.N8N_EXTERNAL_PORT || '5678' }}"
+            echo "   Ví dụ: http://<IP_TRUENAS_CỦA_BẠN>:${{ vars.N8N_EXTERNAL_PORT || '5678' }}"
           fi
           echo "✅ TRIỂN KHAI N8N HOÀN TẤT THÀNH CÔNG"
+        shell: bash
 
-      # Gửi thông báo Telegram (luôn gửi dù thành công hay thất bại)
-      - name: Send notification
-        if: always()  # Thay đổi từ success() thành always() để luôn gửi thông báo
+      - name: Send Telegram success/failure notification
+        if: success() || failure() 
         run: |
           if [[ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" && ! -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]]; then
-            # Tạo link đến GitHub Action run hiện tại
             ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            
-            # Kiểm tra trạng thái của job
-            if [ "${{ job.status }}" == "success" ]; then
-              # Thông báo thành công
+            JOB_STATUS="${{ job.status }}" 
+            if [ "$JOB_STATUS" == "success" ]; then # Sử dụng "" cho so sánh chuỗi trong [ ]
               STATUS_EMOJI="✅"
-              STATUS_TEXT="Deployed n8n successfully!"
+              STATUS_TEXT="Triển khai n8n lên TrueNAS (qua Cloudflared) THÀNH CÔNG!"
             else
-              # Thông báo thất bại
-              STATUS_EMOJI="❌"
-              STATUS_TEXT="Deployment n8n failed!"
+              if [ "$JOB_STATUS" != "cancelled" ]; then # Sử dụng "" cho so sánh chuỗi
+                STATUS_EMOJI="❌"
+                STATUS_TEXT="Triển khai n8n lên TrueNAS (qua Cloudflared) THẤT BẠI!"
+              else
+                echo "Job was cancelled, likely due to timeout. Notification will be handled by the timeout step."
+                exit 0
+              fi
             fi
-            
-            # Gửi thông báo tới Telegram sử dụng JSON để đảm bảo xuống dòng hoạt động chính xác
+            # Tạo payload JSON. Biến JSON_PAYLOAD được shell mở rộng.
+            JSON_PAYLOAD=$(printf '{
+              "chat_id": "%s",
+              "text": "%s *%s*\\nNhánh: %s\\n[Xem Chi Tiết Triển Khai](%s)",
+              "parse_mode": "Markdown"
+            }' \
+            "${{ secrets.TELEGRAM_CHAT_ID }}" \
+            "$STATUS_EMOJI" \
+            "$STATUS_TEXT" \
+            "${{ github.ref_name }}" \
+            "$ACTION_URL")
+            # Gửi payload JSON. Xóa dấu \ trước $JSON_PAYLOAD
             curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
               -H "Content-Type: application/json" \
-              -d '{
-                "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
-                "text": "'"$STATUS_EMOJI"' *'"$STATUS_TEXT"'*\n [View Deployment Details]('"$ACTION_URL"')",
-                "parse_mode": "Markdown"
-              }'
+              -d "$JSON_PAYLOAD" 
+            echo "ℹ️ Thông báo Telegram (thành công/thất bại) đã được gửi (hoặc cố gắng gửi)."
+          else
+            echo "⚠️ Biến Telegram (BOT_TOKEN hoặc CHAT_ID) chưa được đặt. Bỏ qua thông báo."
           fi
+        shell: bash
+
+      - name: Send Telegram timeout notification
+        if: cancelled() 
+        run: |
+          if [[ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" && ! -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]]; then
+            ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            STATUS_EMOJI="⏱️"
+            STATUS_TEXT="Triển khai n8n lên TrueNAS (qua Cloudflared) ĐÃ BỊ HỦY do quá thời gian (timeout > 30 phút)!"
+            
+            JSON_PAYLOAD=$(printf '{
+              "chat_id": "%s",
+              "text": "%s *%s*\\nNhánh: %s\\n[Xem Chi Tiết Triển Khai](%s)",
+              "parse_mode": "Markdown"
+            }' \
+            "${{ secrets.TELEGRAM_CHAT_ID }}" \
+            "$STATUS_EMOJI" \
+            "$STATUS_TEXT" \
+            "${{ github.ref_name }}" \
+            "$ACTION_URL")
+            # Gửi payload JSON. Xóa dấu \ trước $JSON_PAYLOAD
+            curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+              -H "Content-Type: application/json" \
+              -d "$JSON_PAYLOAD"
+            echo "ℹ️ Thông báo Telegram (timeout) đã được gửi."
+          else
+            echo "⚠️ Biến Telegram (BOT_TOKEN hoặc CHAT_ID) chưa được đặt. Bỏ qua thông báo timeout."
+          fi
+        shell: bash

@@ -1,3 +1,5 @@
+version: '3.8' # Nên chỉ định phiên bản docker-compose
+
 services:
   postgresdb:
     image: postgres:15
@@ -15,12 +17,29 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks: # Thêm network cho postgresdb để n8n có thể thấy
+      - default
+
+  redis: # Dịch vụ Redis mới
+    image: redis:latest # Bạn có thể chọn một phiên bản cụ thể nếu muốn
+    restart: always
+    ports: # Mở port Redis ra ngoài nếu bạn cần truy cập trực tiếp (thường không cần cho queue nội bộ)
+      - "${REDIS_EXTERNAL_PORT:-6379}:6379" # Sử dụng biến môi trường hoặc mặc định là 6379
+    volumes:
+      - redis_data:/data # Volume để lưu trữ dữ liệu Redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - default
 
   n8n:
     image: docker.n8n.io/n8nio/n8n
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # build: # Nếu bạn có Dockerfile tùy chỉnh cho n8n, hãy giữ lại phần này
+    #   context: .
+    #   dockerfile: Dockerfile
     restart: always
     ports:
       - "${N8N_EXTERNAL_PORT}:5678"
@@ -29,8 +48,11 @@ services:
     volumes:
       - n8n_data:/home/node/.n8n
       - ./ssh:/home/node/.ssh
-    depends_on:
-      - postgresdb
+    depends_on: # n8n phụ thuộc vào postgresdb và redis
+      postgresdb:
+        condition: service_healthy # Chờ postgresdb sẵn sàng
+      redis:
+        condition: service_healthy # Chờ redis sẵn sàng
     environment:
       - TZ=Asia/Ho_Chi_Minh
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-Asia/Ho_Chi_Minh}
@@ -73,3 +95,4 @@ networks:
 volumes:
   postgres_data:
   n8n_data:
+  redis_data: # Volume mới cho Redis
