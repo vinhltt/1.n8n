@@ -480,10 +480,8 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         /// </exception>
         public static Expression GetMemberExpression(Expression parameter, string? propertyName)
         {
-            if (parameter == null)
-                throw new ArgumentNullException(nameof(parameter));
-            if (propertyName == null)
-                throw new ArgumentNullException(nameof(propertyName));
+            ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+            ArgumentNullException.ThrowIfNull(propertyName, nameof(propertyName));
             const char dot = '.';
             while (true)
             {
@@ -501,8 +499,7 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         /// <returns></returns>
         public static string? GetPropertyName(Expression expression)
         {
-            if (expression == null)
-                throw new ArgumentNullException(nameof(expression));
+            ArgumentNullException.ThrowIfNull(expression, nameof(expression));
             IList<string?> propertyNames = new List<string?>();
             var exp = expression;
             while (true)

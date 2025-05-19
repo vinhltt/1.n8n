@@ -1,9 +1,9 @@
-﻿using System.Collections;
-using System.Linq.Expressions;
-using System.Reflection;
-using CoreFinance.Contracts.BaseEfModels;
+﻿using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Contracts.Enums;
 using CoreFinance.Contracts.Utilities;
+using System.Collections;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace CoreFinance.Contracts.EntityFrameworkUtilities;
 // ReSharper disable All
@@ -91,9 +91,8 @@ public static class ExpressionBuilder
     /// <exception cref="NotSupportedException"></exception>
     private static Expression? CreateExpression(Expression parameter, Criteria filterDescriptor)
     {
-        if (parameter == null) throw new ArgumentNullException(nameof(parameter));
-
-        if (filterDescriptor == null) throw new ArgumentNullException(nameof(filterDescriptor));
+        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+        ArgumentNullException.ThrowIfNull(filterDescriptor, nameof(filterDescriptor));
 
         var member = ExpressionUtils.GetMemberExpression(parameter, filterDescriptor.Field);
         var value = Expression.Constant(filterDescriptor.Value) as Expression;
@@ -294,7 +293,7 @@ public static class ExpressionBuilder
     /// </exception>
     private static Criteria GetCriteria(FilterDescriptor? filter)
     {
-        if (filter == null) throw new ArgumentNullException(nameof(filter));
+        ArgumentNullException.ThrowIfNull(filter, nameof(filter));
 
         var values = new List<string>();
         if (filter.Values is { Length: > 0 })

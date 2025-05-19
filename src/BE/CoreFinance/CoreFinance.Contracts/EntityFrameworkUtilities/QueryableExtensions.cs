@@ -41,8 +41,7 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         /// <exception cref="ArgumentNullException">queryable</exception> O references 
         public static bool IsOrdered<T>(this IQueryable<T> source)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            ArgumentNullException.ThrowIfNull(source, nameof(source));
             return source.Expression.Type.IsAssignableFrom(typeof(IOrderedQueryable<T>));
         }
         #region Where
@@ -246,14 +245,9 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public static async Task<IBasePaging<TSource>> ToPagingAsync<TSource>(this IQueryable<TSource> queryable, Pagination pagination)
         {
-            if (pagination == null)
-            {
-                throw new ArgumentNullException(nameof(pagination));
-            }
-            if (queryable == null)
-            {
-                throw new ArgumentNullException(nameof(queryable));
-            }
+            ArgumentNullException.ThrowIfNull(pagination, nameof(pagination));
+            ArgumentNullException.ThrowIfNull(queryable, nameof(queryable));
+
             var pageIndex = pagination.PageIndex;
             if (pageIndex < 1)
             {
@@ -334,10 +328,9 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         /// <exception cref="ArgumentNullException"></exception>
         public static async Task<IBasePaging<TResult>> ToPagingAsync<TResult, TSource>(this IQueryable<TSource> queryable, IFilterBodyRequest request, Expression<Func<TSource, TResult>> selector) where TResult : class
         {
-            if (request == null || request.Pagination == null)
-                throw new ArgumentNullException(nameof(request));
-            if (selector == null)
-                throw new ArgumentNullException(nameof(selector));
+            ArgumentNullException.ThrowIfNull(request, nameof(request));
+            ArgumentNullException.ThrowIfNull(request.Pagination, nameof(request.Pagination));
+            ArgumentNullException.ThrowIfNull(selector, nameof(selector));
 
             var viewModelQuery = queryable.Select(selector);
 

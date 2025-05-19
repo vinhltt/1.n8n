@@ -12,6 +12,7 @@ using MockQueryable;
 using Moq;
 using Bogus;
 using FluentAssertions;
+// ReSharper disable RedundantArgumentDefaultValue
 
 namespace CoreFinance.Application.Tests;
 
@@ -43,6 +44,7 @@ public class AccountServiceTests
         var pageSize = 2;
         var pageIndex = 1;
         var orderedAccounts = accounts.OrderBy(a => a.Name).ToList();
+        // ReSharper disable once UselessBinaryOperation
         var expectedNames = orderedAccounts.Skip((pageIndex - 1) * pageSize).Take(pageSize).Select(a => a.Name)
             .ToList();
 
