@@ -1,64 +1,127 @@
-//using Moq;
-//using CoreFinance.Application.DTOs;
-//using CoreFinance.Application.Services;
-//using CoreFinance.Domain;
+using System.Linq.Expressions;
+using AutoMapper;
+using CoreFinance.Application.DTOs;
+using CoreFinance.Application.Services;
+using CoreFinance.Contracts.BaseEfModels;
+using CoreFinance.Contracts.Enums;
+using CoreFinance.Domain;
+using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.UnitOffWorks;
+using Microsoft.Extensions.Logging;
+using MockQueryable;
+using Moq;
+using Bogus;
 
-//namespace CoreFinance.Application.Tests
-//{
-//    public class AccountServiceTests
-//    {
-//        private readonly Mock<IAccountRepository> _repoMock;
-//        private readonly AccountService _service;
+namespace CoreFinance.Application.Tests;
 
-//        public AccountServiceTests()
-//        {
-//            _repoMock = new Mock<IAccountRepository>();
-//            _service = new AccountService(_repoMock.Object);
-//        }
+public class AccountServiceTests
+{
+    private static IQueryable<Account> GenerateFakeAccounts(int count)
+    {
+        var faker = new Faker<Account>()
+            .RuleFor(a => a.Id, f => Guid.NewGuid())
+            .RuleFor(a => a.UserId, f => Guid.NewGuid())
+            .RuleFor(a => a.Name, f => f.Company.CompanyName())
+            .RuleFor(a => a.Type, f => f.PickRandom<AccountType>())
+            .RuleFor(a => a.CardNumber, f => f.Finance.CreditCardNumber())
+            .RuleFor(a => a.Currency, f => f.Finance.Currency().Code)
+            .RuleFor(a => a.InitialBalance, f => f.Finance.Amount(0, 10000))
+            .RuleFor(a => a.CurrentBalance, (f, a) => a.InitialBalance + f.Finance.Amount(-1000, 1000))
+            .RuleFor(a => a.AvailableLimit, f => f.Random.Bool() ? f.Finance.Amount(0, 5000) : null)
+            .RuleFor(a => a.CreatedAt, f => f.Date.Past(2))
+            .RuleFor(a => a.UpdatedAt, f => f.Date.Recent())
+            .RuleFor(a => a.IsActive, f => f.Random.Bool());
+        return faker.Generate(count).AsQueryable().BuildMock();
+    }
 
-//        [Fact]
-//        public async Task CreateAccountAsync_ShouldReturnAccountDto()
-//        {
-//            // Arrange
-//            var request = new CreateAccountRequest
-//            {
-//                UserId = Guid.NewGuid(),
-//                AccountName = "Test Account",
-//                AccountType = "Bank",
-//                Currency = "VND",
-//                InitialBalance = 1000
-//            };
+    [Fact]
+    public async Task GetPagingAsync_ShouldReturnPagedResult()
+    {
+        // Arrange
+        var accounts = GenerateFakeAccounts(3);
+        var accountViewModels = accounts.Select(a => new AccountViewModel
+        {
+            Id = a.Id,
+            Name = a.Name,
+            Currency = a.Currency,
+        }).AsQueryable().BuildMock();
 
-//            // Act
-//            var result = await _service.CreateAccountAsync(request);
+        var repoMock = new Mock<IBaseRepository<Account, Guid>>();
+        repoMock.Setup(r => r.GetNoTrackingEntities(It.IsAny<Expression<Func<Account, object>>>()))
+            .Returns(accounts);
+        repoMock.Setup(x => x.GetQueryableTable()).Returns(accounts);
 
-//            // Assert
-//            Assert.NotNull(result);
-//            Assert.Equal(request.AccountName, result.AccountName);
-//            Assert.Equal(request.Currency, result.Currency);
-//            Assert.Equal(request.InitialBalance, result.InitialBalance);
-//        }
+        var unitOfWorkMock = new Mock<IUnitOffWork>();
+        unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
 
-//        [Fact]
-//        public async Task GetAccountsAsync_ShouldReturnList()
-//        {
-//            // Arrange
-//            var userId = Guid.NewGuid();
-//            var accounts = new List<Account>
-//            {
-//                new() { AccountId = Guid.NewGuid(), UserId = userId, AccountName = "A", AccountType = AccountType.Bank, Currency = "VND", InitialBalance = 100, CurrentBalance = 100, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow, IsActive = true },
-//                new() { AccountId = Guid.NewGuid(), UserId = userId, AccountName = "B", AccountType = AccountType.Cash, Currency = "USD", InitialBalance = 200, CurrentBalance = 200, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow, IsActive = true }
-//            };
-//            _repoMock.Setup(r => r.GetAccountsByUserIdAsync(userId)).ReturnsAsync(accounts);
+        var mapperMock = new Mock<IMapper>();
+        // ProjectTo trả về IQueryable<AccountViewModel> hỗ trợ async
+        mapperMock.Setup(m => m.ProjectTo<AccountViewModel>(It.IsAny<IQueryable<Account>>(), It.IsAny<object?>()))
+            .Returns(accountViewModels);
 
-//            // Act
-//            var result = await _service.GetAccountsAsync(userId);
+        var loggerMock = new Mock<ILogger<AccountService>>();
 
-//            // Assert
-//            Assert.NotNull(result);
-//            Assert.Collection(result,
-//                a => Assert.Equal("A", a.AccountName),
-//                a => Assert.Equal("B", a.AccountName));
-//        }
-//    }
-//} 
+        var service = new AccountService(mapperMock.Object, unitOfWorkMock.Object, loggerMock.Object);
+
+        var request = new FilterBodyRequest
+        {
+            SearchValue = "Account",
+            Pagination = new Pagination { PageIndex = 1, PageSize = 2 },
+            Orders = new List<SortDescriptor> { new() { Field = "Name", Direction = SortDirection.Asc } }
+        };
+
+        // Act
+        var result = await service.GetPagingAsync(request);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotNull(result.Data);
+        Assert.Equal(2, result.Data.Count()); // PageSize = 2
+        Assert.Contains(result.Data, x => x.Name == "Account 1");
+        Assert.Contains(result.Data, x => x.Name == "Account 2");
+        Assert.Equal(3, result.Pagination.TotalRow); // Tổng số bản ghi
+        Assert.Equal(2, result.Pagination.PageSize);
+        Assert.Equal(1, result.Pagination.PageIndex);
+    }
+
+    [Fact]
+    public async Task GetPagingAsync_ShouldFilterBySearchValue()
+    {
+        // Arrange
+        var accounts = GenerateFakeAccounts(3);
+        var accountViewModels = accounts.Select(a => new AccountViewModel
+        {
+            Id = a.Id,
+            Name = a.Name,
+            Currency = a.Currency,
+        }).AsQueryable().BuildMock();
+
+        var repoMock = new Mock<IBaseRepository<Account, Guid>>();
+        repoMock.Setup(r => r.GetNoTrackingEntities(It.IsAny<Expression<Func<Account, object>>>()))
+            .Returns(accounts);
+
+        var unitOfWorkMock = new Mock<IUnitOffWork>();
+        unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
+
+        var mapperMock = new Mock<IMapper>();
+        mapperMock.Setup(m => m.ProjectTo<AccountViewModel>(It.IsAny<IQueryable<Account>>(), It.IsAny<object?>()))
+            .Returns(accountViewModels);
+        var loggerMock = new Mock<ILogger<AccountService>>();
+
+        var service = new AccountService(mapperMock.Object, unitOfWorkMock.Object, loggerMock.Object);
+
+        var request = new FilterBodyRequest
+        {
+            SearchValue = "Account 1"
+        };
+
+        // Act
+        var result = await service.GetPagingAsync(request);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotNull(result.Data);
+        Assert.Single(result.Data);
+        Assert.Equal("Account 1", result.Data.First().Name);
+    }
+}
