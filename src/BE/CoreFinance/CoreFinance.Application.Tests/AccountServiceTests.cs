@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using MockQueryable;
 using Moq;
 using Bogus;
+using FluentAssertions;
 
 namespace CoreFinance.Application.Tests;
 
@@ -19,8 +20,8 @@ public class AccountServiceTests
     private static IQueryable<Account> GenerateFakeAccounts(int count)
     {
         var faker = new Faker<Account>()
-            .RuleFor(a => a.Id, f => Guid.NewGuid())
-            .RuleFor(a => a.UserId, f => Guid.NewGuid())
+            .RuleFor(a => a.Id, _ => Guid.NewGuid())
+            .RuleFor(a => a.UserId, _ => Guid.NewGuid())
             .RuleFor(a => a.Name, f => f.Company.CompanyName())
             .RuleFor(a => a.Type, f => f.PickRandom<AccountType>())
             .RuleFor(a => a.CardNumber, f => f.Finance.CreditCardNumber())
@@ -38,7 +39,15 @@ public class AccountServiceTests
     public async Task GetPagingAsync_ShouldReturnPagedResult()
     {
         // Arrange
-        var accounts = GenerateFakeAccounts(3);
+        var accounts = GenerateFakeAccounts(3).ToList();
+        var pageSize = 2;
+        var pageIndex = 1;
+        var orderedAccounts = accounts.OrderBy(a => a.Name).ToList();
+        var expectedNames = orderedAccounts.Skip((pageIndex - 1) * pageSize).Take(pageSize).Select(a => a.Name)
+            .ToList();
+
+        var accountsMock = accounts.AsQueryable().BuildMock();
+
         var accountViewModels = accounts.Select(a => new AccountViewModel
         {
             Id = a.Id,
@@ -47,15 +56,14 @@ public class AccountServiceTests
         }).AsQueryable().BuildMock();
 
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
-        repoMock.Setup(r => r.GetNoTrackingEntities(It.IsAny<Expression<Func<Account, object>>>()))
-            .Returns(accounts);
-        repoMock.Setup(x => x.GetQueryableTable()).Returns(accounts);
+        repoMock.Setup(r => r.GetNoTrackingEntities(It.IsAny<Expression<Func<Account, object>>>() ))
+            .Returns(accountsMock);
+        repoMock.Setup(x => x.GetQueryableTable()).Returns(accountsMock);
 
         var unitOfWorkMock = new Mock<IUnitOffWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
 
         var mapperMock = new Mock<IMapper>();
-        // ProjectTo trả về IQueryable<AccountViewModel> hỗ trợ async
         mapperMock.Setup(m => m.ProjectTo<AccountViewModel>(It.IsAny<IQueryable<Account>>(), It.IsAny<object?>()))
             .Returns(accountViewModels);
 
@@ -65,8 +73,8 @@ public class AccountServiceTests
 
         var request = new FilterBodyRequest
         {
-            SearchValue = "Account",
-            Pagination = new Pagination { PageIndex = 1, PageSize = 2 },
+            SearchValue = "", // Có thể để trống hoặc lấy ký tự chung, vì không filter cụ thể
+            Pagination = new Pagination { PageIndex = pageIndex, PageSize = pageSize },
             Orders = new List<SortDescriptor> { new() { Field = "Name", Direction = SortDirection.Asc } }
         };
 
@@ -74,21 +82,24 @@ public class AccountServiceTests
         var result = await service.GetPagingAsync(request);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.NotNull(result.Data);
-        Assert.Equal(2, result.Data.Count()); // PageSize = 2
-        Assert.Contains(result.Data, x => x.Name == "Account 1");
-        Assert.Contains(result.Data, x => x.Name == "Account 2");
-        Assert.Equal(3, result.Pagination.TotalRow); // Tổng số bản ghi
-        Assert.Equal(2, result.Pagination.PageSize);
-        Assert.Equal(1, result.Pagination.PageIndex);
+        result.Should().NotBeNull();
+        result.Data.Should().NotBeNull();
+        result.Data.Count().Should().Be(pageSize); // PageSize = 2
+        result.Data.Select(x => x.Name).Should().Contain(expectedNames);
+        result.Pagination.TotalRow.Should().Be(accounts.Count); // Tổng số bản ghi
+        result.Pagination.PageSize.Should().Be(pageSize);
+        result.Pagination.PageIndex.Should().Be(pageIndex);
     }
 
     [Fact]
     public async Task GetPagingAsync_ShouldFilterBySearchValue()
     {
         // Arrange
-        var accounts = GenerateFakeAccounts(3);
+        var accounts = GenerateFakeAccounts(3).ToList();
+        var expectedName = accounts[0].Name; // Lấy tên bất kỳ từ dữ liệu fake
+
+        var accountsMock = accounts.AsQueryable().BuildMock();
+
         var accountViewModels = accounts.Select(a => new AccountViewModel
         {
             Id = a.Id,
@@ -97,8 +108,8 @@ public class AccountServiceTests
         }).AsQueryable().BuildMock();
 
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
-        repoMock.Setup(r => r.GetNoTrackingEntities(It.IsAny<Expression<Func<Account, object>>>()))
-            .Returns(accounts);
+        repoMock.Setup(r => r.GetNoTrackingEntities(It.IsAny<Expression<Func<Account, object>>>() ))
+            .Returns(accountsMock);
 
         var unitOfWorkMock = new Mock<IUnitOffWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
@@ -112,16 +123,16 @@ public class AccountServiceTests
 
         var request = new FilterBodyRequest
         {
-            SearchValue = "Account 1"
+            SearchValue = expectedName // Dùng đúng tên vừa lấy
         };
 
         // Act
         var result = await service.GetPagingAsync(request);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.NotNull(result.Data);
-        Assert.Single(result.Data);
-        Assert.Equal("Account 1", result.Data.First().Name);
+        result.Should().NotBeNull();
+        result.Data.Should().NotBeNull();
+        result.Data.Should().ContainSingle();
+        result.Data.First().Name.Should().Be(expectedName);
     }
 }
