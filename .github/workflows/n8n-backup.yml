@@ -3,13 +3,15 @@ name: Daily n8n Backup (Production Only)
 on:
   workflow_dispatch:
     # Cho phép kích hoạt thủ công
-  schedule:
-    - cron: '15 0 * * *' # 7h15 sáng giờ Việt Nam (UTC+7)
+  # schedule:
+  #   - cron: '15 0 * * *' # 7h15 sáng giờ Việt Nam (UTC+7)
 
 jobs:
   backup:
     if: ${{ github.ref_name == 'master' }}
     runs-on: self-hosted
+    # Đặt thời gian timeout cho toàn bộ job này là 30 phút
+    timeout-minutes: 30 
     name: Daily n8n Backup (Production Only)
     steps:
       # Bỏ bước checkout code, sử dụng luôn thư mục deploy production
