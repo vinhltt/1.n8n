@@ -81,6 +81,11 @@ var userFaker = new Faker<User>()
     .RuleFor(u => u.Email, f => f.Internet.Email());
 var users = userFaker.Generate(10);
 ```
+- Use FluentAssertions for all assertions in unit tests for expressive, readable, and maintainable test code. Example:
+
+```csharp
+result.Should().Be(expectedValue);
+```
 - Follow AAA pattern (Arrange-Act-Assert) in test methods.
 - **Chỉ sử dụng xUnit cho unit test, không dùng NUnit hay framework khác.**
 

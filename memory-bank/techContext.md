@@ -11,6 +11,7 @@
 - Logging/Monitoring: ELK/EFK, Prometheus, Grafana
 - Authentication: OpenIddict, JWT, OAuth2
 - (Frontend): (Cần xác định - ví dụ: React, Angular, Vue, Blazor)
+- FluentAssertions cho assert kết quả trong unit test
 
 ## Thiết lập phát triển
 - Sử dụng file .env cho cấu hình môi trường

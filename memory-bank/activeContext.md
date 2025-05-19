@@ -26,4 +26,5 @@
 - Luôn review lại BA Design và Memory Bank trước khi bắt đầu task mới.
 - Đã chuẩn hóa sử dụng Bogus cho fake data trong unit test, tuân thủ .NET rule.
 - Checklist phát triển/test phải có hướng dẫn sử dụng Bogus cho data giả lập.
-- **Chỉ sử dụng xUnit cho unit test, không dùng NUnit hay framework khác.** 
+- **Chỉ sử dụng xUnit cho unit test, không dùng NUnit hay framework khác.**
+- **Chuẩn hóa sử dụng FluentAssertions cho assert kết quả trong unit test, tuân thủ .NET rule.** 

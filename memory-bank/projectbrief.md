@@ -16,4 +16,5 @@
 - Dễ sử dụng, giao diện trực quan, thao tác nhanh chóng.
 - Có tài liệu hướng dẫn chi tiết cho người dùng và nhà phát triển.
 - Hỗ trợ backup, restore, triển khai linh hoạt trên nhiều môi trường.
-- Đáp ứng các yêu cầu phi chức năng: hiệu năng, mở rộng, sẵn sàng cao, bảo mật, dễ bảo trì, tuân thủ quy định pháp lý nếu có. 
+- Đáp ứng các yêu cầu phi chức năng: hiệu năng, mở rộng, sẵn sàng cao, bảo mật, dễ bảo trì, tuân thủ quy định pháp lý nếu có.
+- Chuẩn hóa sử dụng FluentAssertions cho assert kết quả trong unit test, tuân thủ .NET rule. 

@@ -6,6 +6,7 @@
 - Xác định rõ phạm vi, mục tiêu, nghiệp vụ, kiến trúc, pattern, công nghệ, ràng buộc kỹ thuật.
 - Đã chuẩn hóa sử dụng Bogus cho fake data trong unit test, tuân thủ .NET rule.
 - Đã thống nhất chỉ sử dụng xUnit cho unit test.
+- Đã chuẩn hóa sử dụng FluentAssertions cho assert kết quả trong unit test, tuân thủ .NET rule.
 
 ## Còn lại
 - Bổ sung user stories, acceptance criteria chi tiết cho từng chức năng.

@@ -23,4 +23,5 @@
 ## Cách hệ thống nên hoạt động
 - Cho phép kéo thả các node để xây dựng workflow tự động hóa.
 - Hỗ trợ cấu hình, giám sát và quản lý workflow dễ dàng.
-- Cung cấp báo cáo, biểu đồ, thông báo, nhắc nhở theo thời gian thực. 
+- Cung cấp báo cáo, biểu đồ, thông báo, nhắc nhở theo thời gian thực.
+- Chuẩn hóa sử dụng FluentAssertions cho assert kết quả trong unit test, tuân thủ .NET rule. 

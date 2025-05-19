@@ -41,6 +41,7 @@
 ## Best Practices
 - Clean Architecture, DDD, TDD, SOLID cho mọi service.
 - Viết unit test, integration test đầy đủ, coverage > 80%.
+- Chuẩn hóa sử dụng FluentAssertions cho assert kết quả trong unit test, tuân thủ .NET rule.
 - Triển khai blue-green/canary, feature flag cho release.
 - Có tài liệu hướng dẫn backup, restore, disaster recovery.
 - Định nghĩa acceptance criteria rõ ràng cho từng chức năng.
