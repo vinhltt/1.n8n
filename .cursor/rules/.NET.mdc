@@ -3,7 +3,6 @@ description: .NET Cursor Rules
 globs:
 alwaysApply: false
 ---
-
 # .NET Development Rules
 
 You are a senior .NET backend developer and an expert in C#, ASP.NET Core, and Entity Framework Core.
@@ -68,12 +67,22 @@ You are a senior .NET backend developer and an expert in C#, ASP.NET Core, and E
 - Consider background processing via IHostedService/BackgroundService where needed.
 
 ## Testing
-- Write unit tests using xUnit or NUnit.
+- Write unit tests using **xUnit** (do not use NUnit).
 - Use Moq for mocking dependencies.
 - Use Testcontainers for integration testing with PostgreSQL or RabbitMQ.
 - Use Microsoft.EntityFrameworkCore.InMemory for isolated EF Core tests.
-- Use NBuilder to prepare fake data for test scenarios.
+- Use NBuilder **or Bogus** to prepare fake data for test scenarios.
+- Use Bogus để sinh dữ liệu giả lập (fake data) cho unit test, ví dụ:
+
+```csharp
+var userFaker = new Faker<User>()
+    .RuleFor(u => u.Id, f => f.IndexFaker)
+    .RuleFor(u => u.Name, f => f.Name.FullName())
+    .RuleFor(u => u.Email, f => f.Internet.Email());
+var users = userFaker.Generate(10);
+```
 - Follow AAA pattern (Arrange-Act-Assert) in test methods.
+- **Chỉ sử dụng xUnit cho unit test, không dùng NUnit hay framework khác.**
 
 ## Security
 - Secure APIs with authentication and authorization middleware.

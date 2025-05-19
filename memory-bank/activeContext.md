@@ -23,4 +23,7 @@
 ## Pattern, insight, lưu ý
 - Mọi thay đổi lớn về nghiệp vụ, kiến trúc, công nghệ đều phải cập nhật vào Memory Bank.
 - Đảm bảo các yêu cầu phi chức năng (NFR) được kiểm thử và giám sát liên tục.
-- Luôn review lại BA Design và Memory Bank trước khi bắt đầu task mới. 
+- Luôn review lại BA Design và Memory Bank trước khi bắt đầu task mới.
+- Đã chuẩn hóa sử dụng Bogus cho fake data trong unit test, tuân thủ .NET rule.
+- Checklist phát triển/test phải có hướng dẫn sử dụng Bogus cho data giả lập.
+- **Chỉ sử dụng xUnit cho unit test, không dùng NUnit hay framework khác.** 

@@ -4,6 +4,8 @@
 - Hoàn thiện tài liệu BA Design chi tiết cho hệ thống PFM.
 - Cập nhật đầy đủ các file core trong Memory Bank theo BA Design.
 - Xác định rõ phạm vi, mục tiêu, nghiệp vụ, kiến trúc, pattern, công nghệ, ràng buộc kỹ thuật.
+- Đã chuẩn hóa sử dụng Bogus cho fake data trong unit test, tuân thủ .NET rule.
+- Đã thống nhất chỉ sử dụng xUnit cho unit test.
 
 ## Còn lại
 - Bổ sung user stories, acceptance criteria chi tiết cho từng chức năng.
