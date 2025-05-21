@@ -38,8 +38,8 @@ public interface IBaseRepository<TEntity, in TKey> where TEntity : BaseEntity<TK
     /// </summary>
     /// <param name="keyValues"></param>
     /// <returns></returns>
-    Task DeleteHardAsync(params object[] keyValues);
-    /// <summary>
+    Task<int> DeleteHardAsync(params object[] keyValues);
+    /// <summary>s
     /// 
     /// </summary>
     /// <param name="entity"></param>

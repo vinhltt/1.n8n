@@ -141,11 +141,36 @@ public class BaseRepository<TEntity, TKey>(
         return Task.FromResult(countAffect);
     }
 
-    public virtual async Task DeleteHardAsync(params object[] keyValues)
+    public virtual async Task<int> DeleteHardAsync(params object[] keyValues)
     {
-        var entity = await context.Set<TEntity>().FindAsync(keyValues);
-        ValidateAndThrow(entity);
-        Entities.Remove(entity!);
+        // Logic phức tạp hơn bên trong DeleteHardAsync để xây dựng biểu thức Where động
+        // dựa trên keyValues và metadata của khóa chính
+        var entityType = context.Model.FindEntityType(typeof(TEntity));
+        var primaryKey = entityType?.FindPrimaryKey();
+
+        if (primaryKey == null || primaryKey.Properties.Count != keyValues.Length)
+        {
+            throw new ArgumentException("Number of key values does not match the number of primary key properties.");
+        }
+
+        var parameter = Expression.Parameter(typeof(TEntity), "e");
+        Expression? predicateBody = null;
+
+        for (var i = 0; i < primaryKey.Properties.Count; i++)
+        {
+            var property = primaryKey.Properties[i];
+            if (property.PropertyInfo == null) continue;
+            var propertyAccess = Expression.MakeMemberAccess(parameter, property.PropertyInfo);
+            var keyValue = Expression.Constant(keyValues[i], property.ClrType);
+            var equality = Expression.Equal(propertyAccess, keyValue);
+
+            predicateBody = predicateBody == null ? equality : Expression.AndAlso(predicateBody, equality);
+        }
+
+        var predicate = Expression.Lambda<Func<TEntity, bool>>(predicateBody!, parameter);
+
+        return await Entities.Where(predicate).ExecuteDeleteAsync();
+
     }
 
     public virtual void DeleteHard(TEntity entity)
