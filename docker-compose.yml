@@ -1,5 +1,3 @@
-version: '3.8' # Nên chỉ định phiên bản docker-compose
-
 # =============================
 # Static IPv4 assignments for services
 # Last edited: 2024-05-18
