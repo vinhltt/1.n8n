@@ -10,37 +10,22 @@ using CoreFinance.Domain.UnitOffWorks;
 using Microsoft.Extensions.Logging;
 using MockQueryable;
 using Moq;
-using Bogus;
 using FluentAssertions;
-// ReSharper disable RedundantArgumentDefaultValue
+using CoreFinance.Application.Tests.Helpers;
 
-namespace CoreFinance.Application.Tests;
+namespace CoreFinance.Application.Tests.AccountServiceTests;
 
-public class AccountServiceTests
+// Tests for the GetPagingAsync method of AccountService
+public partial class AccountServiceTests
 {
-    private static IQueryable<Account> GenerateFakeAccounts(int count)
-    {
-        var faker = new Faker<Account>()
-            .RuleFor(a => a.Id, _ => Guid.NewGuid())
-            .RuleFor(a => a.UserId, _ => Guid.NewGuid())
-            .RuleFor(a => a.Name, f => f.Company.CompanyName())
-            .RuleFor(a => a.Type, f => f.PickRandom<AccountType>())
-            .RuleFor(a => a.CardNumber, f => f.Finance.CreditCardNumber())
-            .RuleFor(a => a.Currency, f => f.Finance.Currency().Code)
-            .RuleFor(a => a.InitialBalance, f => f.Finance.Amount(0, 10000))
-            .RuleFor(a => a.CurrentBalance, (f, a) => a.InitialBalance + f.Finance.Amount(-1000, 1000))
-            .RuleFor(a => a.AvailableLimit, f => f.Random.Bool() ? f.Finance.Amount(0, 5000) : null)
-            .RuleFor(a => a.CreatedAt, f => f.Date.Past(2))
-            .RuleFor(a => a.UpdatedAt, f => f.Date.Recent())
-            .RuleFor(a => a.IsActive, f => f.Random.Bool());
-        return faker.Generate(count).AsQueryable().BuildMock();
-    }
+    // Helper method has been moved to TestHelpers.cs
+    // private static IQueryable<Account> GenerateFakeAccounts(int count) { ... }
 
     [Fact]
     public async Task GetPagingAsync_ShouldReturnPagedResult()
     {
         // Arrange
-        var accounts = GenerateFakeAccounts(3).ToList();
+        var accounts = TestHelpers.GenerateFakeAccounts(3).ToList();
         var pageSize = 2;
         var pageIndex = 1;
         var orderedAccounts = accounts.OrderBy(a => a.Name).ToList();
@@ -97,7 +82,7 @@ public class AccountServiceTests
     public async Task GetPagingAsync_ShouldFilterBySearchValue()
     {
         // Arrange
-        var accounts = GenerateFakeAccounts(3).ToList();
+        var accounts = TestHelpers.GenerateFakeAccounts(3).ToList();
         var expectedName = accounts[0].Name; // Lấy tên bất kỳ từ dữ liệu fake
 
         var accountsMock = accounts.AsQueryable().BuildMock();
@@ -191,7 +176,7 @@ public class AccountServiceTests
     public async Task GetPagingAsync_ShouldReturnEmpty_WhenSearchValueHasNoMatch()
     {
         // Arrange
-        var accountsData = GenerateFakeAccounts(3).ToList(); // Generate some accounts
+        var accountsData = TestHelpers.GenerateFakeAccounts(3).ToList(); // Generate some accounts
         var accountsMock = accountsData.AsQueryable().BuildMock();
 
         // These are the AccountViewModels that ProjectTo should return *before* the service's Where clause
@@ -283,7 +268,7 @@ public class AccountServiceTests
     public async Task GetPagingAsync_ShouldHandlePaginationEdgeCases(int pageIndex, int pageSize, int totalItems, int expectedPageIndex, int expectedDataCount)
     {
         // Arrange
-        var accounts = GenerateFakeAccounts(totalItems).ToList();
+        var accounts = TestHelpers.GenerateFakeAccounts(totalItems).ToList();
         var orderedAccounts = accounts.OrderBy(a => a.Name).ToList();
         var expectedPageData = orderedAccounts.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
 
@@ -337,164 +322,4 @@ public class AccountServiceTests
             resultNames.Should().BeEquivalentTo(expectedNames, options => options.WithStrictOrdering());
         }
     }
-
-    // --- CreateAsync Tests ---
-
-    [Fact]
-    public async Task CreateAsync_ShouldReturnViewModel_WhenCreationIsSuccessful()
-    {
-        // Arrange
-        var createRequest = new AccountCreateRequest 
-        { 
-            Name = "New Savings Account", 
-            Type = AccountType.Bank, 
-            Currency = "USD", 
-            InitialBalance = 1000,
-            UserId = Guid.NewGuid()
-            // Add other required properties for AccountCreateRequest
-        };
-
-        var expectedViewModel = new AccountViewModel 
-        { 
-            Id = Guid.NewGuid(), // Mapper will set this from newAccountEntity after creation
-            Name = createRequest.Name, 
-            Type = createRequest.Type,
-            Currency = createRequest.Currency,
-            CurrentBalance = createRequest.InitialBalance 
-            // Add other relevant properties
-        };
-
-        var mapperMock = new Mock<IMapper>();
-        mapperMock.Setup(m => m.Map(createRequest, It.IsAny<Account>()))
-            .Callback<AccountCreateRequest, Account>((src, dest) => 
-            {
-                // Simulate AutoMapper's behavior for mapping request to entity
-                dest.Id = Guid.NewGuid(); // Simulate ID generation by DB/repository
-                dest.Name = src.Name;
-                dest.Type = src.Type;
-                dest.Currency = src.Currency;
-                dest.InitialBalance = src.InitialBalance;
-                dest.CurrentBalance = src.InitialBalance; // Assuming current = initial on creation
-                dest.UserId = src.UserId;
-                dest.CreatedAt = DateTime.UtcNow;
-                dest.UpdatedAt = DateTime.UtcNow;
-                dest.IsActive = true;
-            });
-        
-        mapperMock.Setup(m => m.Map<AccountViewModel>(It.IsAny<Account>()))
-            .Returns((Account src) => new AccountViewModel { 
-                Id = src.Id, 
-                Name = src.Name, 
-                Type = src.Type,
-                Currency = src.Currency,
-                CurrentBalance = src.CurrentBalance
-            });
-
-
-        var repoMock = new Mock<IBaseRepository<Account, Guid>>();
-        repoMock.Setup(r => r.CreateAsync(It.IsAny<Account>()))
-            .ReturnsAsync(1); // Simulate 1 record affected
-
-        var unitOfWorkMock = new Mock<IUnitOffWork>();
-        unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
-        // Simulate DoWorkWithTransaction by directly invoking the passed func
-        unitOfWorkMock.Setup(u => u.DoWorkWithTransaction(It.IsAny<Func<Task<AccountViewModel?>>>()))
-            .Returns((Func<Task<AccountViewModel?>> func) => func());
-
-
-        var loggerMock = new Mock<ILogger<AccountService>>();
-        var service = new AccountService(mapperMock.Object, unitOfWorkMock.Object, loggerMock.Object);
-
-        // Act
-        var result = await service.CreateAsync(createRequest);
-
-        // Assert
-        result.Should().NotBeNull();
-        result.Should().BeEquivalentTo(expectedViewModel, options => options.Excluding(vm => vm.Id)); // Id is dynamic
-        result.Name.Should().Be(createRequest.Name);
-        result.Currency.Should().Be(createRequest.Currency);
-
-        mapperMock.Verify(m => m.Map(createRequest, It.IsAny<Account>()), Times.Once);
-        repoMock.Verify(r => r.CreateAsync(It.IsAny<Account>()), Times.Once);
-        mapperMock.Verify(m => m.Map<AccountViewModel>(It.IsAny<Account>()), Times.Once);
-        unitOfWorkMock.Verify(u => u.DoWorkWithTransaction(It.IsAny<Func<Task<AccountViewModel?>>>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task CreateAsync_ShouldThrowNullReferenceException_WhenRepositoryReturnsZeroAffectedCount()
-    {
-        // Arrange
-        var createRequest = new AccountCreateRequest { Name = "Test Account" /* ... other properties */ };
-        
-        var mapperMock = new Mock<IMapper>();
-        mapperMock.Setup(m => m.Map(createRequest, It.IsAny<Account>()));
-        // No need to setup the second Map call as it won't be reached if exception is thrown
-
-        var repoMock = new Mock<IBaseRepository<Account, Guid>>();
-        repoMock.Setup(r => r.CreateAsync(It.IsAny<Account>()))
-            .ReturnsAsync(0); // Simulate 0 records affected
-
-        var unitOfWorkMock = new Mock<IUnitOffWork>();
-        unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
-        unitOfWorkMock.Setup(u => u.DoWorkWithTransaction(It.IsAny<Func<Task<AccountViewModel?>>>()))
-            .Returns((Func<Task<AccountViewModel?>> func) => func());
-
-        var loggerMock = new Mock<ILogger<AccountService>>();
-        var service = new AccountService(mapperMock.Object, unitOfWorkMock.Object, loggerMock.Object);
-
-        // Act
-        Func<Task> act = async () => await service.CreateAsync(createRequest);
-
-        // Assert
-        await act.Should().ThrowAsync<NullReferenceException>();
-        
-        repoMock.Verify(r => r.CreateAsync(It.IsAny<Account>()), Times.Once);
-        unitOfWorkMock.Verify(u => u.DoWorkWithTransaction(It.IsAny<Func<Task<AccountViewModel?>>>()), Times.Once);
-    }
-    
-    [Fact]
-    public async Task CreateAsync_ShouldRollbackTransaction_WhenRepositoryThrowsException()
-    {
-        // Arrange
-        var createRequest = new AccountCreateRequest { Name = "Test Account" /* ... other properties */ };
-
-        var mapperMock = new Mock<IMapper>();
-        mapperMock.Setup(m => m.Map(createRequest, It.IsAny<Account>()));
-
-        var repoMock = new Mock<IBaseRepository<Account, Guid>>();
-        repoMock.Setup(r => r.CreateAsync(It.IsAny<Account>()))
-            .ThrowsAsync(new InvalidOperationException("DB error")); // Simulate a DB error
-
-        var unitOfWorkMock = new Mock<IUnitOffWork>();
-        unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
-        
-        // This setup is crucial: If DoWorkWithTransaction catches the exception and doesn't rethrow, the test is different.
-        // Assuming DoWorkWithTransaction propagates the exception or handles rollback internally.
-        // For this test, we just verify it's called. The actual rollback is an integration concern or UoW test.
-        unitOfWorkMock.Setup(u => u.DoWorkWithTransaction(It.IsAny<Func<Task<AccountViewModel?>>>()))
-             .Returns(async (Func<Task<AccountViewModel?>> func) => await func());
-
-
-        var loggerMock = new Mock<ILogger<AccountService>>();
-        var service = new AccountService(mapperMock.Object, unitOfWorkMock.Object, loggerMock.Object);
-
-        // Act
-        Func<Task> act = async () => await service.CreateAsync(createRequest);
-
-        // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("DB error");
-        
-        repoMock.Verify(r => r.CreateAsync(It.IsAny<Account>()), Times.Once);
-        unitOfWorkMock.Verify(u => u.DoWorkWithTransaction(It.IsAny<Func<Task<AccountViewModel?>>>()), Times.Once);
-        // We can't easily verify rollback in a unit test without more complex UoW mocking.
-        // The key is that the transaction block was entered.
-    }
-    
-    // Consider adding tests for validation if AccountCreateRequest has validation attributes
-    // and if the BaseService or AccountService is expected to trigger validation.
-    // However, validation is often handled by MVC model binding or a dedicated validation layer before the service call.
-    // If service is responsible for some validation, test it here.
-
-    // Test for CreateAsync(List<TCreateRequest> request) can be added if that overload is used and needs specific testing.
-    // The logic is similar but involves collections.
-}
+} 
