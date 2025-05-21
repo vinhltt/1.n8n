@@ -17,6 +17,7 @@ public class AccountController(
     AccountUpdateRequest, AccountViewModel, Guid>(logger,
     accountService)
 {
+    [HttpPost("filter")]
     public override async Task<ActionResult<IBasePaging<AccountViewModel>>> GetPaging(FilterBodyRequest request)
     {
         var result = await accountService.GetPagingAsync(request);

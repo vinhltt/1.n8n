@@ -7,8 +7,8 @@ public class UpdateAccountRequestValidator : AbstractValidator<AccountUpdateRequ
 {
     public UpdateAccountRequestValidator()
     {
-        RuleFor(x => x.AccountName).NotEmpty().MaximumLength(100);
-        RuleFor(x => x.AccountType).NotEmpty();
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(100);
+        RuleFor(x => x.Type).NotEmpty();
         RuleFor(x => x.Currency).NotEmpty().MaximumLength(10);
     }
 }

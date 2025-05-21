@@ -25,7 +25,7 @@ public class AccountService(
                 .GetNoTrackingEntities());
 
         if (!string.IsNullOrEmpty(request.SearchValue))
-            query = query.Where(e => e.Name!.Contains(request.SearchValue ?? ""));
+            query = query.Where(e => e.Name!.ToLower().Contains(request.SearchValue.ToLower() ?? ""));
 
         return await query.ToPagingAsync(request);
     }
