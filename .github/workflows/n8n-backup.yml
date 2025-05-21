@@ -85,4 +85,31 @@ jobs:
           MESSAGE="❌ Backup n8n thất bại trên branch $GITHUB_REF_NAME lúc $(date '+%Y-%m-%d %H:%M:%S')"
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -d chat_id="${TELEGRAM_CHAT_ID}" \
-            -d text="$MESSAGE" 
+            -d text="$MESSAGE"
+
+      - name: Send Telegram timeout notification for backup
+        if: cancelled()
+        run: |
+          if [[ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" && ! -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]]; then
+            ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            STATUS_EMOJI="⏱️"
+            STATUS_TEXT="Backup n8n (Production) ĐÃ BỊ HỦY do quá thời gian (timeout > 30 phút)!"
+            
+            JSON_PAYLOAD=$(printf '{
+              "chat_id": "%s",
+              "text": "%s *%s*\nNhánh: %s\n[Xem Chi Tiết Job](%s)",
+              "parse_mode": "Markdown"
+            }' \
+            "${{ secrets.TELEGRAM_CHAT_ID }}" \
+            "$STATUS_EMOJI" \
+            "$STATUS_TEXT" \
+            "${{ github.ref_name }}" \
+            "$ACTION_URL")
+            curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+              -H "Content-Type: application/json" \
+              -d "$JSON_PAYLOAD"
+            echo "ℹ️ Thông báo Telegram (timeout backup) đã được gửi."
+          else
+            echo "⚠️ Biến Telegram (BOT_TOKEN hoặc CHAT_ID) chưa được đặt. Bỏ qua thông báo timeout backup."
+          fi
+        shell: bash 

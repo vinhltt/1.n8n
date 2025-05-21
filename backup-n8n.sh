@@ -53,11 +53,11 @@ RETENTION_DAYS=${N8N_RETENTION_DAYS:-7}
 
 : "${POSTGRES_USER:?Lỗi: POSTGRES_USER chưa đặt}"
 : "${POSTGRES_PASSWORD:?Lỗi: POSTGRES_PASSWORD chưa đặt}"
-# : "${N8N_BACKUP_DIR_HOST:?Lỗi: N8N_BACKUP_DIR_HOST chưa đặt}" # Vô hiệu hóa hoặc xóa dòng này
+: "${N8N_BACKUP_DIR_HOST:?Lỗi: N8N_BACKUP_DIR_HOST chưa đặt}"
 
 DB_USER="$POSTGRES_USER"
 DB_PASSWORD="$POSTGRES_PASSWORD"
-BACKUP_DIR="./backup" # Thay đổi đường dẫn backup
+BACKUP_DIR="$N8N_BACKUP_DIR_HOST" # Thay đổi đường dẫn backup
 
 # 4) Sanity checks Docker
 docker inspect "$POSTGRES_CONTAINER" >/dev/null 2>&1 \
