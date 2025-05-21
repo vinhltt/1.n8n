@@ -130,6 +130,7 @@ jobs:
           # Backup settings
           N8N_BACKUP_DIR_HOST=${{ secrets.N8N_BACKUP_DIR_HOST }}
           IP_PREFIX=${{ vars.IP_PREFIX }}
+          TRUENAS_DEPLOY_DIR=${{ vars.TRUENAS_DEPLOY_DIR }}
           EOF
           echo '✅ .env file created on TrueNAS at ${{ env.TRUENAS_DEPLOY_DIR }}/.env'"
         shell: bash
