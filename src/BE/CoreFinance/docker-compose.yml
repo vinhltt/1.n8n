@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   corefinance-postgres:
     image: postgres:16
