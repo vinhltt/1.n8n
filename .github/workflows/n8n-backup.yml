@@ -3,37 +3,78 @@ name: Daily n8n Backup (Production Only)
 on:
   workflow_dispatch:
     # Cho phép kích hoạt thủ công
-  # schedule:
-  #   - cron: '15 0 * * *' # 7h15 sáng giờ Việt Nam (UTC+7)
+  schedule:
+    - cron: '15 0 * * *' # 7h15 sáng giờ Việt Nam (UTC+7)
 
 jobs:
   backup:
     if: ${{ github.ref_name == 'master' }}
-    runs-on: self-hosted
+    runs-on: ubuntu-latest # Changed from self-hosted
+    environment: production # Explicitly set environment for master branch
     # Đặt thời gian timeout cho toàn bộ job này là 30 phút
     timeout-minutes: 30 
-    name: Daily n8n Backup (Production Only)
+    name: Daily n8n Backup (Production via TrueNAS SSH) # Updated name for clarity
     steps:
-      # Bỏ bước checkout code, sử dụng luôn thư mục deploy production
-      - name: Thiết lập biến thư mục deploy production
-        run: echo "DEPLOY_DIR=deploy_${GITHUB_REF_NAME}" >> $GITHUB_ENV
+      - name: Set TrueNAS Deploy Directory Environment Variable
+        run: echo "TRUENAS_DEPLOY_DIR=${{ vars.DEPLOY_PATH_ON_TRUENAS }}/deploy_${{ github.ref_name }}" >> $GITHUB_ENV
+        shell: bash
 
-      - name: Kiểm tra file .env và script backup-n8n.sh
+      - name: Setup Cloudflared and SSH Config
         run: |
-          cd $DEPLOY_DIR
-          if [ ! -f .env ]; then
-            echo "❌ Không tìm thấy file .env trong $DEPLOY_DIR"; exit 1;
-          fi
-          if [ ! -f backup-n8n.sh ]; then
-            echo "❌ Không tìm thấy script backup-n8n.sh trong $DEPLOY_DIR"; exit 1;
-          fi
+          echo "Runner HOME directory is: $HOME"
+          # Cài đặt cloudflared
+          sudo wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared
+          sudo chmod +x /usr/local/bin/cloudflared
+          echo "Cloudflared version: $(cloudflared --version)"
 
-      - name: Thực thi backup
+          # Tạo thư mục $HOME/.ssh nếu chưa tồn tại
+          mkdir -p "$HOME/.ssh"
+          
+          # Tạo tệp cấu hình SSH sử dụng $HOME
+          echo "Host truenas-cf-tunnel
+            HostName ${{ secrets.TRUENAS_SSH_HOSTNAME_THROUGH_CLOUDFLARED }}
+            ProxyCommand cloudflared access ssh --hostname %h
+            User ${{ secrets.TRUENAS_USER }}
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            LogLevel ERROR" > "$HOME/.ssh/config" # Sử dụng $HOME
+          
+          chmod 600 "$HOME/.ssh/config"
+          echo "✅ SSH config for Cloudflared created at $HOME/.ssh/config"
+        shell: bash
+
+      - name: Add TrueNAS SSH Private Key to SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.TRUENAS_SSH_PRIVATE_KEY }}
+
+      - name: Check required files on TrueNAS
         run: |
-          cd $DEPLOY_DIR
-          echo "🔒 Đang backup dữ liệu n8n cho môi trường production..."
-          bash ./backup-n8n.sh
-          echo "✅ Đã backup dữ liệu n8n thành công"
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
+            set -e # Exit immediately if a command exits with a non-zero status.
+            echo "Checking files in ${{ env.TRUENAS_DEPLOY_DIR }} on TrueNAS..."
+            cd "${{ env.TRUENAS_DEPLOY_DIR }}"
+            if [ ! -f .env ]; then
+              echo "❌ Không tìm thấy file .env trong ${{ env.TRUENAS_DEPLOY_DIR }} trên TrueNAS"; exit 1;
+            fi
+            if [ ! -f backup-n8n.sh ]; then
+              echo "❌ Không tìm thấy script backup-n8n.sh trong ${{ env.TRUENAS_DEPLOY_DIR }} trên TrueNAS"; exit 1;
+            fi
+            echo "✅ Required files .env and backup-n8n.sh found on TrueNAS."
+          EOF
+        shell: bash
+
+      - name: Execute backup on TrueNAS
+        run: |
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
+            set -e # Exit immediately if a command exits with a non-zero status.
+            echo "🔒 Đang backup dữ liệu n8n cho môi trường production (branch: ${{ github.ref_name }}) trên TrueNAS..."
+            echo "   Thư mục triển khai: ${{ env.TRUENAS_DEPLOY_DIR }}"
+            cd "${{ env.TRUENAS_DEPLOY_DIR }}"
+            bash ./backup-n8n.sh
+            echo "✅ Đã backup dữ liệu n8n thành công trên TrueNAS."
+          EOF
+        shell: bash
 
       - name: Gửi thông báo lỗi backup lên Telegram
         if: failure()
