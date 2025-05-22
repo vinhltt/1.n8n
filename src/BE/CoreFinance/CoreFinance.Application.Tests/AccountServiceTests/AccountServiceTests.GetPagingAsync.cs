@@ -1,6 +1,8 @@
 using System.Linq.Expressions;
 using AutoMapper;
+using AutoMapper.Configuration;
 using CoreFinance.Application.DTOs;
+using CoreFinance.Application.Mapper;
 using CoreFinance.Application.Services;
 using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Contracts.Enums;
@@ -35,28 +37,17 @@ public partial class AccountServiceTests
 
         var accountsMock = accounts.AsQueryable().BuildMock();
 
-        var accountViewModels = accounts.Select(a => new AccountViewModel
-        {
-            Id = a.Id,
-            Name = a.Name,
-            Currency = a.Currency,
-        }).AsQueryable().BuildMock();
-
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
-        repoMock.Setup(r => r.GetNoTrackingEntities(It.IsAny<Expression<Func<Account, object>>>() ))
+        repoMock.Setup(r => r.GetNoTrackingEntities())
             .Returns(accountsMock);
         repoMock.Setup(x => x.GetQueryableTable()).Returns(accountsMock);
 
         var unitOfWorkMock = new Mock<IUnitOffWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
 
-        var mapperMock = new Mock<IMapper>();
-        mapperMock.Setup(m => m.ProjectTo<AccountViewModel>(It.IsAny<IQueryable<Account>>(), It.IsAny<object?>()))
-            .Returns(accountViewModels);
-
         var loggerMock = new Mock<ILogger<AccountService>>();
 
-        var service = new AccountService(mapperMock.Object, unitOfWorkMock.Object, loggerMock.Object);
+        var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
 
         var request = new FilterBodyRequest
         {
@@ -72,7 +63,12 @@ public partial class AccountServiceTests
         result.Should().NotBeNull();
         result.Data.Should().NotBeNull();
         result.Data.Count().Should().Be(pageSize); // PageSize = 2
-        result.Data.Select(x => x.Name).Should().Contain(expectedNames);
+        
+        var expectedViewModels = orderedAccounts.Skip((pageIndex - 1) * pageSize).Take(pageSize)
+            .Select(a => _mapper.Map<AccountViewModel>(a)).ToList();
+        
+        result.Data.Should().BeEquivalentTo(expectedViewModels, options => options.WithStrictOrdering());
+
         result.Pagination.TotalRow.Should().Be(accounts.Count); // Tổng số bản ghi
         result.Pagination.PageSize.Should().Be(pageSize);
         result.Pagination.PageIndex.Should().Be(pageIndex);
@@ -83,30 +79,21 @@ public partial class AccountServiceTests
     {
         // Arrange
         var accounts = TestHelpers.GenerateFakeAccounts(3).ToList();
-        var expectedName = accounts[0].Name; // Lấy tên bất kỳ từ dữ liệu fake
+        var expectedName = accounts[0].Name;
+        var expectedAccount = accounts.First(a => a.Name == expectedName);
 
         var accountsMock = accounts.AsQueryable().BuildMock();
 
-        var accountViewModels = accounts.Select(a => new AccountViewModel
-        {
-            Id = a.Id,
-            Name = a.Name,
-            Currency = a.Currency,
-        }).AsQueryable().BuildMock();
-
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
-        repoMock.Setup(r => r.GetNoTrackingEntities(It.IsAny<Expression<Func<Account, object>>>() ))
+        repoMock.Setup(r => r.GetNoTrackingEntities())
             .Returns(accountsMock);
 
         var unitOfWorkMock = new Mock<IUnitOffWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
 
-        var mapperMock = new Mock<IMapper>();
-        mapperMock.Setup(m => m.ProjectTo<AccountViewModel>(It.IsAny<IQueryable<Account>>(), It.IsAny<object?>()))
-            .Returns(accountViewModels);
         var loggerMock = new Mock<ILogger<AccountService>>();
 
-        var service = new AccountService(mapperMock.Object, unitOfWorkMock.Object, loggerMock.Object);
+        var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
 
         var request = new FilterBodyRequest
         {
@@ -120,7 +107,8 @@ public partial class AccountServiceTests
         result.Should().NotBeNull();
         result.Data.Should().NotBeNull();
         result.Data.Should().ContainSingle();
-        result.Data.First().Name.Should().Be(expectedName);
+        var expectedViewModel = _mapper.Map<AccountViewModel>(expectedAccount);
+        result.Data.First().Should().BeEquivalentTo(expectedViewModel);
     }
 
     [Fact]
@@ -134,27 +122,16 @@ public partial class AccountServiceTests
             new Account { Name = "Another Account" }
         }.AsQueryable().BuildMock();
 
-        var accountViewModels = new List<AccountViewModel>
-        {
-            new AccountViewModel { Name = "Test Account One" },
-            new AccountViewModel { Name = "test account two" },
-            new AccountViewModel { Name = "Another Account" }
-        }.AsQueryable().BuildMock();
-        
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
-        repoMock.Setup(r => r.GetNoTrackingEntities(It.IsAny<Expression<Func<Account, object>>>()))
+        repoMock.Setup(r => r.GetNoTrackingEntities())
             .Returns(accounts);
         repoMock.Setup(x => x.GetQueryableTable()).Returns(accounts);
 
         var unitOfWorkMock = new Mock<IUnitOffWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
 
-        var mapperMock = new Mock<IMapper>();
-        mapperMock.Setup(m => m.ProjectTo<AccountViewModel>(It.IsAny<IQueryable<Account>>(), It.IsAny<object?>()))
-            .Returns(accountViewModels);
-        
         var loggerMock = new Mock<ILogger<AccountService>>();
-        var service = new AccountService(mapperMock.Object, unitOfWorkMock.Object, loggerMock.Object);
+        var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
 
         var request = new FilterBodyRequest
         {
@@ -168,8 +145,11 @@ public partial class AccountServiceTests
         result.Should().NotBeNull();
         result.Data.Should().NotBeNull();
         result.Data.Count().Should().Be(2); // "Test Account One" and "test account two"
-        result.Data.Should().Contain(vm => vm.Name == "Test Account One");
-        result.Data.Should().Contain(vm => vm.Name == "test account two");
+        
+        var expectedViewModels = accounts.Where(a => a.Name.ToLower().Contains("test account")).ToList()
+            .Select(a => _mapper.Map<AccountViewModel>(a)).ToList();
+
+        result.Data.Should().BeEquivalentTo(expectedViewModels);
     }
 
     [Fact]
@@ -179,34 +159,16 @@ public partial class AccountServiceTests
         var accountsData = TestHelpers.GenerateFakeAccounts(3).ToList(); // Generate some accounts
         var accountsMock = accountsData.AsQueryable().BuildMock();
 
-        // These are the AccountViewModels that ProjectTo should return *before* the service's Where clause
-        var projectedViewModels = accountsData.Select(a => new AccountViewModel { 
-            Id = a.Id, 
-            Name = a.Name, 
-            Currency = a.Currency 
-            // Map other fields if they are used by the service's Where clause or subsequent logic
-        }).AsQueryable().BuildMock();
-
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
-        repoMock.Setup(r => r.GetNoTrackingEntities(It.IsAny<Expression<Func<Account, object>>>()))
+        repoMock.Setup(r => r.GetNoTrackingEntities())
             .Returns(accountsMock);
         repoMock.Setup(x => x.GetQueryableTable()).Returns(accountsMock);
 
         var unitOfWorkMock = new Mock<IUnitOffWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
 
-        var mapperMock = new Mock<IMapper>();
-        // Correctly setup ProjectTo to match the 3-parameter overload used by the service
-        // Mapper.ProjectTo<T>(source) resolves to ProjectTo(source, null, new Expression<...>[0])
-        mapperMock.Setup(m => m.ProjectTo(
-                        It.IsAny<IQueryable<Account>>(),  // source
-                        null,                             // parameters argument in ProjectTo
-                        It.IsAny<Expression<Func<AccountViewModel, object>>[]>() // membersToExpand argument
-                    ))
-            .Returns(projectedViewModels); // Return the unfiltered projected view models
-
         var loggerMock = new Mock<ILogger<AccountService>>();
-        var service = new AccountService(mapperMock.Object, unitOfWorkMock.Object, loggerMock.Object);
+        var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
 
         var request = new FilterBodyRequest
         {
@@ -228,22 +190,17 @@ public partial class AccountServiceTests
     {
         // Arrange
         var emptyAccounts = new List<Account>().AsQueryable().BuildMock();
-        var emptyAccountViewModels = new List<AccountViewModel>().AsQueryable().BuildMock();
 
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
-        repoMock.Setup(r => r.GetNoTrackingEntities(It.IsAny<Expression<Func<Account, object>>>()))
+        repoMock.Setup(r => r.GetNoTrackingEntities())
             .Returns(emptyAccounts);
         repoMock.Setup(x => x.GetQueryableTable()).Returns(emptyAccounts);
 
         var unitOfWorkMock = new Mock<IUnitOffWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
 
-        var mapperMock = new Mock<IMapper>();
-        mapperMock.Setup(m => m.ProjectTo<AccountViewModel>(It.IsAny<IQueryable<Account>>(), It.IsAny<object?>()))
-            .Returns(emptyAccountViewModels); // Mapper projects an empty list to an empty list
-
         var loggerMock = new Mock<ILogger<AccountService>>();
-        var service = new AccountService(mapperMock.Object, unitOfWorkMock.Object, loggerMock.Object);
+        var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
 
         var request = new FilterBodyRequest
         {
@@ -270,26 +227,19 @@ public partial class AccountServiceTests
         // Arrange
         var accounts = TestHelpers.GenerateFakeAccounts(totalItems).ToList();
         var orderedAccounts = accounts.OrderBy(a => a.Name).ToList();
-        var expectedPageData = orderedAccounts.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
 
         var accountsMock = accounts.AsQueryable().BuildMock();
-        var accountViewModels = accounts.Select(a => new AccountViewModel { Id = a.Id, Name = a.Name, Currency = a.Currency })
-            .AsQueryable().BuildMock();
 
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
-        repoMock.Setup(r => r.GetNoTrackingEntities(It.IsAny<Expression<Func<Account, object>>>()))
+        repoMock.Setup(r => r.GetNoTrackingEntities())
             .Returns(accountsMock);
         repoMock.Setup(x => x.GetQueryableTable()).Returns(accountsMock);
         
         var unitOfWorkMock = new Mock<IUnitOffWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
 
-        var mapperMock = new Mock<IMapper>();
-        mapperMock.Setup(m => m.ProjectTo<AccountViewModel>(It.IsAny<IQueryable<Account>>(), It.IsAny<object?>()))
-            .Returns(accountViewModels);
-
         var loggerMock = new Mock<ILogger<AccountService>>();
-        var service = new AccountService(mapperMock.Object, unitOfWorkMock.Object, loggerMock.Object);
+        var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
 
         var request = new FilterBodyRequest
         {
@@ -308,18 +258,12 @@ public partial class AccountServiceTests
         result.Pagination.PageIndex.Should().Be(expectedPageIndex); // Assuming ToPagingAsync caps PageIndex or handles it appropriately
         result.Pagination.PageSize.Should().Be(pageSize);
 
-        // Verify that the correct items are returned for the page
-        // This part of the assertion depends on how ToPagingAsync behaves with IQueryable mocks and sorting.
-        // If ToPagingAsync does client-side evaluation due to mocking, the order might not be guaranteed
-        // without careful setup of the mock provider for ToPagingAsync or testing ToPagingAsync itself.
-        // For this test, we assume ToPagingAsync correctly applies pagination after sorting.
         if (expectedDataCount > 0)
         {
-            var resultNames = result.Data.Select(d => d.Name).ToList();
-            var expectedNames = expectedPageData.Select(e => e.Name).ToList();
-            // The order might not be strictly guaranteed here with BuildMock() and ProjectTo if ToPagingAsync relies on database ordering that's not perfectly mimicked.
-            // A more robust check might be to ensure all expected items are present, regardless of order, if strict order is hard to mock.
-            resultNames.Should().BeEquivalentTo(expectedNames, options => options.WithStrictOrdering());
+            var expectedViewModels = orderedAccounts.Skip((pageIndex - 1) * pageSize).Take(pageSize)
+                .Select(a => _mapper.Map<AccountViewModel>(a)).ToList();
+            
+            result.Data.Should().BeEquivalentTo(expectedViewModels, options => options.WithStrictOrdering());
         }
     }
 } 

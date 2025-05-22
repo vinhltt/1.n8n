@@ -32,41 +32,17 @@ public partial class AccountServiceTests
             // Add other required properties for AccountCreateRequest
         };
 
-        var expectedViewModel = new AccountViewModel 
-        { 
-            Id = Guid.NewGuid(), // Mapper will set this from newAccountEntity after creation
-            Name = createRequest.Name, 
-            Type = createRequest.Type,
-            Currency = createRequest.Currency,
-            CurrentBalance = createRequest.InitialBalance 
-            // Add other relevant properties
-        };
+        // Expected ViewModel properties will be based on the mapping profile
+        // No need to manually construct expectedViewModel with dynamic Id, Currency, etc.
+        // We will assert against the properties of the result directly.
 
-        var mapperMock = new Mock<IMapper>();
-        mapperMock.Setup(m => m.Map(createRequest, It.IsAny<Account>()))
-            .Callback<AccountCreateRequest, Account>((src, dest) => 
-            {
-                // Simulate AutoMapper's behavior for mapping request to entity
-                dest.Id = Guid.NewGuid(); // Simulate ID generation by DB/repository
-                dest.Name = src.Name;
-                dest.Type = src.Type;
-                dest.Currency = src.Currency;
-                dest.InitialBalance = src.InitialBalance;
-                dest.CurrentBalance = src.InitialBalance; // Assuming current = initial on creation
-                dest.UserId = src.UserId;
-                dest.CreatedAt = DateTime.UtcNow;
-                dest.UpdatedAt = DateTime.UtcNow;
-                dest.IsActive = true;
-            });
+        // var mapperMock = new Mock<IMapper>(); // Using real _mapper now
+        // mapperMock.Setup(m => m.Map(createRequest, It.IsAny<Account>())) // Not needed with real mapper
+        //     .Callback<AccountCreateRequest, Account>((src, dest) => 
+        //     { /* Simulate AutoMapper's behavior */ });
         
-        mapperMock.Setup(m => m.Map<AccountViewModel>(It.IsAny<Account>()))
-            .Returns((Account src) => new AccountViewModel { 
-                Id = src.Id, 
-                Name = src.Name, 
-                Type = src.Type,
-                Currency = src.Currency,
-                CurrentBalance = src.CurrentBalance
-            });
+        // mapperMock.Setup(m => m.Map<AccountViewModel>(It.IsAny<Account>())) // Not needed with real mapper
+        //     .Returns((Account src) => new AccountViewModel { /* Map manually */ });
 
 
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
@@ -76,26 +52,31 @@ public partial class AccountServiceTests
         var unitOfWorkMock = new Mock<IUnitOffWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
         // Simulate DoWorkWithTransaction by directly invoking the passed func
+        // This part of the mock for UnitOfWork seems reasonable for a unit test.
         unitOfWorkMock.Setup(u => u.DoWorkWithTransaction(It.IsAny<Func<Task<AccountViewModel?>>>()))
             .Returns((Func<Task<AccountViewModel?>> func) => func());
 
 
         var loggerMock = new Mock<ILogger<AccountService>>();
-        var service = new AccountService(mapperMock.Object, unitOfWorkMock.Object, loggerMock.Object);
+        // Use the real _mapper instance available from the partial class constructor
+        var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
 
         // Act
         var result = await service.CreateAsync(createRequest);
 
         // Assert
         result.Should().NotBeNull();
-        result.Should().BeEquivalentTo(expectedViewModel, options => options.Excluding(vm => vm.Id)); // Id is dynamic
+        // Assert properties directly to verify mapping logic
         result.Name.Should().Be(createRequest.Name);
+        result.Type.Should().Be(createRequest.Type);
         result.Currency.Should().Be(createRequest.Currency);
+        result.InitialBalance.Should().Be(createRequest.InitialBalance); // Based on profile mapping
 
-        mapperMock.Verify(m => m.Map(createRequest, It.IsAny<Account>()), Times.Once);
+        // Verify that the repository method was called
         repoMock.Verify(r => r.CreateAsync(It.IsAny<Account>()), Times.Once);
-        mapperMock.Verify(m => m.Map<AccountViewModel>(It.IsAny<Account>()), Times.Once);
+        // Verify that UnitOfWork transaction method was called
         unitOfWorkMock.Verify(u => u.DoWorkWithTransaction(It.IsAny<Func<Task<AccountViewModel?>>>()), Times.Once);
+        // No need to verify mapper calls explicitly when using real mapper
     }
 
     [Fact]
@@ -104,8 +85,8 @@ public partial class AccountServiceTests
         // Arrange
         var createRequest = new AccountCreateRequest { Name = "Test Account" /* ... other properties */ };
         
-        var mapperMock = new Mock<IMapper>();
-        mapperMock.Setup(m => m.Map(createRequest, It.IsAny<Account>()));
+        // var mapperMock = new Mock<IMapper>(); // Using real _mapper now
+        // mapperMock.Setup(m => m.Map(createRequest, It.IsAny<Account>())); // Not needed with real mapper
         // No need to setup the second Map call as it won't be reached if exception is thrown
 
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
@@ -114,11 +95,13 @@ public partial class AccountServiceTests
 
         var unitOfWorkMock = new Mock<IUnitOffWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
+        // Simulate DoWorkWithTransaction by directly invoking the passed func
         unitOfWorkMock.Setup(u => u.DoWorkWithTransaction(It.IsAny<Func<Task<AccountViewModel?>>>()))
             .Returns((Func<Task<AccountViewModel?>> func) => func());
 
         var loggerMock = new Mock<ILogger<AccountService>>();
-        var service = new AccountService(mapperMock.Object, unitOfWorkMock.Object, loggerMock.Object);
+        // Use the real _mapper instance
+        var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
 
         // Act
         Func<Task> act = async () => await service.CreateAsync(createRequest);
@@ -136,8 +119,8 @@ public partial class AccountServiceTests
         // Arrange
         var createRequest = new AccountCreateRequest { Name = "Test Account" /* ... other properties */ };
 
-        var mapperMock = new Mock<IMapper>();
-        mapperMock.Setup(m => m.Map(createRequest, It.IsAny<Account>()));
+        // var mapperMock = new Mock<IMapper>(); // Using real _mapper now
+        // mapperMock.Setup(m => m.Map(createRequest, It.IsAny<Account>())); // Not needed with real mapper
 
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
         repoMock.Setup(r => r.CreateAsync(It.IsAny<Account>()))
@@ -154,7 +137,8 @@ public partial class AccountServiceTests
 
 
         var loggerMock = new Mock<ILogger<AccountService>>();
-        var service = new AccountService(mapperMock.Object, unitOfWorkMock.Object, loggerMock.Object);
+        // Use the real _mapper instance
+        var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
 
         // Act
         Func<Task> act = async () => await service.CreateAsync(createRequest);
