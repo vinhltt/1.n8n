@@ -1,8 +1,4 @@
-using System.Linq.Expressions;
-using AutoMapper;
-using AutoMapper.Configuration;
 using CoreFinance.Application.DTOs;
-using CoreFinance.Application.Mapper;
 using CoreFinance.Application.Services;
 using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Contracts.Enums;
@@ -32,8 +28,6 @@ public partial class AccountServiceTests
         var pageIndex = 1;
         var orderedAccounts = accounts.OrderBy(a => a.Name).ToList();
         // ReSharper disable once UselessBinaryOperation
-        var expectedNames = orderedAccounts.Skip((pageIndex - 1) * pageSize).Take(pageSize).Select(a => a.Name)
-            .ToList();
 
         var accountsMock = accounts.AsQueryable().BuildMock();
 
@@ -64,7 +58,7 @@ public partial class AccountServiceTests
         result.Data.Should().NotBeNull();
         result.Data.Count().Should().Be(pageSize); // PageSize = 2
         
-        var expectedViewModels = orderedAccounts.Skip((pageIndex - 1) * pageSize).Take(pageSize)
+        var expectedViewModels = orderedAccounts.Skip((pageIndex - 1)! * pageSize).Take(pageSize)
             .Select(a => _mapper.Map<AccountViewModel>(a)).ToList();
         
         result.Data.Should().BeEquivalentTo(expectedViewModels, options => options.WithStrictOrdering());
@@ -146,8 +140,8 @@ public partial class AccountServiceTests
         result.Data.Should().NotBeNull();
         result.Data.Count().Should().Be(2); // "Test Account One" and "test account two"
         
-        var expectedViewModels = accounts.Where(a => a.Name.ToLower().Contains("test account")).ToList()
-            .Select(a => _mapper.Map<AccountViewModel>(a)).ToList();
+        var expectedViewModels = accounts.Where(a => a.Name != null && a.Name.ToLower().Contains("test account")).ToList()
+            .Select(_mapper.Map<AccountViewModel>).ToList();
 
         result.Data.Should().BeEquivalentTo(expectedViewModels);
     }

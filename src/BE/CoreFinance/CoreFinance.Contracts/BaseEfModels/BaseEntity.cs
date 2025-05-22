@@ -26,5 +26,5 @@ public abstract class BaseEntity<TKey>
     public DateTime? UpdateAt { get; set; }
     public string? CreateBy { get; set; }
     public string? UpdateBy { get; set; }
-    public bool? Deleted { get; set; }
+    public string? Deleted { get; set; }
 }

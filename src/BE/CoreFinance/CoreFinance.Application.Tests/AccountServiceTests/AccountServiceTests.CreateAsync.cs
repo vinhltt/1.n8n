@@ -1,4 +1,3 @@
-using AutoMapper;
 using CoreFinance.Application.DTOs;
 using CoreFinance.Application.Services;
 using CoreFinance.Domain;
