@@ -44,6 +44,7 @@ flowchart LR
     Debt[DebtService]
     Goal[GoalService]
     Inv[InvestmentService]
+    RecTx[RecurringTransactionService]
     dbP[(db_planning)]
   end
 
@@ -69,6 +70,7 @@ flowchart LR
   APIGW --> Debt
   APIGW --> Goal
   APIGW --> Inv
+  APIGW --> RecTx
   APIGW --> Rep
   APIGW --> Noti
   APIGW --> Intg
@@ -86,6 +88,7 @@ flowchart LR
   Debt --> dbP
   Goal --> dbP
   Inv --> dbP
+  RecTx --> dbP
   Rep --> dbR
   Noti --> dbR
   Intg --> dbR
@@ -103,6 +106,7 @@ flowchart LR
   Debt -->|Publish/Consume| MQ
   Goal -->|Publish/Consume| MQ
   Inv -->|Publish/Consume| MQ
+  RecTx -->|Publish/Consume| MQ
   Rep -->|Publish/Consume| MQ
   Noti -->|Publish/Consume| MQ
   Intg -->|Publish/Consume| MQ

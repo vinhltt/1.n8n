@@ -40,6 +40,7 @@ This document outlines the development plan and weekly timeline for the Personal
 - Debt management (loans, repayments, reminders)
 - Financial goal management
 - Investment tracking (stocks, funds, real estate)
+- Recurring transactions management (subscriptions, scheduled payments, future cash flow projection)
 
 ### Week 5: Reporting & Integration
 - Basic and advanced financial reports

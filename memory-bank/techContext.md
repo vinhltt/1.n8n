@@ -12,6 +12,8 @@
 - Authentication: OpenIddict, JWT, OAuth2
 - (Frontend): (Cần xác định - ví dụ: React, Angular, Vue, Blazor)
 - FluentAssertions cho assert kết quả trong unit test
+- **Quartz.NET hoặc Hangfire cho xử lý recurring jobs và lịch trình giao dịch định kỳ**
+- **Scheduling library: NCrontab, Cronos hoặc Quartz.NET cho việc xử lý các quy tắc lặp lại phức tạp trong RecurringTransactionService**
 
 ## Thiết lập phát triển
 - Sử dụng file .env cho cấu hình môi trường
@@ -37,9 +39,11 @@
 - RabbitMQ >= 3.x
 - Ocelot >= 17.x
 - OpenIddict >= 4.x
+- **Quartz.NET hoặc Hangfire >= 2.x (cho RecurringTransactionService)**
 - (Frontend framework: TBD)
 
 ## Pattern sử dụng công cụ
 - Ưu tiên dùng docker-compose cho local dev/test
 - Script hóa các thao tác lặp lại (backup, restore, deploy)
-- Tích hợp health check, logging, monitoring, alerting tự động 
+- Tích hợp health check, logging, monitoring, alerting tự động
+- **Sử dụng NCrontab hoặc Cronos để đọc/viết chuỗi cron expression cho việc xác định tần suất lặp của giao dịch định kỳ** 

@@ -58,6 +58,10 @@ Tài liệu này mô tả thiết kế phân tích nghiệp vụ cho hệ thốn
 *   **FR-PI-1:** Người dùng có thể ghi nhận và theo dõi các khoản nợ (vay, trả góp). (AC: Nhập thông tin chủ nợ, số tiền vay, lãi suất, kỳ hạn; nhắc lịch trả nợ).
 *   **FR-PI-2:** Người dùng có thể tạo và theo dõi các mục tiêu tài chính (mua nhà, mua xe, nghỉ hưu). (AC: Nhập tên mục tiêu, số tiền cần, thời hạn; gợi ý số tiền cần tiết kiệm định kỳ).
 *   **FR-PI-3:** Người dùng có thể ghi nhận và theo dõi các khoản đầu tư (cổ phiếu, trái phiếu, quỹ, bất động sản). (AC: Nhập thông tin tài sản, số lượng, giá mua; cập nhật giá trị thị trường - có thể cần tích hợp API).
+*   **FR-PI-4:** Người dùng có thể tạo và quản lý các mẫu giao dịch định kỳ (recurring transaction template) bao gồm thông tin về tên, mô tả, số tiền, loại giao dịch, danh mục, tài khoản, ngày bắt đầu, tần suất, và thời hạn. (AC: Cần nhập các thông tin cơ bản và quy tắc lặp lại).
+*   **FR-PI-5:** Hệ thống tự động sinh ra các giao dịch dự kiến (expected transactions) dựa trên mẫu giao dịch định kỳ để dự báo dòng tiền trong tương lai. (AC: Giao dịch dự kiến được sinh ra đúng lịch trình và hiển thị trong báo cáo kế hoạch tiền mặt).
+*   **FR-PI-6:** Người dùng có thể liên kết các giao dịch thực tế với giao dịch dự kiến tương ứng. (AC: Cập nhật trạng thái giao dịch dự kiến khi có giao dịch thực tế tương ứng).
+*   **FR-PI-7:** Hệ thống hiển thị thông báo khi có giao dịch định kỳ sắp đến hạn hoặc đã quá hạn mà chưa được ghi nhận. (AC: Thông báo được gửi đúng thời điểm qua các kênh đã cấu hình).
 
 ### 4.5 Reporting & Integration (ReportingService, NotificationService, IntegrationService)
 *   **FR-RI-1:** Hệ thống cung cấp các báo cáo tài chính cơ bản (tổng quan tài sản, dòng tiền, thu chi theo danh mục). (AC: Cho phép lọc theo thời gian, tài khoản; hiển thị biểu đồ).

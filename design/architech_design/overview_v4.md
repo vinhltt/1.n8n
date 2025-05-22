@@ -28,6 +28,7 @@ Hệ thống PFM được thiết kế theo kiến trúc microservices, với c�
 - **DebtService**: Quản lý khoản nợ
 - **GoalService**: Quản lý mục tiêu tài chính
 - **InvestmentService**: Quản lý đầu tư
+- **RecurringTransactionService**: Quản lý giao dịch định kỳ
 - **Database**: db_planning (PostgreSQL)
 
 ### 2.5 Reporting & Integration
