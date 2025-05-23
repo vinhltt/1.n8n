@@ -13,5 +13,11 @@ public static class ServiceExtensions
         services.AddSingleton<IProxyGenerator, ProxyGenerator>();
         services.AddScoped<IAsyncInterceptor, MonitoringInterceptor>();
         services.AddProxiedScoped<IAccountService, AccountService>();
+
+        services.AddValidatorsFromAssemblyContaining<CreateAccountRequestValidator>();
+        services.AddValidatorsFromAssemblyContaining<UpdateAccountRequestValidator>();
+
+        services.AddFluentValidationAutoValidation();
+        services.AddFluentValidationClientsideAdapters();
     }
 }
