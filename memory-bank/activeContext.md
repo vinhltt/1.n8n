@@ -35,4 +35,5 @@
 - Checklist phát triển/test phải có hướng dẫn sử dụng Bogus cho data giả lập.
 - **Chỉ sử dụng xUnit cho unit test, không dùng NUnit hay framework khác.**
 - **Chuẩn hóa sử dụng FluentAssertions cho assert kết quả trong unit test, tuân thủ .NET rule.**
+- **Quy ước sử dụng instance AutoMapper thật (không mock) cho unit test ở tầng service, dựa vào các AutoMapper profile đã được cấu hình đúng và đã được test riêng.**
 - **Lưu ý đặc biệt về việc đồng bộ dữ liệu giữa giao dịch dự kiến (ExpectedTransaction trong Planning & Investment) và giao dịch thực tế (Transaction trong Core Finance) thông qua Message Bus hoặc ReportingService.** 

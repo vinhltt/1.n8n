@@ -4,12 +4,12 @@ using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Contracts.Enums;
 using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
-using CoreFinance.Domain.UnitOffWorks;
 using Microsoft.Extensions.Logging;
 using MockQueryable;
 using Moq;
 using FluentAssertions;
 using CoreFinance.Application.Tests.Helpers;
+using CoreFinance.Domain.UnitOfWorks;
 
 namespace CoreFinance.Application.Tests.AccountServiceTests;
 
@@ -36,7 +36,7 @@ public partial class AccountServiceTests
             .Returns(accountsMock);
         repoMock.Setup(x => x.GetQueryableTable()).Returns(accountsMock);
 
-        var unitOfWorkMock = new Mock<IUnitOffWork>();
+        var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
 
         var loggerMock = new Mock<ILogger<AccountService>>();
@@ -82,7 +82,7 @@ public partial class AccountServiceTests
         repoMock.Setup(r => r.GetNoTrackingEntities())
             .Returns(accountsMock);
 
-        var unitOfWorkMock = new Mock<IUnitOffWork>();
+        var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
 
         var loggerMock = new Mock<ILogger<AccountService>>();
@@ -111,9 +111,9 @@ public partial class AccountServiceTests
         // Arrange
         var accounts = new List<Account>
         {
-            new Account { Name = "Test Account One" },
-            new Account { Name = "test account two" },
-            new Account { Name = "Another Account" }
+            new() { Name = "Test Account One" },
+            new() { Name = "test account two" },
+            new() { Name = "Another Account" }
         }.AsQueryable().BuildMock();
 
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
@@ -121,7 +121,7 @@ public partial class AccountServiceTests
             .Returns(accounts);
         repoMock.Setup(x => x.GetQueryableTable()).Returns(accounts);
 
-        var unitOfWorkMock = new Mock<IUnitOffWork>();
+        var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
 
         var loggerMock = new Mock<ILogger<AccountService>>();
@@ -158,7 +158,7 @@ public partial class AccountServiceTests
             .Returns(accountsMock);
         repoMock.Setup(x => x.GetQueryableTable()).Returns(accountsMock);
 
-        var unitOfWorkMock = new Mock<IUnitOffWork>();
+        var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
 
         var loggerMock = new Mock<ILogger<AccountService>>();
@@ -190,7 +190,7 @@ public partial class AccountServiceTests
             .Returns(emptyAccounts);
         repoMock.Setup(x => x.GetQueryableTable()).Returns(emptyAccounts);
 
-        var unitOfWorkMock = new Mock<IUnitOffWork>();
+        var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
 
         var loggerMock = new Mock<ILogger<AccountService>>();
@@ -229,7 +229,7 @@ public partial class AccountServiceTests
             .Returns(accountsMock);
         repoMock.Setup(x => x.GetQueryableTable()).Returns(accountsMock);
         
-        var unitOfWorkMock = new Mock<IUnitOffWork>();
+        var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
 
         var loggerMock = new Mock<ILogger<AccountService>>();

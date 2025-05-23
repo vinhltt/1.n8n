@@ -1,33 +1,20 @@
-using AutoMapper;
-using CoreFinance.Application.Mapper;
 using CoreFinance.Application.Services;
 using CoreFinance.Domain;
-using CoreFinance.Domain.UnitOffWorks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.UnitOfWorks;
 
 namespace CoreFinance.Application.Tests.AccountServiceTests;
 
 public partial class AccountServiceTests
 {
-    private readonly IMapper _mapper;
-
-    public AccountServiceTests()
-    {
-        var config = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile<AutoMapperProfile>();
-        });
-        _mapper = config.CreateMapper();
-    }
-
     [Fact]
     public async Task GetByIdAsync_ShouldReturnAccount_WhenAccountExists()
     {
         // Arrange
-        var unitOffWorkMock = new Mock<IUnitOffWork>();
+        var unitOffWorkMock = new Mock<IUnitOfWork>();
         var loggerMock = new Mock<ILogger<AccountService>>();
         var repositoryMock = new Mock<IBaseRepository<Account, Guid>>();
 
@@ -52,7 +39,7 @@ public partial class AccountServiceTests
     public async Task GetByIdAsync_ShouldReturnNull_WhenAccountDoesNotExist()
     {
         // Arrange
-        var unitOffWorkMock = new Mock<IUnitOffWork>();
+        var unitOffWorkMock = new Mock<IUnitOfWork>();
         var loggerMock = new Mock<ILogger<AccountService>>();
         var repositoryMock = new Mock<IBaseRepository<Account, Guid>>();
 
