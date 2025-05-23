@@ -10,14 +10,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace CoreFinance.Application.Tests.AccountServiceTests;
-
-// Tests for the CreateAsync method of AccountService
 public partial class AccountServiceTests
 {
-    // Helper method has been moved to TestHelpers.cs
-    // private static IQueryable<Account> GenerateFakeAccounts(int count) { ... }
-
-    // --- CreateAsync Tests ---
 
     [Fact]
     public async Task CreateAsync_ShouldReturnViewModel_WhenCreationIsSuccessful()
@@ -32,19 +26,6 @@ public partial class AccountServiceTests
             UserId = Guid.NewGuid()
             // Add other required properties for AccountCreateRequest
         };
-
-        // Expected ViewModel properties will be based on the mapping profile
-        // No need to manually construct expectedViewModel with dynamic Id, Currency, etc.
-        // We will assert against the properties of the result directly.
-
-        // var mapperMock = new Mock<IMapper>(); // Using real _mapper now
-        // mapperMock.Setup(m => m.Map(createRequest, It.IsAny<Account>())) // Not needed with real mapper
-        //     .Callback<AccountCreateRequest, Account>((src, dest) => 
-        //     { /* Simulate AutoMapper's behavior */ });
-        
-        // mapperMock.Setup(m => m.Map<AccountViewModel>(It.IsAny<Account>())) // Not needed with real mapper
-        //     .Returns((Account src) => new AccountViewModel { /* Map manually */ });
-
 
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
         repoMock.Setup(r => r.CreateAsync(It.IsAny<Account>()))
@@ -86,10 +67,6 @@ public partial class AccountServiceTests
     {
         // Arrange
         var createRequest = new AccountCreateRequest { Name = "Test Account", UserId = Guid.NewGuid() };
-        
-        // var mapperMock = new Mock<IMapper>(); // Using real _mapper now
-        // mapperMock.Setup(m => m.Map(createRequest, It.IsAny<Account>())); // Not needed with real mapper
-        // No need to setup the second Map call as it won't be reached if exception is thrown
 
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
         repoMock.Setup(r => r.CreateAsync(It.IsAny<Account>()))
@@ -125,9 +102,6 @@ public partial class AccountServiceTests
     {
         // Arrange
         var createRequest = new AccountCreateRequest { Name = "Test Account", UserId = Guid.NewGuid() };
-
-        // var mapperMock = new Mock<IMapper>(); // Using real _mapper now
-        // mapperMock.Setup(m => m.Map(createRequest, It.IsAny<Account>())); // Not needed with real mapper
 
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
         repoMock.Setup(r => r.CreateAsync(It.IsAny<Account>()))

@@ -14,8 +14,6 @@ namespace CoreFinance.Application.Tests.AccountServiceTests;
 
 public partial class AccountServiceTests
 {
-    // --- CreateAsync(List<TCreateRequest>) Tests ---
-
     [Fact]
     public async Task CreateAsync_List_ValidRequest_ReturnsViewModels()
     {
