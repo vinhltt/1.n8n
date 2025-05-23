@@ -10,12 +10,13 @@ using Microsoft.Extensions.Logging;
 namespace CoreFinance.Application.Services.Base;
 
 /// <summary>
+/// Base service class providing common CRUD operations for entities.
 /// </summary>
-/// <typeparam name="TEntity"></typeparam>
-/// <typeparam name="TCreateRequest"></typeparam>
-/// <typeparam name="TUpdateRequest"></typeparam>
-/// <typeparam name="TViewModel"></typeparam>
-/// <typeparam name="TKey"></typeparam>
+/// <typeparam name="TEntity">The type of the entity.</typeparam>
+/// <typeparam name="TCreateRequest">The type of the create request DTO.</typeparam>
+/// <typeparam name="TUpdateRequest">The type of the update request DTO.</typeparam>
+/// <typeparam name="TViewModel">The type of the view model DTO.</typeparam>
+/// <typeparam name="TKey">The type of the entity's primary key.</typeparam>
 public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TViewModel,
     TKey>(
     IMapper mapper,
@@ -30,68 +31,83 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
 {
     protected readonly IMapper Mapper = mapper;
     protected readonly IUnitOfWork UnitOffWork = unitOffWork;
+    private readonly ILogger _logger = logger;
 
     /// <summary>
+    /// Deletes an entity permanently by its identifier asynchronously.
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    /// <param name="id">The identifier of the entity.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the number of state entries written to the database.</returns>
     public async Task<int?> DeleteHardAsync(TKey id)
     {
-        logger.LogTrace($"{nameof(DeleteHardAsync)}: {id.TryParseToString()}");
+        _logger.LogTrace($"{nameof(DeleteHardAsync)}: {id.TryParseToString()}");
         await UnitOffWork.Repository<TEntity, TKey>().DeleteHardAsync(id!);
         return await UnitOffWork.SaveChangesAsync();
     }
 
     /// <summary>
+    /// Soft deletes an entity by its identifier asynchronously.
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    /// <param name="id">The identifier of the entity.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the number of state entries written to the database.</returns>
     public async Task<int?> DeleteSoftAsync(TKey id)
     {
-        logger.LogTrace($"{nameof(DeleteSoftAsync)}: {id.TryParseToString()}");
+        _logger.LogTrace($"{nameof(DeleteSoftAsync)}: {id.TryParseToString()}");
         return await UnitOffWork.Repository<TEntity, TKey>().DeleteSoftAsync(id!);
     }
 
     /// <summary>
+    /// Gets all entities as view models asynchronously.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the collection of view models.</returns>
     public virtual async Task<IEnumerable<TViewModel>?> GetAllDtoAsync()
     {
         var query = UnitOffWork.Repository<TEntity, TKey>();
         var result = await Mapper.ProjectTo<TViewModel>(query.GetNoTrackingEntities())
             .ToListAsync();
-        logger.LogTrace($"{nameof(GetAllDtoAsync)} result: {result.TryParseToString()}");
+        _logger.LogTrace($"{nameof(GetAllDtoAsync)} result: {result.TryParseToString()}");
         return result;
     }
 
+    /// <summary>
+    /// Gets an entity by its identifier as a view model asynchronously.
+    /// </summary>
+    /// <param name="id">The identifier of the entity.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the view model, or null if the entity is not found.</returns>
     public virtual async Task<TViewModel?> GetByIdAsync(TKey id)
     {
-        logger.LogTrace($"{nameof(GetByIdAsync)}: {id.TryParseToString()}");
+        _logger.LogTrace($"{nameof(GetByIdAsync)}: {id.TryParseToString()}");
         var entity = await UnitOffWork.Repository<TEntity, TKey>().GetByIdNoTrackingAsync(id);
         var result = Mapper.Map<TViewModel>(entity);
-        logger.LogTrace($"{nameof(GetByIdAsync)} result: {result.TryParseToString()}");
+        _logger.LogTrace($"{nameof(GetByIdAsync)} result: {result.TryParseToString()}");
         return result;
     }
 
+    /// <summary>
+    /// Updates an entity asynchronously.
+    /// </summary>
+    /// <param name="id">The identifier of the entity to update.</param>
+    /// <param name="request">The update request containing the new data.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the updated view model, or null if the update failed.</returns>
     public virtual async Task<TViewModel?> UpdateAsync(TKey id, TUpdateRequest request)
     {
         await using var trans = await UnitOffWork.BeginTransactionAsync();
         try
         {
-            logger.LogTrace($"{nameof(UpdateAsync)} request: {id}, {request.TryParseToString()}");
+            _logger.LogTrace($"{nameof(UpdateAsync)} request: {id}, {request.TryParseToString()}");
             if (id is null || !id.Equals(request.Id))
                 throw new KeyNotFoundException();
             var entity = await UnitOffWork.Repository<TEntity, TKey>().GetByIdAsync(id);
-            logger.LogTrace($"{nameof(UpdateAsync)} old entity: {entity.TryParseToString()}");
+            _logger.LogTrace($"{nameof(UpdateAsync)} old entity: {entity.TryParseToString()}");
 
             if (entity == null) throw new NullReferenceException();
             entity = Mapper.Map(request, entity);
-            logger.LogTrace($"{nameof(UpdateAsync)} new entity: {entity.TryParseToString()}");
+            _logger.LogTrace($"{nameof(UpdateAsync)} new entity: {entity.TryParseToString()}");
             var effectedCount = await UnitOffWork.Repository<TEntity, TKey>().UpdateAsync(entity);
-            logger.LogTrace($"{nameof(UpdateAsync)} effectedCount: {effectedCount}");
+            _logger.LogTrace($"{nameof(UpdateAsync)} effectedCount: {effectedCount}");
             if (effectedCount <= 0) throw new UpdateFailedException();
             var result = Mapper.Map<TViewModel>(entity);
-            logger.LogTrace($"{nameof(UpdateAsync)} result: {result.TryParseToString()}");
+            _logger.LogTrace($"{nameof(UpdateAsync)} result: {result.TryParseToString()}");
             await trans.CommitAsync();
             return result;
         }
@@ -103,25 +119,26 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
     }
 
     /// <summary>
+    /// Creates a new entity asynchronously.
     /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
+    /// <param name="request">The create request containing the data for the new entity.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the created view model, or null if the creation failed.</returns>
     /// <exception cref="NullReferenceException"></exception>
     public virtual async Task<TViewModel?> CreateAsync(TCreateRequest request)
     {
         await using var trans = await UnitOffWork.BeginTransactionAsync();
         try
         {
-            logger.LogTrace($"{nameof(CreateAsync)} request: {request.TryParseToString()}");
+            _logger.LogTrace($"{nameof(CreateAsync)} request: {request.TryParseToString()}");
             var entityNew = new TEntity();
             Mapper.Map(request, entityNew);
-            logger.LogTrace($"{nameof(CreateAsync)} entitiesNew: {entityNew.TryParseToString()}");
+            _logger.LogTrace($"{nameof(CreateAsync)} entitiesNew: {entityNew.TryParseToString()}");
             var effectedCount =
                 await UnitOffWork.Repository<TEntity, TKey>().CreateAsync(entityNew);
-            logger.LogTrace($"{nameof(CreateAsync)} affectedCount: {effectedCount}");
+            _logger.LogTrace($"{nameof(CreateAsync)} affectedCount: {effectedCount}");
             if (effectedCount <= 0) throw new CreateFailedException();
             var result = Mapper.Map<TViewModel>(entityNew);
-            logger.LogTrace($"{nameof(CreateAsync)} result: {result.TryParseToString()}");
+            _logger.LogTrace($"{nameof(CreateAsync)} result: {result.TryParseToString()}");
             await trans.CommitAsync();
             return result;
         }
@@ -133,16 +150,17 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
     }
 
     /// <summary>
+    /// Creates multiple new entities asynchronously.
     /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
+    /// <param name="request">The list of create requests containing the data for the new entities.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the collection of created view models, or an empty collection if the creation failed.</returns>
     /// <exception cref="NullReferenceException"></exception>
     public virtual async Task<IEnumerable<TViewModel>?> CreateAsync(
         List<TCreateRequest> request)
     {
         if (!request.Any())
         {
-            logger.LogInformation("Request Is Empty");
+            _logger.LogInformation("Request Is Empty");
             return new List<TViewModel>();
         }
 
@@ -150,21 +168,21 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
         try
         {
             var baseCreateRequests = request as TCreateRequest[] ?? request.ToArray();
-            logger.LogTrace($"{nameof(CreateAsync)} request: {baseCreateRequests.TryParseToString()}");
+            _logger.LogTrace($"{nameof(CreateAsync)} request: {baseCreateRequests.TryParseToString()}");
 
             var entitiesNew = new List<TEntity>();
             Mapper.Map(baseCreateRequests, entitiesNew);
-            logger.LogTrace($"{nameof(CreateAsync)} entitiesNew: {entitiesNew.TryParseToString()}");
+            _logger.LogTrace($"{nameof(CreateAsync)} entitiesNew: {entitiesNew.TryParseToString()}");
 
             var effectedCount =
                 await UnitOffWork.Repository<TEntity, TKey>().CreateAsync(entitiesNew);
-            logger.LogTrace($"{nameof(CreateAsync)} affectedCount: {effectedCount}");
+            _logger.LogTrace($"{nameof(CreateAsync)} affectedCount: {effectedCount}");
 
             if (effectedCount <= 0) throw new CreateFailedException();
 
             var result = Mapper.Map<IEnumerable<TViewModel>>(entitiesNew);
             var baseViewModels = result as TViewModel[] ?? result.ToArray();
-            logger.LogTrace($"{nameof(CreateAsync)} result: {baseViewModels.TryParseToString()}");
+            _logger.LogTrace($"{nameof(CreateAsync)} result: {baseViewModels.TryParseToString()}");
             await trans.CommitAsync();
 
             return baseViewModels;
