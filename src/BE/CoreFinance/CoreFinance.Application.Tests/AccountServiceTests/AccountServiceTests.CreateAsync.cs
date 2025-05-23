@@ -2,11 +2,12 @@ using CoreFinance.Application.DTOs;
 using CoreFinance.Application.Services;
 using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Exceptions;
 using CoreFinance.Domain.UnitOfWorks;
-using Microsoft.Extensions.Logging;
-using Moq;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace CoreFinance.Application.Tests.AccountServiceTests;
 
@@ -111,7 +112,7 @@ public partial class AccountServiceTests
         Func<Task> act = async () => await service.CreateAsync(createRequest);
 
         // Assert
-        await act.Should().ThrowAsync<NullReferenceException>();
+        await act.Should().ThrowAsync<CreateFailedException>();
         
         repoMock.Verify(r => r.CreateAsync(It.IsAny<Account>()), Times.Once);
         unitOfWorkMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
