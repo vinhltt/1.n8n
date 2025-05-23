@@ -108,7 +108,6 @@ public partial class AccountServiceTests
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
-        unitOfWorkMock.Setup(u => u.SaveChangesAsync()).ReturnsAsync(affectedCount);
 
         var loggerMock = new Mock<ILogger<AccountService>>();
         var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
@@ -120,7 +119,6 @@ public partial class AccountServiceTests
         result.Should().Be(affectedCount);
 
         repoMock.Verify(r => r.DeleteHardAsync(accountId), Times.Once);
-        unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Once);
     }
 
     [Theory]

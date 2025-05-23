@@ -25,7 +25,6 @@ public partial class AccountServiceTests
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
-        unitOfWorkMock.Setup(u => u.SaveChangesAsync()).ReturnsAsync(expectedAffectedCount);
 
         var loggerMock = new Mock<ILogger<AccountService>>();
         var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
@@ -37,7 +36,6 @@ public partial class AccountServiceTests
         result.Should().Be(expectedAffectedCount);
 
         repoMock.Verify(r => r.DeleteHardAsync(accountId), Times.Once);
-        unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Once);
     }
 
     [Fact]
@@ -65,7 +63,6 @@ public partial class AccountServiceTests
         result.Should().Be(expectedAffectedCount);
 
         repoMock.Verify(r => r.DeleteHardAsync(accountId), Times.Once);
-        unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Once);
     }
 
     [Fact]
@@ -104,11 +101,10 @@ public partial class AccountServiceTests
 
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
         repoMock.Setup(r => r.DeleteHardAsync(accountId))
-            .ReturnsAsync(1);
+            .ThrowsAsync(expectedException);
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
-        unitOfWorkMock.Setup(u => u.SaveChangesAsync()).ThrowsAsync(expectedException);
 
         var loggerMock = new Mock<ILogger<AccountService>>();
         var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
@@ -120,6 +116,5 @@ public partial class AccountServiceTests
         await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("Save changes failed");
 
         repoMock.Verify(r => r.DeleteHardAsync(accountId), Times.Once);
-        unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Once);
     }
 } 

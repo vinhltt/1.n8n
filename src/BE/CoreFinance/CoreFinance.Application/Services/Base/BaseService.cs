@@ -41,8 +41,7 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
     public async Task<int?> DeleteHardAsync(TKey id)
     {
         _logger.LogTrace($"{nameof(DeleteHardAsync)}: {id.TryParseToString()}");
-        await UnitOffWork.Repository<TEntity, TKey>().DeleteHardAsync(id!);
-        return await UnitOffWork.SaveChangesAsync();
+        return await UnitOffWork.Repository<TEntity, TKey>().DeleteHardAsync(id!);
     }
 
     /// <summary>
