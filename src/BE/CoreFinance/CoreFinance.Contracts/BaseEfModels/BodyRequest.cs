@@ -7,6 +7,4 @@ public class BodyRequest : IBodyRequest
 
     }
 }
-public interface IBodyRequest
-{
-}
+public interface IBodyRequest;

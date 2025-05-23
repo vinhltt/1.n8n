@@ -1,5 +1,3 @@
 ﻿namespace CoreFinance.Contracts.DTOs;
 
-public abstract class BaseCreateRequest : BaseDto
-{
-}
+public abstract class BaseCreateRequest : BaseDto;

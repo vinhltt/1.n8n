@@ -6,14 +6,14 @@ using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Contracts.DTOs;
 using CoreFinance.Contracts.EntityFrameworkUtilities;
 using CoreFinance.Domain;
-using CoreFinance.Domain.UnitOffWorks;
+using CoreFinance.Domain.UnitOfWorks;
 using Microsoft.Extensions.Logging;
 
 namespace CoreFinance.Application.Services;
 
 public class AccountService(
     IMapper mapper,
-    IUnitOffWork unitOffWork,
+    IUnitOfWork unitOffWork,
     ILogger<AccountService> logger) 
     : BaseService<Account, AccountCreateRequest, AccountUpdateRequest, AccountViewModel, Guid>(mapper, unitOffWork, logger), 
         IAccountService
@@ -25,7 +25,7 @@ public class AccountService(
                 .GetNoTrackingEntities());
 
         if (!string.IsNullOrEmpty(request.SearchValue))
-            query = query.Where(e => e.Name!.ToLower().Contains(request.SearchValue.ToLower() ?? ""));
+            query = query.Where(e => e.Name!.ToLower().Contains(request.SearchValue.ToLower()));
 
         return await query.ToPagingAsync(request);
     }

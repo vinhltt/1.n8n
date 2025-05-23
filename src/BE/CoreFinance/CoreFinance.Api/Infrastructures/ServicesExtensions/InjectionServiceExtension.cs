@@ -1,7 +1,7 @@
 ﻿using CoreFinance.Application.Mapper;
-using CoreFinance.Domain.UnitOffWorks;
+using CoreFinance.Domain.UnitOfWorks;
 using CoreFinance.Infrastructure;
-using CoreFinance.Infrastructure.UnitOffWorks;
+using CoreFinance.Infrastructure.UnitOfWorks;
 
 namespace CoreFinance.Api.Infrastructures.ServicesExtensions;
 
@@ -11,7 +11,7 @@ public static class InjectionServiceExtension
     {
         services.AddHttpContextAccessor();
         services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
-        services.AddScoped(typeof(IUnitOffWork), typeof(UnitOffWork<CoreFinanceDbContext>));
+        services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork<CoreFinanceDbContext>));
         services.AddRepositories();
         services.AddServices();
     }

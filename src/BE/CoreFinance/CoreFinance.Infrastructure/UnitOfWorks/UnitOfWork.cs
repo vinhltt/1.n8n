@@ -1,82 +1,35 @@
-﻿using CoreFinance.Domain.BaseRepositories;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
-using System.Reflection;
-using CoreFinance.Domain.UnitOffWorks;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using CoreFinance.Contracts.Attributes;
 using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Contracts.Constants;
 using CoreFinance.Contracts.Utilities;
+using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.UnitOfWorks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
-namespace CoreFinance.Infrastructure.UnitOffWorks;
+namespace CoreFinance.Infrastructure.UnitOfWorks;
 
-public class UnitOffWork<TContext>(
+public class UnitOfWork<TContext>(
     TContext context,
-    IServiceProvider serviceProvider
-)
-    : IUnitOffWork
+    IServiceProvider serviceProvider)
+    : IUnitOfWork
     where TContext : DbContext
 {
     private bool _disposed;
     private Dictionary<Type, object?>? _repositories;
-    //private UserManager<User>? _userManager;
 
     public Task<int> SaveChangesAsync()
     {
         return context.SaveChangesAsync();
     }
 
-    public int SaveChanges()
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
     {
-        return context.SaveChanges();
-    }
-
-    public async Task DoWorkWithTransaction(Action action)
-    {
-        await using var trans = await context.Database.BeginTransactionAsync();
-        try
-        {
-            action.Invoke();
-            await trans.CommitAsync();
-        }
-        catch
-        {
-            await trans.RollbackAsync();
-            throw;
-        }
-    }
-
-    public async Task DoWorkWithTransaction(Task<Action> action)
-    {
-        await using var trans = await context.Database.BeginTransactionAsync();
-        try
-        {
-            (await action).Invoke();
-            await trans.CommitAsync();
-        }
-        catch
-        {
-            await trans.RollbackAsync();
-            throw;
-        }
-    }
-
-    public async Task<T> DoWorkWithTransaction<T>(Func<Task<T>> action)
-    {
-        await using var trans = await context.Database.BeginTransactionAsync();
-        try
-        {
-            var result = await action.Invoke();
-            await trans.CommitAsync();
-            return result;
-        }
-        catch
-        {
-            await trans.RollbackAsync();
-            throw;
-        }
+        return await context.Database.BeginTransactionAsync();
     }
 
     public async Task<string> GetTemplateQueryAsync(
@@ -102,7 +55,7 @@ public class UnitOffWork<TContext>(
                throw new InvalidOperationException();
     }
 
-    ~UnitOffWork()
+    ~UnitOfWork()
     {
         Dispose(false);
     }
@@ -123,10 +76,16 @@ public class UnitOffWork<TContext>(
     )
     {
         if (!_disposed)
+        {
             if (disposing)
+            {
                 context.Dispose();
+            }
 
-        _disposed = true;
+            // Free unmanaged resources (unmanaged objects) and override finalizer
+            // Set large fields to null
+            _disposed = true;
+        }
     }
 
     protected string BuildPathDao(
