@@ -2,6 +2,7 @@ using AutoMapper;
 using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Contracts.DTOs;
 using CoreFinance.Contracts.Utilities;
+using CoreFinance.Domain.Exceptions;
 using CoreFinance.Domain.UnitOfWorks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -88,7 +89,7 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
             logger.LogTrace($"{nameof(UpdateAsync)} new entity: {entity.TryParseToString()}");
             var effectedCount = await UnitOffWork.Repository<TEntity, TKey>().UpdateAsync(entity);
             logger.LogTrace($"{nameof(UpdateAsync)} effectedCount: {effectedCount}");
-            if (effectedCount <= 0) throw new NullReferenceException();
+            if (effectedCount <= 0) throw new UpdateFailedException();
             var result = Mapper.Map<TViewModel>(entity);
             logger.LogTrace($"{nameof(UpdateAsync)} result: {result.TryParseToString()}");
             await trans.CommitAsync();
@@ -118,7 +119,7 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
             var effectedCount =
                 await UnitOffWork.Repository<TEntity, TKey>().CreateAsync(entityNew);
             logger.LogTrace($"{nameof(CreateAsync)} affectedCount: {effectedCount}");
-            if (effectedCount <= 0) throw new NullReferenceException();
+            if (effectedCount <= 0) throw new CreateFailedException();
             var result = Mapper.Map<TViewModel>(entityNew);
             logger.LogTrace($"{nameof(CreateAsync)} result: {result.TryParseToString()}");
             await trans.CommitAsync();
@@ -159,7 +160,7 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
                 await UnitOffWork.Repository<TEntity, TKey>().CreateAsync(entitiesNew);
             logger.LogTrace($"{nameof(CreateAsync)} affectedCount: {effectedCount}");
 
-            if (effectedCount <= 0) throw new NullReferenceException();
+            if (effectedCount <= 0) throw new CreateFailedException();
 
             var result = Mapper.Map<IEnumerable<TViewModel>>(entitiesNew);
             var baseViewModels = result as TViewModel[] ?? result.ToArray();
