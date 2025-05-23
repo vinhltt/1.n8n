@@ -10,5 +10,6 @@ public static class RepositoryExtensions
     public static void AddRepositories(this IServiceCollection services)
     {
         services.AddProxiedScoped<IBaseRepository<Account, Guid>, BaseRepository<Account, Guid>>();
+        services.AddProxiedScoped<IBaseRepository<Transaction, Guid>, BaseRepository<Transaction, Guid>>();
     }
 }

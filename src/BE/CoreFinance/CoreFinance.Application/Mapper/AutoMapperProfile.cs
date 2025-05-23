@@ -11,6 +11,8 @@ public class AutoMapperProfile : Profile
         CreateMap<Account, AccountCreateRequest>().ReverseMap();
         CreateMap<Account, AccountUpdateRequest>().ReverseMap();
         CreateMap<Account, AccountViewModel>().ReverseMap();
-
+        CreateMap<Transaction, TransactionCreateRequest>().ReverseMap();
+        CreateMap<Transaction, TransactionUpdateRequest>().ReverseMap();
+        CreateMap<Transaction, TransactionViewModel>().ReverseMap();
     }
 }
