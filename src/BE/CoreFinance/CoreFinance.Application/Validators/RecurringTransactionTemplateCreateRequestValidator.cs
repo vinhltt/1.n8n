@@ -7,7 +7,6 @@ public class RecurringTransactionTemplateCreateRequestValidator : AbstractValida
 {
     public RecurringTransactionTemplateCreateRequestValidator()
     {
-        RuleFor(x => x.UserId).NotEmpty();
         RuleFor(x => x.AccountId).NotEmpty();
         RuleFor(x => x.Name).NotEmpty().MaximumLength(100);
         RuleFor(x => x.Amount).GreaterThan(0);

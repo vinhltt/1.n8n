@@ -8,7 +8,6 @@ public class CreateTransactionRequestValidator : AbstractValidator<TransactionCr
     public CreateTransactionRequestValidator()
     {
         RuleFor(x => x.AccountId).NotEmpty();
-        RuleFor(x => x.UserId).NotEmpty();
         RuleFor(x => x.TransactionDate).NotEmpty();
         RuleFor(x => x.RevenueAmount).GreaterThanOrEqualTo(0);
         RuleFor(x => x.SpentAmount).GreaterThanOrEqualTo(0);

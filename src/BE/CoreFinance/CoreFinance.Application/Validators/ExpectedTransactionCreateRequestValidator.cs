@@ -8,7 +8,6 @@ public class ExpectedTransactionCreateRequestValidator : AbstractValidator<Expec
     public ExpectedTransactionCreateRequestValidator()
     {
         RuleFor(x => x.RecurringTransactionTemplateId).NotEmpty();
-        RuleFor(x => x.UserId).NotEmpty();
         RuleFor(x => x.AccountId).NotEmpty();
         RuleFor(x => x.ExpectedDate).NotEmpty();
         RuleFor(x => x.ExpectedAmount).GreaterThanOrEqualTo(0);

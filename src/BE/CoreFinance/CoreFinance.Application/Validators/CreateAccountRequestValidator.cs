@@ -7,7 +7,6 @@ public class CreateAccountRequestValidator : AbstractValidator<AccountCreateRequ
 {
     public CreateAccountRequestValidator()
     {
-        RuleFor(x => x.UserId).NotEmpty();
         RuleFor(x => x.Name).NotEmpty().MaximumLength(100);
         RuleFor(x => x.Type).NotEmpty();
         RuleFor(x => x.Currency).NotEmpty().MaximumLength(10);

@@ -9,7 +9,7 @@ namespace CoreFinance.Application.DTOs.Transaction;
 public class TransactionViewModel : BaseViewModel<Guid>
 {
     public Guid AccountId { get; set; }
-    public Guid UserId { get; set; }
+    public Guid? UserId { get; set; }
     public DateTime TransactionDate { get; set; }
     public decimal RevenueAmount { get; set; }
     public decimal SpentAmount { get; set; }

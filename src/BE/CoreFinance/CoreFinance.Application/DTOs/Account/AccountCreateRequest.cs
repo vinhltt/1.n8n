@@ -5,7 +5,7 @@ namespace CoreFinance.Application.DTOs.Account;
 
 public class AccountCreateRequest : BaseCreateRequest
 {
-    public Guid UserId { get; set; }
+    public Guid? UserId { get; set; }
     public string? Name { get; set; }
     public AccountType Type { get; set; }
     public string? CardNumber { get; set; }

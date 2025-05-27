@@ -1,6 +1,8 @@
 using CoreFinance.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using CoreFinance.Api.Infrastructures.ServicesExtensions;
+using CoreFinance.Contracts;
+using CoreFinance.Contracts.Utilities;
 using Serilog;
 
 async Task CreateDbIfNotExistsAsync(IHost host)
@@ -39,7 +41,9 @@ Log.Logger = new LoggerConfiguration()
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddGeneralConfigurations();
+var corsOption = configuration.GetOptions<CorsOptions>("CorsOptions");
+var policyName = corsOption!.PolicyName.Nullify("AppCorsPolicy");
+builder.AddGeneralConfigurations(policyName, corsOption);
 builder.Services.AddInjectedServices();
 
 var app = builder.Build();
@@ -57,6 +61,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(policyName);
 
 //app.UseAuthorization();
 

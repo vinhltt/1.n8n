@@ -6,7 +6,7 @@ namespace CoreFinance.Application.DTOs.ExpectedTransaction;
 public class ExpectedTransactionViewModel : BaseViewModel<Guid>
 {
     public Guid RecurringTransactionTemplateId { get; set; }
-    public Guid UserId { get; set; }
+    public Guid? UserId { get; set; }
     public Guid AccountId { get; set; }
     public Guid? ActualTransactionId { get; set; }
     public DateTime ExpectedDate { get; set; }
