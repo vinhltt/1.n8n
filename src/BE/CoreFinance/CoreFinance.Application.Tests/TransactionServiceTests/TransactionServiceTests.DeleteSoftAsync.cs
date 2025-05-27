@@ -1,4 +1,3 @@
-using CoreFinance.Application.DTOs;
 using CoreFinance.Application.Services;
 using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
@@ -6,9 +5,6 @@ using CoreFinance.Domain.UnitOfWorks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace CoreFinance.Application.Tests.TransactionServiceTests;
 

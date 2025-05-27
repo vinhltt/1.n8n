@@ -14,4 +14,4 @@ public class UpdateFailedException : Exception
     public UpdateFailedException(string message, Exception innerException) : base(message, innerException)
     {
     }
-} 
+}

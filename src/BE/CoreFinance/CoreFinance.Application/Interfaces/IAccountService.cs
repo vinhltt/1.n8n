@@ -1,4 +1,4 @@
-using CoreFinance.Application.DTOs;
+using CoreFinance.Application.DTOs.Account;
 using CoreFinance.Application.Services.Base;
 using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Contracts.DTOs;

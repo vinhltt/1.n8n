@@ -4,8 +4,9 @@ namespace CoreFinance.Contracts.Utilities;
 
 public static class StringHelper
 {
-    public static readonly string PascalCaseStringPattern = @"^_+";
-    public static readonly string PascalCaseStringPatternReplace = @"([a-z0-9])(A-Z)";
+    public static readonly string TypePascalCaseStringPattern = @"^_+";
+    public static readonly string TypePascalCaseStringPatternReplace = @"([a-z0-9])(A-Z)";
+
     /// <summary>
     /// 
     /// </summary>
@@ -17,9 +18,11 @@ public static class StringHelper
         {
             return value;
         }
-        var startUnderScores = Regex.Match(value, PascalCaseStringPatternReplace);
-        return startUnderScores + Regex.Replace(value, PascalCaseStringPatternReplace, "$1_$2").ToLower();
+
+        var startUnderScores = Regex.Match(value, TypePascalCaseStringPatternReplace);
+        return startUnderScores + Regex.Replace(value, TypePascalCaseStringPatternReplace, "$1_$2").ToLower();
     }
+
     /// <summary>
     /// 
     /// </summary>
@@ -33,12 +36,15 @@ public static class StringHelper
         {
             return defaultValue;
         }
+
         if (trim)
         {
             value = value.Trim();
         }
+
         return value.Length == 0 ? defaultValue : value;
     }
+
     /// <summary>
     /// Trim start, Trim end and Trim middle space
     /// </summary>

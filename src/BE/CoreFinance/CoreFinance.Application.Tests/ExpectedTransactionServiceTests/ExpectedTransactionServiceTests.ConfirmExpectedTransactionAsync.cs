@@ -1,0 +1,178 @@
+using CoreFinance.Application.Services;
+using CoreFinance.Domain;
+using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Enums;
+using CoreFinance.Domain.UnitOfWorks;
+using FluentAssertions;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
+using Moq;
+
+namespace CoreFinance.Application.Tests.ExpectedTransactionServiceTests;
+
+public partial class ExpectedTransactionServiceTests
+{
+    [Fact]
+    public async Task ConfirmExpectedTransactionAsync_ShouldReturnTrue_WhenTransactionIsConfirmedSuccessfully()
+    {
+        // Arrange
+        var expectedTransactionId = Guid.NewGuid();
+        var actualTransactionId = Guid.NewGuid();
+        var expectedTransaction = new ExpectedTransaction
+        {
+            Id = expectedTransactionId,
+            Status = ExpectedTransactionStatus.Pending,
+            UserId = Guid.NewGuid(),
+            AccountId = Guid.NewGuid(),
+            ExpectedAmount = 100m,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        var repoMock = new Mock<IBaseRepository<ExpectedTransaction, Guid>>();
+        repoMock.Setup(r => r.GetByIdAsync(expectedTransactionId))
+            .ReturnsAsync(expectedTransaction);
+        repoMock.Setup(r => r.UpdateAsync(It.IsAny<ExpectedTransaction>()))
+            .ReturnsAsync(1);
+
+        var transactionMock = new Mock<IDbContextTransaction>();
+        transactionMock.Setup(t => t.CommitAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        transactionMock.Setup(t => t.DisposeAsync()).Returns(ValueTask.CompletedTask);
+
+        var unitOfWorkMock = new Mock<IUnitOfWork>();
+        unitOfWorkMock.Setup(u => u.Repository<ExpectedTransaction, Guid>()).Returns(repoMock.Object);
+        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(transactionMock.Object);
+        unitOfWorkMock.Setup(u => u.SaveChangesAsync()).ReturnsAsync(1);
+
+        var loggerMock = new Mock<ILogger<ExpectedTransactionService>>();
+        var service = new ExpectedTransactionService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
+
+        // Act
+        var result = await service.ConfirmExpectedTransactionAsync(expectedTransactionId, actualTransactionId);
+
+        // Assert
+        result.Should().BeTrue();
+        expectedTransaction.Status.Should().Be(ExpectedTransactionStatus.Confirmed);
+        expectedTransaction.ActualTransactionId.Should().Be(actualTransactionId);
+        expectedTransaction.ProcessedAt.Should().NotBeNull();
+        expectedTransaction.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+
+        repoMock.Verify(r => r.GetByIdAsync(expectedTransactionId), Times.Once);
+        repoMock.Verify(r => r.UpdateAsync(It.IsAny<ExpectedTransaction>()), Times.Once);
+        unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Once);
+        transactionMock.Verify(t => t.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task ConfirmExpectedTransactionAsync_ShouldReturnFalse_WhenTransactionNotFound()
+    {
+        // Arrange
+        var expectedTransactionId = Guid.NewGuid();
+        var actualTransactionId = Guid.NewGuid();
+
+        var repoMock = new Mock<IBaseRepository<ExpectedTransaction, Guid>>();
+        repoMock.Setup(r => r.GetByIdAsync(expectedTransactionId))
+            .ReturnsAsync((ExpectedTransaction?)null);
+
+        var transactionMock = new Mock<IDbContextTransaction>();
+        transactionMock.Setup(t => t.CommitAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        transactionMock.Setup(t => t.DisposeAsync()).Returns(ValueTask.CompletedTask);
+
+        var unitOfWorkMock = new Mock<IUnitOfWork>();
+        unitOfWorkMock.Setup(u => u.Repository<ExpectedTransaction, Guid>()).Returns(repoMock.Object);
+        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(transactionMock.Object);
+
+        var loggerMock = new Mock<ILogger<ExpectedTransactionService>>();
+        var service = new ExpectedTransactionService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
+
+        // Act
+        var result = await service.ConfirmExpectedTransactionAsync(expectedTransactionId, actualTransactionId);
+
+        // Assert
+        result.Should().BeFalse();
+        repoMock.Verify(r => r.GetByIdAsync(expectedTransactionId), Times.Once);
+        repoMock.Verify(r => r.UpdateAsync(It.IsAny<ExpectedTransaction>()), Times.Never);
+        unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Never);
+    }
+
+    [Fact]
+    public async Task ConfirmExpectedTransactionAsync_ShouldReturnFalse_WhenTransactionIsNotPending()
+    {
+        // Arrange
+        var expectedTransactionId = Guid.NewGuid();
+        var actualTransactionId = Guid.NewGuid();
+        var expectedTransaction = new ExpectedTransaction
+        {
+            Id = expectedTransactionId,
+            Status = ExpectedTransactionStatus.Confirmed, // Already confirmed
+            UserId = Guid.NewGuid(),
+            AccountId = Guid.NewGuid(),
+            ExpectedAmount = 100m
+        };
+
+        var repoMock = new Mock<IBaseRepository<ExpectedTransaction, Guid>>();
+        repoMock.Setup(r => r.GetByIdAsync(expectedTransactionId))
+            .ReturnsAsync(expectedTransaction);
+
+        var transactionMock = new Mock<IDbContextTransaction>();
+        transactionMock.Setup(t => t.CommitAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        transactionMock.Setup(t => t.DisposeAsync()).Returns(ValueTask.CompletedTask);
+
+        var unitOfWorkMock = new Mock<IUnitOfWork>();
+        unitOfWorkMock.Setup(u => u.Repository<ExpectedTransaction, Guid>()).Returns(repoMock.Object);
+        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(transactionMock.Object);
+
+        var loggerMock = new Mock<ILogger<ExpectedTransactionService>>();
+        var service = new ExpectedTransactionService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
+
+        // Act
+        var result = await service.ConfirmExpectedTransactionAsync(expectedTransactionId, actualTransactionId);
+
+        // Assert
+        result.Should().BeFalse();
+        repoMock.Verify(r => r.GetByIdAsync(expectedTransactionId), Times.Once);
+        repoMock.Verify(r => r.UpdateAsync(It.IsAny<ExpectedTransaction>()), Times.Never);
+        unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Never);
+    }
+
+    [Fact]
+    public async Task ConfirmExpectedTransactionAsync_ShouldReturnFalse_WhenExceptionOccurs()
+    {
+        // Arrange
+        var expectedTransactionId = Guid.NewGuid();
+        var actualTransactionId = Guid.NewGuid();
+
+        var repoMock = new Mock<IBaseRepository<ExpectedTransaction, Guid>>();
+        repoMock.Setup(r => r.GetByIdAsync(expectedTransactionId))
+            .ThrowsAsync(new InvalidOperationException("Database error"));
+
+        var transactionMock = new Mock<IDbContextTransaction>();
+        transactionMock.Setup(t => t.RollbackAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        transactionMock.Setup(t => t.DisposeAsync()).Returns(ValueTask.CompletedTask);
+
+        var unitOfWorkMock = new Mock<IUnitOfWork>();
+        unitOfWorkMock.Setup(u => u.Repository<ExpectedTransaction, Guid>()).Returns(repoMock.Object);
+        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(transactionMock.Object);
+
+        var loggerMock = new Mock<ILogger<ExpectedTransactionService>>();
+        var service = new ExpectedTransactionService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
+
+        // Act
+        var result = await service.ConfirmExpectedTransactionAsync(expectedTransactionId, actualTransactionId);
+
+        // Assert
+        result.Should().BeFalse();
+        repoMock.Verify(r => r.GetByIdAsync(expectedTransactionId), Times.Once);
+        transactionMock.Verify(t => t.RollbackAsync(It.IsAny<CancellationToken>()), Times.Once);
+
+        // Verify that error was logged
+        loggerMock.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Error confirming expected transaction")),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
+}

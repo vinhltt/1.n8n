@@ -26,11 +26,12 @@ async Task CreateDbIfNotExistsAsync(IHost host)
         logger.LogError(ex, "An error occurred creating the DB.");
     }
 }
+
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var configuration = new ConfigurationBuilder()
+    .AddEnvironmentVariables()
     .AddJsonFile("appsettings.json", false, true)
-    .AddJsonFile(
-        $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json",
-        true, true)
+    .AddJsonFile($"appsettings.{env}.json", true, true)
     .Build();
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(configuration)
@@ -66,7 +67,7 @@ await CreateDbIfNotExistsAsync(app);
 
 try
 {
-    app.Run();
+    await app.RunAsync();
 }
 finally
 {

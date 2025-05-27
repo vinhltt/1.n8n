@@ -3,6 +3,7 @@
 public class GlobalVariable<T>
 {
     private static T? _object;
+
     public GlobalVariable(T? @object)
     {
         _object = @object;

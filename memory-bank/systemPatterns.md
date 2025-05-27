@@ -20,32 +20,47 @@
 - Mỗi service phải có tài liệu mô tả rõ ràng về API, sự kiện, và database schema.
 - Health check endpoint cho từng service, giám sát tự động.
 - Backup/restore tự động hóa, kiểm thử định kỳ.
+- **Foreign Key Design Pattern: Sử dụng nullable Guid (Guid?) cho tất cả Foreign Keys để tạo mối quan hệ linh hoạt, không quá chặt chẽ giữa các Entity. Điều này cho phép:**
+  - **Tạo Entity mà không cần liên kết ngay lập tức với Entity khác**
+  - **Xử lý các trường hợp dữ liệu không đầy đủ hoặc import từ nguồn bên ngoài**
+  - **Hỗ trợ soft delete và orphaned records management**
+  - **Tăng tính linh hoạt trong việc thiết kế API và business logic**
 
 ## Quan hệ thành phần
 - n8n là trung tâm điều phối workflow.
 - Các dịch vụ nghiệp vụ chính:
   - Identity & Access: AuthService, UserService, RoleService
-  - Core Finance: AccountService, TransactionService, StatementService
+  - **Core Finance: AccountService, TransactionService, StatementService, RecurringTransactionTemplateService, ExpectedTransactionService**
   - Money Management: BudgetService, JarService, SharedExpenseService
-  - Planning & Investment: DebtService, GoalService, InvestmentService, RecurringTransactionService
+  - Planning & Investment: DebtService, GoalService, InvestmentService
   - Reporting & Integration: ReportingService, NotificationService, IntegrationService
 - Mỗi service gắn với database riêng, không chia sẻ schema.
 - File storage (MinIO) dùng cho import/export statement.
 
-RecurringTransactionService:
-- Quản lý các mẫu giao dịch định kỳ (RecurringTransactionTemplate) và giao dịch dự kiến (ExpectedTransaction).
-- Cung cấp API để tạo/sửa/xóa/liệt kê mẫu giao dịch định kỳ.
-- Sinh ra các giao dịch dự kiến dựa trên mẫu (thông qua background worker hoặc event-driven).
-- Publish events như ExpectedTransactionCreated, DueDateApproaching cho các service khác.
-- Tương tác với ReportingService để cung cấp dữ liệu cho báo cáo kế hoạch tiền mặt.
-- Tương tác với NotificationService để gửi thông báo về giao dịch định kỳ sắp đến hạn.
+**Core Finance Services:**
+- **RecurringTransactionTemplateService:**
+  - Quản lý các mẫu giao dịch định kỳ (RecurringTransactionTemplate).
+  - Cung cấp API để tạo/sửa/xóa/liệt kê mẫu giao dịch định kỳ.
+  - Sinh ra các giao dịch dự kiến dựa trên mẫu (thông qua background worker hoặc event-driven).
+  - Tính toán ngày thực hiện tiếp theo dựa trên frequency và custom interval.
+  - Hỗ trợ quản lý trạng thái active/inactive của mẫu.
+
+- **ExpectedTransactionService:**
+  - Quản lý các giao dịch dự kiến (ExpectedTransaction) được sinh từ mẫu định kỳ.
+  - Cung cấp lifecycle management: Pending → Confirmed/Cancelled/Completed.
+  - Hỗ trợ điều chỉnh giao dịch dự kiến (amount, reason) với lưu trữ original amount.
+  - Cung cấp dự báo dòng tiền (cash flow forecast) và phân tích theo category.
+  - Tương tác với TransactionService khi confirm expected transaction.
 
 ## Luồng nghiệp vụ chính
 - Import sao kê: User upload file → StatementService lưu file (MinIO) → publish event → StatementProcessor xử lý → TransactionService ghi nhận giao dịch.
 - Ghi nhận giao dịch thủ công: User nhập → API Gateway → TransactionService → AccountService cập nhật số dư → publish event cho các service khác (report, budget, ...).
+- **Quản lý giao dịch định kỳ:**
+  - **User tạo mẫu → RecurringTransactionTemplateService lưu mẫu → background job sinh giao dịch dự kiến → ExpectedTransactionService quản lý lifecycle.**
+  - **Background job chạy định kỳ → GenerateExpectedTransactionsForAllActiveTemplatesAsync → sinh giao dịch dự kiến cho tất cả mẫu active.**
+  - **User xác nhận giao dịch dự kiến → ExpectedTransactionService.ConfirmExpectedTransactionAsync → liên kết với Transaction thực tế.**
 - Quản lý ngân sách, mục tiêu, nợ, đầu tư: các service chuyên biệt, đồng bộ qua event bus.
 - Báo cáo, thông báo: ReportingService, NotificationService consume event từ các service khác.
-- Quản lý giao dịch định kỳ: User tạo mẫu → RecurringTransactionService lưu mẫu → sinh giao dịch dự kiến → publish event → ReportingService tạo báo cáo kế hoạch tiền mặt, NotificationService gửi thông báo.
 
 ## Best Practices
 - Clean Architecture, DDD, TDD, SOLID cho mọi service.
@@ -56,18 +71,23 @@ RecurringTransactionService:
 - Có tài liệu hướng dẫn backup, restore, disaster recovery.
 - Định nghĩa acceptance criteria rõ ràng cho từng chức năng.
 - Đảm bảo các yêu cầu phi chức năng: hiệu năng, mở rộng, bảo mật, usability, reliability, compliance.
-- Quy ước tổ chức file Unit Test: Sử dụng **partial class** với tên `ServiceNameTests` trải rộng trên nhiều file. Các file con, đặt tên theo định dạng `ServiceNameTests.MethodName.cs`, sẽ được nhóm vào một thư mục con cùng tên với lớp test (`ServiceNameTests`) bên trong thư mục test chính (`CoreFinance.Application.Tests`). Các hàm helper dùng chung cho test sẽ được đặt trong file `TestHelpers.cs` trong thư mục `Helpers`.
+- **Quy ước tổ chức file Unit Test: Sử dụng partial class với tên `ServiceNameTests` trải rộng trên nhiều file. Các file con, đặt tên theo định dạng `ServiceNameTests.MethodName.cs`, sẽ được nhóm vào một thư mục con cùng tên với lớp test (`ServiceNameTests`) bên trong thư mục test chính (`CoreFinance.Application.Tests`). Các hàm helper dùng chung cho test sẽ được đặt trong file `TestHelpers.cs` trong thư mục `Helpers`.**
 
 ## Lựa chọn giải pháp
 - Import statement: ưu tiên manual upload (CSV/Excel), lên kế hoạch tích hợp API ngân hàng hoặc aggregator trong tương lai.
 - Frontend: (Cần xác định, ví dụ React, Angular, Vue, Blazor).
-- Sinh giao dịch định kỳ: ưu tiên background worker định kỳ (nightly job) kết hợp với event-driven khi tạo mẫu mới để có kết quả ngay lập tức.
+- **Sinh giao dịch định kỳ: sử dụng background worker định kỳ (nightly job) với Quartz.NET hoặc Hangfire, kết hợp với event-driven khi tạo mẫu mới để có kết quả ngay lập tức.**
+- **Domain models: RecurringTransactionTemplate và ExpectedTransaction được thiết kế với đầy đủ navigation properties để hỗ trợ Entity Framework relationships.**
 
 ## Lộ trình & Ưu tiên
 - Triển khai theo phase: core service trước (Identity, Core Finance, Reporting), sau đó Money Management, Planning & Investment, cuối cùng là advanced features.
+- **Core Finance đã hoàn thành: Account, Transaction, RecurringTransactionTemplate, ExpectedTransaction services.**
+- **Tiếp theo: triển khai API Controllers, background job service, tích hợp với NotificationService và ReportingService.**
 - Mỗi phase có checklist hoàn thành, review kiến trúc và bảo mật.
 
 ## Luồng triển khai quan trọng
 - Tự động hóa backup/restore.
 - CI/CD cho workflow và cấu hình.
-- Health check, logging, monitoring, alerting tự động. 
+- Health check, logging, monitoring, alerting tự động.
+- **Background job scheduling cho việc sinh giao dịch dự kiến từ các mẫu định kỳ.**
+- **Event publishing khi có thay đổi trong expected transactions để đồng bộ với reporting và notification services.** 

@@ -10,42 +10,44 @@ public static class ExpressionUtils
     /// <summary>
     ///
     /// </summary>
-    public static readonly Expression TrueExpression = Expression.Constant(true);
+    public static readonly Expression TypeTrueExpression = Expression.Constant(true);
 
     /// <summary>
     ///
     /// </summary>
-    public static readonly Expression FalseExpression = Expression.Constant(true);
+    public static readonly Expression TypeFalseExpression = Expression.Constant(true);
 
     /// <summary>
     ///
     /// </summary>
-    public static readonly Expression NullExpression = Expression.Constant(null);
+    public static readonly Expression TypeNullExpression = Expression.Constant(null);
 
     /// <summary>
     ///
     /// </summary>
-    public static readonly Expression ZeroExpression = Expression.Constant(0);
+    public static readonly Expression TypeZeroExpression = Expression.Constant(0);
 
     /// <summary>
     ///
     /// </summary>
-    public static readonly Expression StringEmptyExpression = Expression.Constant(0);
+    public static readonly Expression TypeStringEmptyExpression = Expression.Constant(0);
 
     /// <summary>
     ///
     /// </summary>
-    public static readonly MethodInfo? TrimMethod = typeof(string).GetRuntimeMethod("Trim", Array.Empty<Type>());
+    public static readonly MethodInfo? TypeTrimMethod = typeof(string).GetRuntimeMethod("Trim", Array.Empty<Type>());
 
     /// <summary>
     ///
     /// </summary>
-    public static readonly MethodInfo? StartsWithMethod = typeof(string).GetRuntimeMethod("StartsWith", new[] { typeof(string) });
+    public static readonly MethodInfo? TypeStartsWithMethod =
+        typeof(string).GetRuntimeMethod("StartsWith", new[] { typeof(string) });
 
     /// <summary>
     ///
     /// </summary>
-    public static readonly MethodInfo? EndsWithMethod = typeof(string).GetRuntimeMethod("EndsWith", new[] { typeof(string) });
+    public static readonly MethodInfo? TypeEndsWithMethod =
+        typeof(string).GetRuntimeMethod("EndsWith", new[] { typeof(string) });
 
     /// <summary>
     /// Creates the typed constant expression from string.
@@ -99,38 +101,47 @@ public static class ExpressionUtils
         {
             return Expression.Constant(ushort.Parse(value), type);
         }
+
         if (type.IsUnsignedInt())
         {
             return Expression.Constant(uint.Parse(value), type);
         }
+
         if (type.IsUnsignedLong())
         {
             return Expression.Constant(ulong.Parse(value), type);
         }
+
         if (type.IsFloat())
         {
             return Expression.Constant(float.Parse(value), type);
         }
+
         if (type.IsDouble())
         {
             return Expression.Constant(double.Parse(value), type);
         }
+
         if (type.IsDecimal())
         {
             return Expression.Constant(decimal.Parse(value), type);
         }
+
         if (type.IsTimeSpan())
         {
             return Expression.Constant(TimeSpan.Parse(value), type);
         }
+
         if (type.IsDateTimeOffset())
         {
             return Expression.Constant(DateTimeOffset.Parse(value), type);
         }
+
         if (type == typeof(byte[]))
         {
             return Expression.Constant(Convert.FromBase64String(value), type);
         }
+
         return Expression.Constant(value, type);
     }
 
@@ -179,7 +190,7 @@ public static class ExpressionUtils
     public static Expression IsNull(Expression expression)
 
     {
-        return Expression.Equal(expression, NullExpression);
+        return Expression.Equal(expression, TypeNullExpression);
     }
 
     /// <summary> III Determines whether the given expression is not null.
@@ -187,7 +198,7 @@ public static class ExpressionUtils
     /// <returns></returns>/returns>s
     public static Expression IsNotNull(Expression expression)
     {
-        return Expression.NotEqual(expression, NullExpression);
+        return Expression.NotEqual(expression, TypeNullExpression);
     }
 
     /// <summary> III Determines whether the given expression is empty.
@@ -196,7 +207,7 @@ public static class ExpressionUtils
     /// <returns></returns>s
     public static Expression IsEmpty(Expression expression)
     {
-        return Expression.Equal(expression, StringEmptyExpression);
+        return Expression.Equal(expression, TypeStringEmptyExpression);
     }
 
     /// <summary>
@@ -204,10 +215,9 @@ public static class ExpressionUtils
     /// </summary>
     /// <param name="expression">The expression.</param>,
     /// <returns></returns>s
-
     public static Expression IsNotEmpty(Expression expression)
     {
-        return Expression.NotEqual(expression, StringEmptyExpression);
+        return Expression.NotEqual(expression, TypeStringEmptyExpression);
     }
 
     /// <summary>
@@ -237,7 +247,8 @@ public static class ExpressionUtils
     /// <returns></returns>/returns>
     public static Expression IsNullOrWhiteSpace(Expression expression)
     {
-        return Expression.OrElse(IsNull(expression), Expression.Equal(Expression.Call(expression, TrimMethod!), StringEmptyExpression));
+        return Expression.OrElse(IsNull(expression),
+            Expression.Equal(Expression.Call(expression, TypeTrimMethod!), TypeStringEmptyExpression));
     }
 
     /// <summary>
@@ -247,7 +258,8 @@ public static class ExpressionUtils
     /// <returns></returns>
     public static Expression IsNotNullOrWhiteSpace(Expression expression)
     {
-        return Expression.AndAlso(IsNotNull(expression), Expression.NotEqual(Expression.Call(expression, TrimMethod!), StringEmptyExpression));
+        return Expression.AndAlso(IsNotNull(expression),
+            Expression.NotEqual(Expression.Call(expression, TypeTrimMethod!), TypeStringEmptyExpression));
     }
 
     /// <summary>
@@ -262,6 +274,7 @@ public static class ExpressionUtils
         {
             return Expression.Equal(left, right);
         }
+
         return Expression.AndAlso(IsNotNull(left), Expression.Equal(left, right));
     }
 
@@ -276,6 +289,7 @@ public static class ExpressionUtils
         {
             return Expression.NotEqual(left, right);
         }
+
         return Expression.OrElse(IsNull(left), Expression.NotEqual(left, right));
     }
 
@@ -286,7 +300,7 @@ public static class ExpressionUtils
     /// <returns></returns>
     public static Expression IsStartsWith(Expression left, Expression right)
     {
-        return Expression.AndAlso(IsNotNull(left), Expression.Call(left, StartsWithMethod!, right));
+        return Expression.AndAlso(IsNotNull(left), Expression.Call(left, TypeStartsWithMethod!, right));
     }
 
     /// <summary> Il Determines whether the left expression ends with to right expression. II/ </summary>
@@ -295,7 +309,7 @@ public static class ExpressionUtils
     /// <returns></returns>
     public static Expression IsEndsWith(Expression left, Expression right)
     {
-        return Expression.AndAlso(IsNotNull(left), Expression.Call(left, EndsWithMethod!, right));
+        return Expression.AndAlso(IsNotNull(left), Expression.Call(left, TypeEndsWithMethod!, right));
     }
 
     /// <summary> III Determines whether the left expression is greater than right expression.
@@ -308,12 +322,14 @@ public static class ExpressionUtils
         if (left.Type.IsString())
         {
             var compare = Expression.Call(typeof(string), "Compare", null, new[] { left, right });
-            return Expression.GreaterThan(compare, ZeroExpression);
+            return Expression.GreaterThan(compare, TypeZeroExpression);
         }
+
         if (Nullable.GetUnderlyingType(left.Type) == null)
         {
             return Expression.GreaterThan(left, right);
         }
+
         return Expression.AndAlso(IsNotNull(left), Expression.GreaterThan(left, right));
     }
 
@@ -327,12 +343,14 @@ public static class ExpressionUtils
         if (left.Type.IsString())
         {
             var compare = Expression.Call(typeof(string), "Compare", null, new[] { left, right });
-            return Expression.GreaterThanOrEqual(compare, ZeroExpression);
+            return Expression.GreaterThanOrEqual(compare, TypeZeroExpression);
         }
+
         if (Nullable.GetUnderlyingType(left.Type) == null)
         {
             return Expression.GreaterThanOrEqual(left, right);
         }
+
         return Expression.AndAlso(IsNotNull(left), Expression.GreaterThanOrEqual(left, right));
     }
 
@@ -346,12 +364,14 @@ public static class ExpressionUtils
         if (left.Type.IsString())
         {
             var compare = Expression.Call(typeof(string), "Compare", null, new[] { left, right });
-            return Expression.LessThan(compare, ZeroExpression);
+            return Expression.LessThan(compare, TypeZeroExpression);
         }
+
         if (Nullable.GetUnderlyingType(left.Type) == null)
         {
             return Expression.LessThan(left, right);
         }
+
         return Expression.AndAlso(IsNotNull(left), Expression.LessThan(left, right));
     }
 
@@ -364,12 +384,14 @@ public static class ExpressionUtils
         if (left.Type.IsString())
         {
             var compare = Expression.Call(typeof(string), "Compare", null, new[] { left, right });
-            return Expression.LessThanOrEqual(compare, ZeroExpression);
+            return Expression.LessThanOrEqual(compare, TypeZeroExpression);
         }
+
         if (Nullable.GetUnderlyingType(left.Type) == null)
         {
             return Expression.LessThanOrEqual(left, right);
         }
+
         return Expression.AndAlso(IsNotNull(left), Expression.LessThanOrEqual(left, right));
     }
 
@@ -380,7 +402,7 @@ public static class ExpressionUtils
     /// <returns></returns>
     public static Expression IsLike(Expression left, Expression right)
     {
-        var contains = typeof(string).GetMethod("Contains", new [] { typeof(string) });
+        var contains = typeof(string).GetMethod("Contains", new[] { typeof(string) });
 
         return Expression.Call(left, contains!, right);
     }
@@ -392,7 +414,8 @@ public static class ExpressionUtils
     /// <returns></returns>
     public static Expression IsNotLike(Expression left, Expression right)
     {
-        var indexof = Expression.Call(left, "Indexof", null, right, Expression.Constant(StringComparison.OrdinalIgnoreCase));
+        var indexof = Expression.Call(left, "Indexof", null, right,
+            Expression.Constant(StringComparison.OrdinalIgnoreCase));
         return Expression.Equal(indexof, Expression.Constant(-1));
     }
 
@@ -408,8 +431,11 @@ public static class ExpressionUtils
         {
             var constant = right as ConstantExpression;
             left = Expression.Convert(left, typeof(object));
-            return Expression.Call(constant, typeof(IList).GetRuntimeMethod("Contains", new[] { constant!.Value!.GetType().GetElementType() }!)!, left);
+            return Expression.Call(constant,
+                typeof(IList).GetRuntimeMethod("Contains", new[] { constant!.Value!.GetType().GetElementType() }!)!,
+                left);
         }
+
         return Expression.Call(left, typeof(string).GetRuntimeMethod("Contains", new[] { right.Type })!, right);
     }
 
@@ -420,7 +446,8 @@ public static class ExpressionUtils
     /// <returns></returns>
     public static Expression IsNotContains(Expression left, Expression right)
     {
-        return Expression.Not(Expression.Call(left, typeof(string).GetRuntimeMethod("Contains", new[] { right.Type })!, right));
+        return Expression.Not(Expression.Call(left, typeof(string).GetRuntimeMethod("Contains", new[] { right.Type })!,
+            right));
     }
 
     /// <summary>
@@ -432,9 +459,13 @@ public static class ExpressionUtils
     {
         if (right.Type.IsArray)
         {
-            var constant = (ConstantExpression)right; left = Expression.Convert(left, typeof(object));
-            return Expression.Call(constant, typeof(IList).GetRuntimeMethod("Contains", new[] { constant.Value!.GetType().GetElementType() }!)!, left);
+            var constant = (ConstantExpression)right;
+            left = Expression.Convert(left, typeof(object));
+            return Expression.Call(constant,
+                typeof(IList).GetRuntimeMethod("Contains", new[] { constant.Value!.GetType().GetElementType() }!)!,
+                left);
         }
+
         return Expression.Call(left, typeof(string).GetRuntimeMethod("Contains", new[] { right.Type })!, right);
     }
 
@@ -449,9 +480,13 @@ public static class ExpressionUtils
         {
             var constant = right as ConstantExpression;
             left = Expression.Convert(left, typeof(object));
-            return Expression.Not(Expression.Call(constant, typeof(IList).GetRuntimeMethod("Contains", new[] { constant!.Value!.GetType().GetElementType() }!)!, left));
+            return Expression.Not(Expression.Call(constant,
+                typeof(IList).GetRuntimeMethod("Contains", new[] { constant!.Value!.GetType().GetElementType() }!)!,
+                left));
         }
-        return Expression.Not(Expression.Call(left, typeof(string).GetRuntimeMethod("Contains", new[] { right.Type })!, right));
+
+        return Expression.Not(Expression.Call(left, typeof(string).GetRuntimeMethod("Contains", new[] { right.Type })!,
+            right));
     }
 
     /// < summary >
@@ -464,9 +499,13 @@ public static class ExpressionUtils
     {
         if (Nullable.GetUnderlyingType(expression.Type) == null)
         {
-            return Expression.AndAlso(Expression.GreaterThanOrEqual(expression, value1), Expression.LessThanOrEqual(expression, value2));
+            return Expression.AndAlso(Expression.GreaterThanOrEqual(expression, value1),
+                Expression.LessThanOrEqual(expression, value2));
         }
-        return Expression.AndAlso(IsNotNull(expression), Expression.AndAlso(Expression.GreaterThanOrEqual(expression, value1), Expression.LessThanOrEqual(expression, value2)));
+
+        return Expression.AndAlso(IsNotNull(expression),
+            Expression.AndAlso(Expression.GreaterThanOrEqual(expression, value1),
+                Expression.LessThanOrEqual(expression, value2)));
     }
 
     /// <summary>
@@ -509,7 +548,9 @@ public static class ExpressionUtils
                 case ExpressionType.Lambda:
                     exp = ((LambdaExpression)exp).Body; break;
                 case ExpressionType.MemberAccess:
-                    var memberExpression = exp as MemberExpression; var propertyInfo = memberExpression!.Member as PropertyInfo; propertyNames.Add(propertyInfo?.Name);
+                    var memberExpression = exp as MemberExpression;
+                    var propertyInfo = memberExpression!.Member as PropertyInfo;
+                    propertyNames.Add(propertyInfo?.Name);
                     if (memberExpression.Expression?.NodeType == ExpressionType.Parameter)
                         return string.Join('.', propertyNames.Reverse());
                     var parameter = GetParameterExpression(memberExpression.Expression!);
@@ -617,6 +658,7 @@ public static class ExpressionUtils
         {
             expression = (expression as MemberExpression)?.Expression;
         }
+
         return expression?.NodeType == ExpressionType.Parameter ? expression as ParameterExpression : null;
     }
 }

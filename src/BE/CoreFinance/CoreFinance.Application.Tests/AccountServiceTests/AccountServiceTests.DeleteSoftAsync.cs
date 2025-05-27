@@ -149,4 +149,4 @@ public partial class AccountServiceTests
         repoMock.Verify(r => r.DeleteSoftAsync(accountId), Times.Once);
         unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Never);
     }
-} 
+}

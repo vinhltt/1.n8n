@@ -1,4 +1,4 @@
-using CoreFinance.Application.DTOs;
+using CoreFinance.Application.DTOs.Transaction;
 using CoreFinance.Application.Services;
 using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
@@ -7,11 +7,6 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using MockQueryable;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace CoreFinance.Application.Tests.TransactionServiceTests;
 
@@ -44,10 +39,11 @@ public partial class TransactionServiceTests
         var result = await service.GetAllDtoAsync();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().HaveCount(transactions.Count);
+        var transactionViewModels = result!.ToList();
+        transactionViewModels.Should().NotBeNull();
+        transactionViewModels.Should().HaveCount(transactions.Count);
         var expectedViewModels = transactions.Select(_mapper.Map<TransactionViewModel>).ToList();
-        result.Should().BeEquivalentTo(expectedViewModels);
+        transactionViewModels.Should().BeEquivalentTo(expectedViewModels);
         repoMock.Verify(r => r.GetNoTrackingEntities(), Times.Once);
     }
 
@@ -71,8 +67,9 @@ public partial class TransactionServiceTests
         var result = await service.GetAllDtoAsync();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().BeEmpty();
+        var transactionViewModels = result!.ToList();
+        transactionViewModels.Should().NotBeNull();
+        transactionViewModels.Should().BeEmpty();
         repoMock.Verify(r => r.GetNoTrackingEntities(), Times.Once);
     }
 }

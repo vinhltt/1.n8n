@@ -27,9 +27,8 @@ public static class GeneralServiceExtension
 {
     public static void AddGeneralConfigurations(
         this WebApplicationBuilder builder
-        )
+    )
     {
-
         // Add DbContext
         builder.Services.AddDbContext<CoreFinanceDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("CoreFinanceDb"))

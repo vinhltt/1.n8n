@@ -29,11 +29,6 @@ public class BaseRepository<TEntity, TKey>(
     {
     }
 
-    // ReSharper disable once EmptyDestructor
-    ~BaseRepository()
-    {
-    }
-
     #endregion ctor
 
     #region public
@@ -121,8 +116,8 @@ public class BaseRepository<TEntity, TKey>(
         var entry = context.Entry(entity);
         entity.SetValueUpdate(currentUserName);
         if (entry.State < EntityState.Added) entry.State = EntityState.Modified;
-        var countAffect = context.SaveChanges();
-        return Task.FromResult(countAffect);
+        var countAffect = context.SaveChangesAsync();
+        return countAffect;
     }
 
     public virtual Task<int> UpdateAsync(IEnumerable<TEntity> entities)
@@ -137,8 +132,8 @@ public class BaseRepository<TEntity, TKey>(
 
         var entry = context.Entry(baseEntities);
         if (entry.State < EntityState.Added) entry.State = EntityState.Modified;
-        var countAffect = context.SaveChanges();
-        return Task.FromResult(countAffect);
+        var countAffect = context.SaveChangesAsync();
+        return countAffect;
     }
 
     public virtual async Task<int> DeleteHardAsync(params object[] keyValues)
@@ -170,7 +165,6 @@ public class BaseRepository<TEntity, TKey>(
         var predicate = Expression.Lambda<Func<TEntity, bool>>(predicateBody!, parameter);
 
         return await Entities.Where(predicate).ExecuteDeleteAsync();
-
     }
 
     public virtual void DeleteHard(TEntity entity)

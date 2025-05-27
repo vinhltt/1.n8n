@@ -1,9 +1,7 @@
-using System;
-using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Contracts.DTOs;
-using CoreFinance.Domain;
+using CoreFinance.Domain.Enums;
 
-namespace CoreFinance.Application.DTOs;
+namespace CoreFinance.Application.DTOs.Transaction;
 
 /// <summary>
 /// ViewModel for transaction data.

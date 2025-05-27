@@ -29,16 +29,6 @@ namespace CoreFinance.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<string>("AccountName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("account_name");
-
-                    b.Property<int>("AccountType")
-                        .HasColumnType("integer")
-                        .HasColumnName("account_type");
-
                     b.Property<decimal?>("AvailableLimit")
                         .HasColumnType("numeric")
                         .HasColumnName("available_limit");
@@ -82,6 +72,16 @@ namespace CoreFinance.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_active");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
+
                     b.Property<DateTime?>("UpdateAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("update_at");
@@ -105,6 +105,248 @@ namespace CoreFinance.Infrastructure.Migrations
                         .HasDatabaseName("ix_accounts_id");
 
                     b.ToTable("accounts", (string)null);
+                });
+
+            modelBuilder.Entity("CoreFinance.Domain.ExpectedTransaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<Guid?>("ActualTransactionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("actual_transaction_id");
+
+                    b.Property<string>("AdjustmentReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("adjustment_reason");
+
+                    b.Property<string>("Category")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("category");
+
+                    b.Property<DateTime?>("CreateAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_at");
+
+                    b.Property<string>("CreateBy")
+                        .HasColumnType("text")
+                        .HasColumnName("create_by");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Deleted")
+                        .HasColumnType("text")
+                        .HasColumnName("deleted");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<decimal>("ExpectedAmount")
+                        .HasColumnType("numeric")
+                        .HasColumnName("expected_amount");
+
+                    b.Property<DateTime>("ExpectedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expected_date");
+
+                    b.Property<DateTime>("GeneratedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("generated_at");
+
+                    b.Property<bool>("IsAdjusted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_adjusted");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("notes");
+
+                    b.Property<decimal?>("OriginalAmount")
+                        .HasColumnType("numeric")
+                        .HasColumnName("original_amount");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("processed_at");
+
+                    b.Property<Guid>("RecurringTransactionTemplateId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("recurring_transaction_template_id");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("integer")
+                        .HasColumnName("transaction_type");
+
+                    b.Property<DateTime?>("UpdateAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("update_at");
+
+                    b.Property<string>("UpdateBy")
+                        .HasColumnType("text")
+                        .HasColumnName("update_by");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_expected_transactions");
+
+                    b.HasIndex("AccountId")
+                        .HasDatabaseName("ix_expected_transactions_account_id");
+
+                    b.HasIndex("ActualTransactionId")
+                        .HasDatabaseName("ix_expected_transactions_actual_transaction_id");
+
+                    b.HasIndex("Id")
+                        .HasDatabaseName("ix_expected_transactions_id");
+
+                    b.HasIndex("RecurringTransactionTemplateId")
+                        .HasDatabaseName("ix_expected_transactions_recurring_transaction_template_id");
+
+                    b.ToTable("expected_transactions", (string)null);
+                });
+
+            modelBuilder.Entity("CoreFinance.Domain.RecurringTransactionTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_id");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric")
+                        .HasColumnName("amount");
+
+                    b.Property<bool>("AutoGenerate")
+                        .HasColumnType("boolean")
+                        .HasColumnName("auto_generate");
+
+                    b.Property<string>("Category")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("category");
+
+                    b.Property<DateTime?>("CreateAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_at");
+
+                    b.Property<string>("CreateBy")
+                        .HasColumnType("text")
+                        .HasColumnName("create_by");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("CronExpression")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("cron_expression");
+
+                    b.Property<int?>("CustomIntervalDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("custom_interval_days");
+
+                    b.Property<int>("DaysInAdvance")
+                        .HasColumnType("integer")
+                        .HasColumnName("days_in_advance");
+
+                    b.Property<string>("Deleted")
+                        .HasColumnType("text")
+                        .HasColumnName("deleted");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
+
+                    b.Property<int>("Frequency")
+                        .HasColumnType("integer")
+                        .HasColumnName("frequency");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<DateTime>("NextExecutionDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("next_execution_date");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("notes");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
+
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("integer")
+                        .HasColumnName("transaction_type");
+
+                    b.Property<DateTime?>("UpdateAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("update_at");
+
+                    b.Property<string>("UpdateBy")
+                        .HasColumnType("text")
+                        .HasColumnName("update_by");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_recurring_transaction_templates");
+
+                    b.HasIndex("AccountId")
+                        .HasDatabaseName("ix_recurring_transaction_templates_account_id");
+
+                    b.HasIndex("Id")
+                        .HasDatabaseName("ix_recurring_transaction_templates_id");
+
+                    b.ToTable("recurring_transaction_templates", (string)null);
                 });
 
             modelBuilder.Entity("CoreFinance.Domain.Transaction", b =>
@@ -238,6 +480,46 @@ namespace CoreFinance.Infrastructure.Migrations
                     b.ToTable("transactions", (string)null);
                 });
 
+            modelBuilder.Entity("CoreFinance.Domain.ExpectedTransaction", b =>
+                {
+                    b.HasOne("CoreFinance.Domain.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_expected_transactions_accounts_account_id");
+
+                    b.HasOne("CoreFinance.Domain.Transaction", "ActualTransaction")
+                        .WithMany()
+                        .HasForeignKey("ActualTransactionId")
+                        .HasConstraintName("fk_expected_transactions_transactions_actual_transaction_id");
+
+                    b.HasOne("CoreFinance.Domain.RecurringTransactionTemplate", "RecurringTransactionTemplate")
+                        .WithMany("ExpectedTransactions")
+                        .HasForeignKey("RecurringTransactionTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_expected_transactions_recurring_transaction_templates_recur");
+
+                    b.Navigation("Account");
+
+                    b.Navigation("ActualTransaction");
+
+                    b.Navigation("RecurringTransactionTemplate");
+                });
+
+            modelBuilder.Entity("CoreFinance.Domain.RecurringTransactionTemplate", b =>
+                {
+                    b.HasOne("CoreFinance.Domain.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_recurring_transaction_templates_accounts_account_id");
+
+                    b.Navigation("Account");
+                });
+
             modelBuilder.Entity("CoreFinance.Domain.Transaction", b =>
                 {
                     b.HasOne("CoreFinance.Domain.Account", "Account")
@@ -253,6 +535,11 @@ namespace CoreFinance.Infrastructure.Migrations
             modelBuilder.Entity("CoreFinance.Domain.Account", b =>
                 {
                     b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("CoreFinance.Domain.RecurringTransactionTemplate", b =>
+                {
+                    b.Navigation("ExpectedTransactions");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,4 @@
-using CoreFinance.Application.DTOs;
+using CoreFinance.Application.DTOs.Transaction;
 using CoreFinance.Application.Services;
 using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
@@ -6,11 +6,8 @@ using CoreFinance.Domain.UnitOfWorks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
-using System.Threading.Tasks;
 using CoreFinance.Domain.Exceptions;
 using Microsoft.EntityFrameworkCore.Storage;
-using Xunit;
 
 namespace CoreFinance.Application.Tests.TransactionServiceTests;
 
@@ -28,7 +25,6 @@ public partial class TransactionServiceTests
             RevenueAmount = 100,
             SpentAmount = 0
         };
-        var transaction = _mapper.Map<Transaction>(createRequest);
         var repoMock = new Mock<IBaseRepository<Transaction, Guid>>();
         repoMock.Setup(r => r.CreateAsync(It.IsAny<Transaction>())).ReturnsAsync(1);
         var unitOfWorkMock = new Mock<IUnitOfWork>();
@@ -67,7 +63,7 @@ public partial class TransactionServiceTests
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Transaction, Guid>()).Returns(repoMock.Object);
-        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.FromResult(transactionMock.Object));
+        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(transactionMock.Object);
 
         var loggerMock = new Mock<ILogger<TransactionService>>();
         var service = new TransactionService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
@@ -89,7 +85,8 @@ public partial class TransactionServiceTests
     public async Task CreateAsync_ShouldThrowNullReferenceException_WhenRepositoryReturnsZeroAffectedCount()
     {
         // Arrange
-        var createRequest = new TransactionCreateRequest { Description = "Test Transaction", AccountId = Guid.NewGuid(), UserId = Guid.NewGuid() };
+        var createRequest = new TransactionCreateRequest
+            { Description = "Test Transaction", AccountId = Guid.NewGuid(), UserId = Guid.NewGuid() };
         var repoMock = new Mock<IBaseRepository<Transaction, Guid>>();
         repoMock.Setup(r => r.CreateAsync(It.IsAny<Transaction>())).ReturnsAsync(0);
 
@@ -99,7 +96,7 @@ public partial class TransactionServiceTests
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Transaction, Guid>()).Returns(repoMock.Object);
-        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.FromResult(transactionMock.Object));
+        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(transactionMock.Object);
 
         var loggerMock = new Mock<ILogger<TransactionService>>();
         var service = new TransactionService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
@@ -119,9 +116,11 @@ public partial class TransactionServiceTests
     public async Task CreateAsync_ShouldRollbackTransaction_WhenRepositoryThrowsException()
     {
         // Arrange
-        var createRequest = new TransactionCreateRequest { Description = "Test Transaction", AccountId = Guid.NewGuid(), UserId = Guid.NewGuid() };
+        var createRequest = new TransactionCreateRequest
+            { Description = "Test Transaction", AccountId = Guid.NewGuid(), UserId = Guid.NewGuid() };
         var repoMock = new Mock<IBaseRepository<Transaction, Guid>>();
-        repoMock.Setup(r => r.CreateAsync(It.IsAny<Transaction>())).ThrowsAsync(new InvalidOperationException("DB error"));
+        repoMock.Setup(r => r.CreateAsync(It.IsAny<Transaction>()))
+            .ThrowsAsync(new InvalidOperationException("DB error"));
 
         var transactionMock = new Mock<IDbContextTransaction>();
         transactionMock.Setup(t => t.CommitAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
@@ -129,7 +128,7 @@ public partial class TransactionServiceTests
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Transaction, Guid>()).Returns(repoMock.Object);
-        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.FromResult(transactionMock.Object));
+        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(transactionMock.Object);
 
         var loggerMock = new Mock<ILogger<TransactionService>>();
         var service = new TransactionService(_mapper, unitOfWorkMock.Object, loggerMock.Object);

@@ -113,10 +113,10 @@ public class UnitOfWork<TContext>(
         where T : class
     {
         var result = typeof(T).GetProperties()
-                              .Select(prop => GetSqlParameterAttributeValue(input, prop))
-                              .Where(param => param != null)
-                              .Select(param => param!)
-                              .ToArray();
+            .Select(prop => GetSqlParameterAttributeValue(input, prop))
+            .Where(param => param != null)
+            .Select(param => param!)
+            .ToArray();
 
         return result;
     }
@@ -127,11 +127,11 @@ public class UnitOfWork<TContext>(
     )
     {
         var type = input!.GetType()
-                         .GetProperty(prop.Name);
+            .GetProperty(prop.Name);
 
         var attribute = type!.GetCustomAttributes(typeof(SqlParameterAttribute),
-                                 true)
-                             .FirstOrDefault();
+                true)
+            .FirstOrDefault();
 
         if (attribute == null)
             return null;

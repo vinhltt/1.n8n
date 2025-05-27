@@ -8,6 +8,7 @@ public class FilterBodyRequest : BodyRequest, IFilterBodyRequest
     public IEnumerable<SortDescriptor>? Orders { get; set; }
     public Pagination? Pagination { get; set; }
 }
+
 public interface IFilterBodyRequest : IBodyRequest
 {
     public string? LangId { get; set; }

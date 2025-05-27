@@ -1,6 +1,6 @@
 using CoreFinance.Contracts.DTOs;
 
-namespace CoreFinance.Application.DTOs;
+namespace CoreFinance.Application.DTOs.Account;
 
 public class AccountUpdateRequest : BaseUpdateRequest<Guid>
 {

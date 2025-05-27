@@ -1,4 +1,4 @@
-using CoreFinance.Application.DTOs;
+using CoreFinance.Application.DTOs.Transaction;
 using FluentValidation;
 
 namespace CoreFinance.Application.Validators;

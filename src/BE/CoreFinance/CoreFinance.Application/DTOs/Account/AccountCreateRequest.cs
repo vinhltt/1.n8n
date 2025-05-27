@@ -1,7 +1,7 @@
 using CoreFinance.Contracts.DTOs;
-using CoreFinance.Domain;
+using CoreFinance.Domain.Enums;
 
-namespace CoreFinance.Application.DTOs;
+namespace CoreFinance.Application.DTOs.Account;
 
 public class AccountCreateRequest : BaseCreateRequest
 {

@@ -13,6 +13,7 @@ public interface IUnitOfWork : IDisposable
         [CallerMemberName] string methodName = "",
         [CallerFilePath] string path = ""
     );
+
     IBaseRepository<TEntity, TKey> Repository<TEntity, TKey>() where TEntity : BaseEntity<TKey>;
     Task<IDbContextTransaction> BeginTransactionAsync();
 }

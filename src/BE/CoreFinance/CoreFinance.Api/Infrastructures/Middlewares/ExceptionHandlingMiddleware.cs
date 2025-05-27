@@ -1,4 +1,4 @@
-﻿namespace CoreFinance.Api.Infrastructures.Middlewares;
+﻿//namespace CoreFinance.Api.Infrastructures.Middlewares;
 
 //public class ExceptionHandlingMiddleware : IMiddleware
 //{

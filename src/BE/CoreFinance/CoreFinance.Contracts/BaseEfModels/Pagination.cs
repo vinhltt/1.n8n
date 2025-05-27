@@ -9,6 +9,7 @@ public class Pagination
         TotalRow = 0;
         PageCount = 0;
     }
+
     public int TotalRow { get; set; }
     public int PageCount { get; set; }
     public int PageIndex { get; set; }

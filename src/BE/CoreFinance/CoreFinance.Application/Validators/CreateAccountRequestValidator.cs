@@ -1,5 +1,5 @@
 using FluentValidation;
-using CoreFinance.Application.DTOs;
+using CoreFinance.Application.DTOs.Account;
 
 namespace CoreFinance.Application.Validators;
 

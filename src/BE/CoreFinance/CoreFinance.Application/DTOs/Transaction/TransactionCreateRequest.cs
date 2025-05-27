@@ -1,14 +1,12 @@
-using System;
-using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Contracts.DTOs;
-using CoreFinance.Domain;
+using CoreFinance.Domain.Enums;
 
-namespace CoreFinance.Application.DTOs;
+namespace CoreFinance.Application.DTOs.Transaction;
 
 /// <summary>
-/// DTO for updating a transaction.
+/// DTO for creating a transaction.
 /// </summary>
-public class TransactionUpdateRequest : BaseUpdateRequest<Guid>
+public class TransactionCreateRequest : BaseCreateRequest
 {
     public Guid AccountId { get; set; }
     public Guid UserId { get; set; }

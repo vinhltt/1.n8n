@@ -88,8 +88,8 @@ public static class TypeList
     /// <summary>
     /// The simple types
     /// </summary>
-    public static readonly Type[] SimpleTypes = new Type[]
-    {
+    public static readonly Type[] TypeSimpleTypes =
+    [
         TypeOfChar,
         TypeOfString,
         TypeOfBoolean,
@@ -106,22 +106,22 @@ public static class TypeList
         TypeOfTimeSpan,
         TypeOfDateTime,
         TypeOfDateTimeOffset,
-        TypeOfGuid,
-    };
+        TypeOfGuid
+    ];
 
-    /// <summary> II/ Determines whether [is simple type] [the specified type]. // </summary> III <param name="type">The type.</param>, III <returns> III <c>true</c> if [is simple type] [the specified type]; otherwise, «c>false</c>.
+    /// <summary>Determines whether [is simple type] [the specified type].</summary>
+    /// <param name="type">The type.</param>,
+    /// <returns>
+    /// if [is simple type] [the specified type] otherwise, <c>false </c>.
     /// </returns> O references
     public static bool IsSimpleType(Type type)
     {
-        if (SimpleTypes.Any(t => t == type))
+        if (TypeSimpleTypes.Any(t => t == type))
         {
             return true;
         }
+
         var underlyingType = Nullable.GetUnderlyingType(type);
-        if (underlyingType != null && SimpleTypes.Any(t => t == type))
-        {
-            return true;
-        }
-        return false;
+        return underlyingType != null && TypeSimpleTypes.Any(t => t == type);
     }
 }

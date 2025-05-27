@@ -6,6 +6,7 @@ public static class TypeList
     /// The type of character
     /// </summary>
     public static readonly Type TypeOfChar = typeof(char);
+
     /// <summary>
     /// The type of nullable character
     /// </summary>
@@ -188,7 +189,7 @@ public static class TypeList
     /// <summary>
     /// The simple types
     /// </summary>
-    public static readonly Type[] SimpleTypes =
+    public static readonly Type[] TypeSimpleTypes =
     {
         TypeOfChar,
         TypeOfNullableChar,
@@ -239,12 +240,13 @@ public static class TypeList
     /// </returns> 
     public static bool IsSimpleType(Type type)
     {
-        if (SimpleTypes.Any(t => t == type))
+        if (TypeSimpleTypes.Any(t => t == type))
         {
             return true;
         }
+
         var underlyingType = Nullable.GetUnderlyingType(type);
-        return underlyingType != null && SimpleTypes.Any(t => t == type);
+        return underlyingType != null && TypeSimpleTypes.Any(t => t == type);
     }
 
     public static bool IsBoolean(this Type type)

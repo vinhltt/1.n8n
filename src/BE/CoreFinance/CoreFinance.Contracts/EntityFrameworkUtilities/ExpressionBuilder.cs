@@ -37,7 +37,7 @@ public static class ExpressionBuilder
 
         if (filterDescriptor != null) expression = CreateExpression(parameter, criteria);
 
-        return Expression.Lambda<Func<TModel, bool>>(expression ?? ExpressionUtils.TrueExpression,
+        return Expression.Lambda<Func<TModel, bool>>(expression ?? ExpressionUtils.TypeTrueExpression,
             parameter);
     }
 
@@ -58,7 +58,7 @@ public static class ExpressionBuilder
         if (!(filterDescriptors ?? throw new ArgumentNullException(nameof(filterDescriptors)))
             .Any())
             return Expression.Lambda<Func<TModel, bool>>(
-                expression ?? ExpressionUtils.TrueExpression, parameter);
+                expression ?? ExpressionUtils.TypeTrueExpression, parameter);
 
         foreach (var filterDescriptor in filterDescriptors)
         {
@@ -73,7 +73,7 @@ public static class ExpressionBuilder
                     : Expression.OrElse(expression, innerExpression);
         }
 
-        return Expression.Lambda<Func<TModel, bool>>(expression ?? ExpressionUtils.TrueExpression,
+        return Expression.Lambda<Func<TModel, bool>>(expression ?? ExpressionUtils.TypeTrueExpression,
             parameter);
     }
 

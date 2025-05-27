@@ -1,5 +1,5 @@
 using AutoMapper;
-using CoreFinance.Application.DTOs;
+using CoreFinance.Application.DTOs.Transaction;
 using CoreFinance.Application.Interfaces;
 using CoreFinance.Application.Services.Base;
 using CoreFinance.Contracts.BaseEfModels;
@@ -15,7 +15,8 @@ public class TransactionService(
     IMapper mapper,
     IUnitOfWork unitOfWork,
     ILogger<TransactionService> logger)
-    : BaseService<Transaction, TransactionCreateRequest, TransactionUpdateRequest, TransactionViewModel, Guid>(mapper, unitOfWork, logger),
+    : BaseService<Transaction, TransactionCreateRequest, TransactionUpdateRequest, TransactionViewModel, Guid>(mapper,
+            unitOfWork, logger),
         ITransactionService
 {
     // Add custom logic for Transaction if needed
@@ -28,8 +29,8 @@ public class TransactionService(
 
         // Example: filter by Description or other fields if needed
         if (!string.IsNullOrEmpty(request.SearchValue))
-            query = query.Where(e => e.Description != null 
-                                     && (e.Description.ToLower().Contains(request.SearchValue.ToLower()) 
+            query = query.Where(e => e.Description != null
+                                     && (e.Description.ToLower().Contains(request.SearchValue.ToLower())
                                          || e.CategorySummary!.ToLower().Contains(request.SearchValue.ToLower())));
 
         return await query.ToPagingAsync(request);

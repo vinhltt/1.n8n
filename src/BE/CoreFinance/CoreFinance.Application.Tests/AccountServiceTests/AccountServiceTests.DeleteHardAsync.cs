@@ -11,7 +11,6 @@ namespace CoreFinance.Application.Tests.AccountServiceTests;
 // Tests for the DeleteHardAsync methods of AccountService
 public partial class AccountServiceTests
 {
-
     [Fact]
     public async Task DeleteHardAsync_ShouldReturnAffectedCount_WhenDeletionIsSuccessful()
     {
@@ -117,4 +116,4 @@ public partial class AccountServiceTests
 
         repoMock.Verify(r => r.DeleteHardAsync(accountId), Times.Once);
     }
-} 
+}

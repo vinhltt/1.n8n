@@ -13,15 +13,18 @@ public abstract class BaseEntity<TKey>
         CreateBy = createBy;
         return this;
     }
+
     public virtual BaseEntity<TKey> SetValueUpdate(string updateBy)
     {
         UpdateAt = DateTime.Now;
         UpdateBy = updateBy;
         return this;
     }
+
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Required]
     public virtual TKey? Id { get; set; }
+
     public DateTime? CreateAt { get; set; }
     public DateTime? UpdateAt { get; set; }
     public string? CreateBy { get; set; }

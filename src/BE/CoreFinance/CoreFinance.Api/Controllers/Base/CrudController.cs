@@ -41,7 +41,7 @@ public abstract class CrudController<TEntity, TCreateRequest, TUpdateRequest,
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, ex.Message);
+            Logger.LogError(ex, "An error occurred while updating the entity with ID {Id}", id);
             return StatusCode(500);
         }
     }
@@ -67,7 +67,7 @@ public abstract class CrudController<TEntity, TCreateRequest, TUpdateRequest,
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public abstract Task<ActionResult<IBasePaging<TViewModel>>>
-        GetPaging(FilterBodyRequest request);
+        GetPagingAsync(FilterBodyRequest request);
 
     [HttpGet("{id}")]
     public virtual async Task<ActionResult> GetById(TKey id)

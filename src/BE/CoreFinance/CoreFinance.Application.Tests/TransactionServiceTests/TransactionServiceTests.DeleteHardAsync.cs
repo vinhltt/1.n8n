@@ -1,4 +1,3 @@
-using CoreFinance.Application.DTOs;
 using CoreFinance.Application.Services;
 using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
@@ -6,9 +5,6 @@ using CoreFinance.Domain.UnitOfWorks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace CoreFinance.Application.Tests.TransactionServiceTests;
 
@@ -53,7 +49,6 @@ public partial class TransactionServiceTests
         // Assert
         result.Should().Be(expectedAffectedCount);
         repoMock.Verify(r => r.DeleteHardAsync(transactionId), Times.Once);
-        unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Once);
     }
 
     [Fact]
@@ -66,7 +61,6 @@ public partial class TransactionServiceTests
         repoMock.Setup(r => r.DeleteHardAsync(transactionId)).ReturnsAsync(expectedAffectedCount);
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Transaction, Guid>()).Returns(repoMock.Object);
-        unitOfWorkMock.Setup(u => u.SaveChangesAsync()).ReturnsAsync(expectedAffectedCount);
         var loggerMock = new Mock<ILogger<TransactionService>>();
         var service = new TransactionService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
 
@@ -76,7 +70,6 @@ public partial class TransactionServiceTests
         // Assert
         result.Should().Be(expectedAffectedCount);
         repoMock.Verify(r => r.DeleteHardAsync(transactionId), Times.Once);
-        unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Once);
     }
 
     [Fact]
@@ -108,10 +101,9 @@ public partial class TransactionServiceTests
         var transactionId = Guid.NewGuid();
         var expectedException = new InvalidOperationException("Save changes failed");
         var repoMock = new Mock<IBaseRepository<Transaction, Guid>>();
-        repoMock.Setup(r => r.DeleteHardAsync(transactionId)).ReturnsAsync(1);
+        repoMock.Setup(r => r.DeleteHardAsync(transactionId)).ThrowsAsync(expectedException);
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Transaction, Guid>()).Returns(repoMock.Object);
-        unitOfWorkMock.Setup(u => u.SaveChangesAsync()).ThrowsAsync(expectedException);
         var loggerMock = new Mock<ILogger<TransactionService>>();
         var service = new TransactionService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
 
@@ -121,6 +113,5 @@ public partial class TransactionServiceTests
         // Assert
         await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("Save changes failed");
         repoMock.Verify(r => r.DeleteHardAsync(transactionId), Times.Once);
-        unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Once);
     }
 }

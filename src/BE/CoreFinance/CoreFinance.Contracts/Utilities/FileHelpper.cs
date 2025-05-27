@@ -18,10 +18,10 @@ public class FileHelper
     public static string GetApplicationFolder()
     {
         var path = Assembly.GetExecutingAssembly()
-                           .Location;
+            .Location;
 
         return Path.GetDirectoryName(path)
                ?? throw new Exception(
-               "FolderNotFoundException");
+                   "FolderNotFoundException");
     }
 }

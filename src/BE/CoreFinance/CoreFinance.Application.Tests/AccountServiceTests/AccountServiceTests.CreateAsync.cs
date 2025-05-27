@@ -1,7 +1,8 @@
-using CoreFinance.Application.DTOs;
+using CoreFinance.Application.DTOs.Account;
 using CoreFinance.Application.Services;
 using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Enums;
 using CoreFinance.Domain.Exceptions;
 using CoreFinance.Domain.UnitOfWorks;
 using FluentAssertions;
@@ -10,18 +11,18 @@ using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace CoreFinance.Application.Tests.AccountServiceTests;
+
 public partial class AccountServiceTests
 {
-
     [Fact]
     public async Task CreateAsync_ShouldReturnViewModel_WhenCreationIsSuccessful()
     {
         // Arrange
-        var createRequest = new AccountCreateRequest 
-        { 
-            Name = "New Savings Account", 
-            Type = AccountType.Bank, 
-            Currency = "USD", 
+        var createRequest = new AccountCreateRequest
+        {
+            Name = "New Savings Account",
+            Type = AccountType.Bank,
+            Currency = "USD",
             InitialBalance = 1000,
             UserId = Guid.NewGuid()
             // Add other required properties for AccountCreateRequest
@@ -37,7 +38,7 @@ public partial class AccountServiceTests
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
-        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.FromResult(transactionMock.Object));
+        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(transactionMock.Object);
 
 
         var loggerMock = new Mock<ILogger<AccountService>>();
@@ -74,12 +75,12 @@ public partial class AccountServiceTests
 
         var transactionMock = new Mock<IDbContextTransaction>();
         // According to BaseService.cs, CommitAsync is called in the catch block when effectedCount <= 0
-        transactionMock.Setup(t => t.CommitAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask); 
+        transactionMock.Setup(t => t.CommitAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         transactionMock.Setup(t => t.DisposeAsync()).Returns(ValueTask.CompletedTask);
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
-        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.FromResult(transactionMock.Object));
+        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(transactionMock.Object);
 
         var loggerMock = new Mock<ILogger<AccountService>>();
         // Use the real _mapper instance
@@ -90,13 +91,14 @@ public partial class AccountServiceTests
 
         // Assert
         await act.Should().ThrowAsync<CreateFailedException>();
-        
+
         repoMock.Verify(r => r.CreateAsync(It.IsAny<Account>()), Times.Once);
         unitOfWorkMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
-        transactionMock.Verify(t => t.RollbackAsync(It.IsAny<CancellationToken>()), Times.Once); // BaseService commits in catch
+        transactionMock.Verify(t => t.RollbackAsync(It.IsAny<CancellationToken>()),
+            Times.Once); // BaseService commits in catch
         transactionMock.Verify(t => t.DisposeAsync(), Times.Once);
     }
-    
+
     [Fact]
     public async Task CreateAsync_ShouldRollbackTransaction_WhenRepositoryThrowsException()
     {
@@ -109,12 +111,12 @@ public partial class AccountServiceTests
 
         var transactionMock = new Mock<IDbContextTransaction>();
         // According to BaseService.cs, CommitAsync is called in the catch block when an exception occurs
-        transactionMock.Setup(t => t.CommitAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask); 
+        transactionMock.Setup(t => t.CommitAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
         transactionMock.Setup(t => t.DisposeAsync()).Returns(ValueTask.CompletedTask);
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
-        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.FromResult(transactionMock.Object));
+        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(transactionMock.Object);
 
 
         var loggerMock = new Mock<ILogger<AccountService>>();
@@ -126,10 +128,11 @@ public partial class AccountServiceTests
 
         // Assert
         await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("DB error");
-        
+
         repoMock.Verify(r => r.CreateAsync(It.IsAny<Account>()), Times.Once);
         unitOfWorkMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
-        transactionMock.Verify(t => t.RollbackAsync(It.IsAny<CancellationToken>()), Times.Once); // BaseService commits in catch
+        transactionMock.Verify(t => t.RollbackAsync(It.IsAny<CancellationToken>()),
+            Times.Once); // BaseService commits in catch
         transactionMock.Verify(t => t.DisposeAsync(), Times.Once);
     }
-} 
+}

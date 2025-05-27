@@ -1,8 +1,9 @@
 using Bogus;
-using CoreFinance.Application.DTOs;
+using CoreFinance.Application.DTOs.Account;
 using CoreFinance.Application.Services;
 using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Enums;
 using CoreFinance.Domain.Exceptions;
 using CoreFinance.Domain.UnitOfWorks;
 using FluentAssertions;
@@ -34,13 +35,13 @@ public partial class AccountServiceTests
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
         repoMock.Setup(r => r.CreateAsync(It.IsAny<List<Account>>()))
             .ReturnsAsync(numberOfAccounts);
-        
+
         var transactionMock = new Mock<IDbContextTransaction>();
         transactionMock.Setup(t => t.DisposeAsync()).Returns(ValueTask.CompletedTask);
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
-        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.FromResult(transactionMock.Object));
+        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(transactionMock.Object);
 
         var loggerMock = new Mock<ILogger<AccountService>>();
         var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
@@ -52,7 +53,8 @@ public partial class AccountServiceTests
         var accountViewModels = result!.ToList();
         accountViewModels.Should().NotBeNullOrEmpty();
         accountViewModels.Should().HaveCount(numberOfAccounts);
-        accountViewModels.Should().BeEquivalentTo(expectedViewModels, options => options.ExcludingMissingMembers().Excluding(e => e.Id));
+        accountViewModels.Should().BeEquivalentTo(expectedViewModels,
+            options => options.ExcludingMissingMembers().Excluding(e => e.Id));
 
         repoMock.Verify(r => r.CreateAsync(It.Is<List<Account>>(list => list.Count == numberOfAccounts)), Times.Once);
         unitOfWorkMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
@@ -67,10 +69,10 @@ public partial class AccountServiceTests
         var createRequests = new List<AccountCreateRequest>();
 
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
-        
+
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         // BeginTransactionAsync should not be called for empty list as per BaseService logic
-        
+
         var loggerMock = new Mock<ILogger<AccountService>>();
         var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
 
@@ -98,13 +100,13 @@ public partial class AccountServiceTests
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
         repoMock.Setup(r => r.CreateAsync(It.IsAny<List<Account>>()))
             .ReturnsAsync(0);
-        
+
         var transactionMock = new Mock<IDbContextTransaction>();
         transactionMock.Setup(t => t.DisposeAsync()).Returns(ValueTask.CompletedTask);
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
-        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.FromResult(transactionMock.Object));
+        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(transactionMock.Object);
 
         var loggerMock = new Mock<ILogger<AccountService>>();
         var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
@@ -129,7 +131,7 @@ public partial class AccountServiceTests
         var createRequests = new Faker<AccountCreateRequest>()
             .RuleFor(r => r.Name, f => f.Finance.AccountName())
             .Generate(numberOfAccounts);
-        
+
         var repoMock = new Mock<IBaseRepository<Account, Guid>>();
         repoMock.Setup(r => r.CreateAsync(It.IsAny<List<Account>>()))
             .ThrowsAsync(new InvalidOperationException("Simulated DB error"));
@@ -139,7 +141,7 @@ public partial class AccountServiceTests
 
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.Repository<Account, Guid>()).Returns(repoMock.Object);
-        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).Returns(Task.FromResult(transactionMock.Object));
+        unitOfWorkMock.Setup(u => u.BeginTransactionAsync()).ReturnsAsync(transactionMock.Object);
 
         var loggerMock = new Mock<ILogger<AccountService>>();
         var service = new AccountService(_mapper, unitOfWorkMock.Object, loggerMock.Object);
@@ -155,4 +157,4 @@ public partial class AccountServiceTests
         transactionMock.Verify(t => t.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
         transactionMock.Verify(t => t.DisposeAsync(), Times.Once);
     }
-} 
+}

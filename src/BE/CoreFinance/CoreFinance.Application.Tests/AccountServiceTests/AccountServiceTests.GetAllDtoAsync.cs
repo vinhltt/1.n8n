@@ -1,7 +1,8 @@
-using CoreFinance.Application.DTOs;
+using CoreFinance.Application.DTOs.Account;
 using CoreFinance.Application.Services;
 using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Enums;
 using CoreFinance.Domain.UnitOfWorks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -19,9 +20,19 @@ public partial class AccountServiceTests
         // Arrange
         var accounts = new List<Account>
         {
-            new() { Id = Guid.NewGuid(), Name = "Account 1", Type = AccountType.Bank, Currency = "USD", InitialBalance = 100 },
-            new() { Id = Guid.NewGuid(), Name = "Account 2", Type = AccountType.Cash, Currency = "EUR", InitialBalance = 50 },
-            new() { Id = Guid.NewGuid(), Name = "Account 3", Type = AccountType.CreditCard, Currency = "VND", InitialBalance = 0 }
+            new()
+            {
+                Id = Guid.NewGuid(), Name = "Account 1", Type = AccountType.Bank, Currency = "USD", InitialBalance = 100
+            },
+            new()
+            {
+                Id = Guid.NewGuid(), Name = "Account 2", Type = AccountType.Cash, Currency = "EUR", InitialBalance = 50
+            },
+            new()
+            {
+                Id = Guid.NewGuid(), Name = "Account 3", Type = AccountType.CreditCard, Currency = "VND",
+                InitialBalance = 0
+            }
         };
 
         var accountsMock = accounts.AsQueryable().BuildMock();
@@ -41,12 +52,13 @@ public partial class AccountServiceTests
         var result = await service.GetAllDtoAsync();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().HaveCount(accounts.Count);
-        
+        var accountViewModels = result!.ToList();
+        accountViewModels.Should().NotBeNull();
+        accountViewModels.Should().HaveCount(accounts.Count);
+
         // Map the expected accounts using the real mapper to compare with the result
         var expectedViewModels = accounts.Select(_mapper.Map<AccountViewModel>).ToList();
-        result.Should().BeEquivalentTo(expectedViewModels);
+        accountViewModels.Should().BeEquivalentTo(expectedViewModels);
 
         // Verify that the repository method was called
         repoMock.Verify(r => r.GetNoTrackingEntities(), Times.Once);
@@ -73,10 +85,11 @@ public partial class AccountServiceTests
         var result = await service.GetAllDtoAsync();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().BeEmpty();
+        var accountViewModels = result!.ToList();
+        accountViewModels.Should().NotBeNull();
+        accountViewModels.Should().BeEmpty();
 
         // Verify that the repository method was called
         repoMock.Verify(r => r.GetNoTrackingEntities(), Times.Once);
     }
-} 
+}

@@ -6,7 +6,7 @@ public static class MathUtils
         params decimal?[]? values)
     {
         return values?.Where(value => value.HasValue)
-                     .Sum(value => value!.Value);
+            .Sum(value => value!.Value);
     }
 
     public static decimal NullToZero(
