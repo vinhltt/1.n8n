@@ -1,0 +1,78 @@
+---
+description: 
+globs: src/FE/nuxt/**
+alwaysApply: false
+---
+# Nuxt 3 Frontend Development Rules
+
+## Context
+
+- Apply to all files within src/FE/nuxt directory
+- Based on project dependencies: Nuxt 3, Vue 3, TypeScript, Tailwind CSS, Pinia
+- Includes specific libraries: @headlessui/vue, @vueuse/core, @pinia/nuxt, vue3-apexcharts, sweetalert2
+
+## Critical Rules
+
+- Write concise TypeScript code with Composition API and `<script setup>` syntax
+- Use PascalCase for components (AuthWizard.vue), camelCase for composables (useAuthState.ts)
+- Structure files: exported component, composables, helpers, static content, types
+- Prefer types over interfaces, avoid enums, use const objects instead
+- Use Pinia for state management with @pinia/nuxt
+- Leverage VueUse (@vueuse/core) for common composables and utilities
+- Use Tailwind CSS with mobile-first responsive design approach
+- Implement Nuxt 3 auto-imports for components and composables
+- Use useFetch/useAsyncData for data fetching instead of traditional methods
+- Apply SEO best practices with useHead and useSeoMeta
+- Use descriptive variable names with auxiliary verbs (isLoading, hasError)
+- Implement lazy loading for routes and components for performance
+- Use Suspense for asynchronous components
+- Follow Nuxt 3 directory structure (pages/, components/, composables/)
+
+## Examples
+
+<example>
+  // ✅ Good: Nuxt 3 component with Composition API
+  <template>
+    <div class="min-h-screen bg-gray-50 md:bg-white">
+      <HeadlessDialog v-model="isModalOpen">
+        <div class="p-4 sm:p-6">
+          <h2 class="text-lg font-semibold">{{ title }}</h2>
+        </div>
+      </HeadlessDialog>
+    </div>
+  </template>
+
+  <script setup lang="ts">
+  import { HeadlessDialog } from '@headlessui/vue'
+  
+  type UserData = {
+    id: string
+    name: string
+  }
+  
+  const isModalOpen = ref(false)
+  const { data: users } = await useFetch<UserData[]>('/api/users')
+  
+  useHead({
+    title: 'User Management'
+  })
+  </script>
+</example>
+
+<example type="invalid">
+  // ❌ Bad: Options API and missing TypeScript
+  <script>
+  export default {
+    data() {
+      return {
+        users: []
+      }
+    },
+    async mounted() {
+      const response = await fetch('/api/users')
+      this.users = await response.json()
+    }
+  }
+  </script>
+</example>
+

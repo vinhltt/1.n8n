@@ -1,6 +1,6 @@
 ---
-description: .NET Cursor Rules
-globs:
+description: 
+globs: src/BE/**/*.cs
 alwaysApply: false
 ---
 # .NET Development Rules
@@ -30,7 +30,7 @@ You are a senior .NET backend developer and an expert in C#, ASP.NET Core, and E
 - Apply EFCore.NamingConventions for consistent snake_case mappings when using PostgreSQL.
 
 ## Syntax and Formatting
-- Follow the [C# Coding Conventions](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions).
+- Follow the [C# Coding Conventions](mdc:https:/learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions).
 - Use C#'s expressive syntax (e.g., null-conditional operators, string interpolation).
 - Prefer `var` when the type is obvious.
 - Keep code clean, consistent, and self-documenting.
