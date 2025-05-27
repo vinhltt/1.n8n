@@ -58,7 +58,7 @@
 - **Quản lý giao dịch định kỳ:**
   - **User tạo mẫu → RecurringTransactionTemplateService lưu mẫu → background job sinh giao dịch dự kiến → ExpectedTransactionService quản lý lifecycle.**
   - **Background job chạy định kỳ → GenerateExpectedTransactionsForAllActiveTemplatesAsync → sinh giao dịch dự kiến cho tất cả mẫu active.**
-  - **User xác nhận giao dịch dự kiến → ExpectedTransactionService.ConfirmExpectedTransactionAsync → liên kết với Transaction thực tế.**
+  - **User xác nhận giao dịch dự kiến → ExpectedTransactionService.ConfirmTransactionAsync/AdjustTransactionAsync/CancelTransactionAsync → liên kết với Transaction thực tế (Confirm), cập nhật thông tin (Adjust), hoặc đánh dấu đã hủy (Cancel).**
 - Quản lý ngân sách, mục tiêu, nợ, đầu tư: các service chuyên biệt, đồng bộ qua event bus.
 - Báo cáo, thông báo: ReportingService, NotificationService consume event từ các service khác.
 
@@ -66,6 +66,7 @@
 - Clean Architecture, DDD, TDD, SOLID cho mọi service.
 - Viết unit test, integration test đầy đủ, coverage > 80%.
 - Chuẩn hóa sử dụng FluentAssertions cho assert kết quả trong unit test, tuân thủ .NET rule.
+- **Validation: Sử dụng FluentValidation cho tất cả các request DTO. Các validator được đăng ký tập trung trong lớp `ServiceExtensions` thông qua extension method `AddApplicationValidators`. Validation được thực hiện tự động bởi middleware của ASP.NET Core.**
 - **Trong unit test cho tầng service, ưu tiên sử dụng instance AutoMapper thật (được inject, không mock) để kiểm tra logic nghiệp vụ cùng với logic mapping, giả định rằng các AutoMapper profile đã được cấu hình đúng và được test riêng.**
 - Triển khai blue-green/canary, feature flag cho release.
 - Có tài liệu hướng dẫn backup, restore, disaster recovery.

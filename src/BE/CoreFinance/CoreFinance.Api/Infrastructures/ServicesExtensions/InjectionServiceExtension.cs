@@ -11,7 +11,8 @@ public static class InjectionServiceExtension
     {
         services.AddHttpContextAccessor();
         services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
-        services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork<CoreFinanceDbContext>));
+        services.AddScoped<IUnitOfWork, UnitOfWork<CoreFinanceDbContext>>();
+        services.AddApplicationValidators();
         services.AddRepositories();
         services.AddServices();
     }

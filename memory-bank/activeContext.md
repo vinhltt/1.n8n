@@ -4,6 +4,8 @@
 - **Đã hoàn thành triển khai tính năng Quản lý Giao dịch Định kỳ (Recurring Transactions) trong Core Finance bounded context.**
 - **Đang hoàn thiện và kiểm thử các chức năng của RecurringTransactionTemplateService và ExpectedTransactionService.**
 - Đảm bảo Memory Bank phản ánh đầy đủ nghiệp vụ, kiến trúc, yêu cầu chức năng/phi chức năng, tiến độ, insight mới nhất.
+- **Đã cấu hình Dependency Injection cho các service và repository mới.**
+- **Đã tạo và đăng ký các validator cho các request DTOs sử dụng FluentValidation.**
 - **Chuẩn bị triển khai background job để tự động sinh giao dịch dự kiến từ các mẫu định kỳ.**
 
 ## Thay đổi gần đây
@@ -18,6 +20,8 @@
   - **Tất cả test files được tổ chức trong thư mục con theo tên service.**
   - **Di chuyển helper functions vào TestHelpers.cs trong thư mục Helpers.**
 - **Đã viết comprehensive unit tests cho tất cả methods của cả hai services mới.**
+- **Đã cấu hình Dependency Injection cho Unit of Work, RecurringTransactionTemplateService và ExpectedTransactionService trong ServiceExtensions.**
+- **Đã tạo các validator bằng FluentValidation cho các request DTOs liên quan đến RecurringTransactionTemplate và ExpectedTransaction, và đăng ký chúng tập trung bằng extension method AddApplicationValidators.**
 - **Đã cập nhật DataAnnotations cho tất cả Entity trong CoreFinance.Domain:**
   - **Thêm [Column(TypeName = "decimal(18,2)")] cho các property decimal liên quan đến tiền**
   - **Thêm [Range] validation cho các giá trị số**
@@ -68,4 +72,5 @@
 - **Chỉ sử dụng xUnit cho unit test, không dùng NUnit hay framework khác.**
 - **Chuẩn hóa sử dụng FluentAssertions cho assert kết quả trong unit test, tuân thủ .NET rule.**
 - **Quy ước sử dụng instance AutoMapper thật (không mock) cho unit test ở tầng service, dựa vào các AutoMapper profile đã được cấu hình đúng và đã được test riêng.**
+- **Đã chuẩn hóa việc đăng ký validator bằng extension method AddApplicationValidators để dễ quản lý.**
 - **Lưu ý về việc đồng bộ dữ liệu giữa giao dịch dự kiến (ExpectedTransaction) và giao dịch thực tế (Transaction) thông qua ActualTransactionId khi confirm expected transaction.** 

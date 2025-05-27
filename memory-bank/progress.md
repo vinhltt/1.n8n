@@ -15,6 +15,8 @@
   - **Triển khai ExpectedTransactionService với 11 methods chính: CRUD operations, quản lý lifecycle (confirm/cancel/adjust), dự báo dòng tiền.**
   - **Tạo đầy đủ DTOs cho cả hai services: CreateRequest, UpdateRequest, ViewModel và các specialized requests.**
   - **Viết comprehensive unit tests cho tất cả methods với coverage cao, áp dụng pattern partial class và tổ chức theo thư mục service.**
+- **Đã cấu hình Dependency Injection cho Unit of Work, RecurringTransactionTemplateService và ExpectedTransactionService.**
+- **Đã tạo các validator bằng FluentValidation cho các request DTOs liên quan đến RecurringTransactionTemplate và ExpectedTransaction, và đăng ký chúng tập trung.**
 
 ## Còn lại
 - **Triển khai background job service để tự động sinh giao dịch dự kiến từ các mẫu định kỳ (sử dụng Quartz.NET hoặc Hangfire).**
@@ -31,7 +33,7 @@
 ## Trạng thái hiện tại
 - Dự án đã có nền tảng tài liệu nghiệp vụ, kiến trúc, kỹ thuật vững chắc.
 - **Core Finance bounded context đã có đầy đủ chức năng cơ bản: Account, Transaction, RecurringTransactionTemplate, ExpectedTransaction.**
-- **Tính năng Recurring Transactions đã sẵn sàng cho việc tích hợp với các services khác và triển khai API layer.**
+- **Tính năng Recurring Transactions đã sẵn sàng cho việc tích hợp với các services khác và triển khai API layer, bao gồm cấu hình DI và validation.**
 - Sẵn sàng chuyển sang giai đoạn triển khai API Controllers và tích hợp với background job system.
 - **Pattern tổ chức unit test đã được chuẩn hóa và áp dụng thành công, có thể replicate cho các services khác.**
 
