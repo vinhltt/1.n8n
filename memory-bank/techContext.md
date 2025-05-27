@@ -10,13 +10,14 @@
 - Containerization: Docker, docker-compose cho dev, Kubernetes cho production
 - Logging/Monitoring: ELK/EFK, Prometheus, Grafana
 - Authentication: OpenIddict, JWT, OAuth2
-- (Frontend): (Cần xác định - ví dụ: React, Angular, Vue, Blazor)
+- **Frontend: Nuxt 3 + Vue 3 + TypeScript + Tailwind CSS + Pinia**
 - FluentAssertions cho assert kết quả trong unit test
 - **Quartz.NET hoặc Hangfire cho xử lý recurring jobs và lịch trình giao dịch định kỳ**
 - **Entity Framework Core cho ORM với navigation properties và relationships**
 - **xUnit cho unit testing framework**
 - **Bogus cho fake data generation trong unit tests**
 - **AutoMapper cho object mapping giữa domain models và DTOs**
+- **FluentValidation cho validation request DTOs**
 
 ## Thiết lập phát triển
 - Sử dụng file .env cho cấu hình môi trường
@@ -52,7 +53,13 @@
 - **FluentAssertions >= 6.x**
 - **Bogus >= 34.x**
 - **AutoMapper >= 12.x**
-- (Frontend framework: TBD)
+- **FluentValidation >= 11.x (hoặc phiên bản tương thích)**
+- **Nuxt 3 >= 3.13.x với Vue 3, TypeScript, Tailwind CSS**
+- **@nuxtjs/i18n >= 8.5.x cho đa ngôn ngữ**
+- **@pinia/nuxt >= 0.5.x cho state management**
+- **@headlessui/vue >= 1.7.x cho UI components**
+- **vue3-apexcharts >= 1.6.x cho charts**
+- **@vueuse/core >= 11.1.x cho composables**
 
 ## Pattern sử dụng công cụ
 - Ưu tiên dùng docker-compose cho local dev/test
@@ -62,4 +69,5 @@
 - **Background job scheduling: cron expressions cho việc sinh giao dịch dự kiến định kỳ**
 - **Unit test pattern: partial class với file riêng cho mỗi method, helper functions trong TestHelpers.cs**
 - **AutoMapper configuration: profile classes riêng cho mỗi domain entity, test mapping logic riêng**
-- **Repository pattern với UnitOfWork cho data access layer** 
+- **Repository pattern với UnitOfWork cho data access layer**
+- **Validation: Sử dụng FluentValidation với tính năng tự động validate qua middleware của ASP.NET Core.** 

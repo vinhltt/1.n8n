@@ -69,5 +69,13 @@ export default defineNuxtConfig({
         options: { linkExactActiveClass: 'active' },
     },
 
-    compatibilityDate: '2024-09-21',
+    compatibilityDate: '2024-09-21',  
+    runtimeConfig: {
+        // Private keys (only available on server-side)
+        
+        // Public keys (exposed to client-side)
+        public: {
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://localhost:7293'
+        }
+    },
 });

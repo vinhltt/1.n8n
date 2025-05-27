@@ -1,25 +1,110 @@
 # activeContext.md
 
 ## Trọng tâm công việc hiện tại
-- **Đã hoàn thành triển khai tính năng Quản lý Giao dịch Định kỳ (Recurring Transactions) trong Core Finance bounded context.**
-- **Đang hoàn thiện và kiểm thử các chức năng của RecurringTransactionTemplateService và ExpectedTransactionService.**
-- Đảm bảo Memory Bank phản ánh đầy đủ nghiệp vụ, kiến trúc, yêu cầu chức năng/phi chức năng, tiến độ, insight mới nhất.
-- **Đã cấu hình Dependency Injection cho các service và repository mới.**
-- **Đã tạo và đăng ký các validator cho các request DTOs sử dụng FluentValidation.**
-- **Chuẩn bị triển khai background job để tự động sinh giao dịch dự kiến từ các mẫu định kỳ.**
+- **✅ Đã hoàn thành triển khai Account Management system cho frontend Nuxt 3.**
+- **✅ Đã cấu hình kết nối từ Nuxt frontend đến .NET Core API backend (https://localhost:7293).**
+- **✅ Đã setup thành công Nuxt project với tất cả dependencies cần thiết.**
+- **✅ Đã tổ chức lại cấu trúc types và interfaces theo Nuxt best practices.**
+- **✅ Đã bổ sung menu navigation để truy cập trang Account management.**
+- **✅ Dev server đang chạy thành công trên port 3000.**
+- **✅ Build production thành công với tất cả optimizations.**
+- **✅ Đã fix FilterBodyRequest format mismatch giữa frontend và backend.**
+- **✅ Đã fix CreateAccountRequest validation bằng cách thay đổi frontend gửi form data.**
+- **✅ Đã remove userId requirement cho account creation vì chưa có authentication system.**
 
 ## Thay đổi gần đây
-- **Đã triển khai đầy đủ tính năng Quản lý Giao dịch Định kỳ trong Core Finance (thay vì Planning & Investment như dự định ban đầu):**
-  - **Tạo domain models: RecurringTransactionTemplate và ExpectedTransaction với đầy đủ properties và enums.**
-  - **Triển khai RecurringTransactionTemplateService với các chức năng: tạo/sửa/xóa mẫu, sinh giao dịch dự kiến, tính toán ngày thực hiện tiếp theo.**
-  - **Triển khai ExpectedTransactionService với các chức năng: quản lý giao dịch dự kiến, xác nhận/hủy/điều chỉnh, dự báo dòng tiền.**
-  - **Tạo đầy đủ DTOs cho cả hai services: CreateRequest, UpdateRequest, ViewModel và các request đặc biệt.**
-- **Đã tổ chức lại cấu trúc unit tests theo pattern mới:**
-  - **Sử dụng partial class cho mỗi service test (AccountServiceTests, ExpectedTransactionServiceTests, RecurringTransactionTemplateServiceTests).**
-  - **Mỗi method của service có file test riêng theo format ServiceNameTests.MethodName.cs.**
-  - **Tất cả test files được tổ chức trong thư mục con theo tên service.**
-  - **Di chuyển helper functions vào TestHelpers.cs trong thư mục Helpers.**
-- **Đã viết comprehensive unit tests cho tất cả methods của cả hai services mới.**
+- **✅ Đã triển khai đầy đủ Account Management system cho frontend:**
+  - **Trang danh sách accounts (/apps/accounts) với CRUD operations, filtering, pagination**
+  - **Modal component cho tạo/chỉnh sửa accounts với form validation**
+  - **Trang chi tiết account (/apps/accounts/[id]) với charts và transactions**
+  - **Composable useAccounts.ts với API integration và utility functions**
+
+- **✅ Đã cấu hình project setup:**
+  - **Cài đặt thành công tất cả dependencies: @nuxtjs/tailwindcss, @pinia/nuxt, @nuxtjs/i18n, @vueuse/nuxt**
+  - **Fix conflicts giữa Tailwind CSS v3/v4, downgrade về version ổn định**
+  - **Tạo file locales/vi.json cho internationalization**
+  - **Fix CSS issues: Import đúng tailwind.css với custom VRISTO classes (bg-success, text-white-dark, etc.)**
+  - **Thêm custom colors vào tailwind.config.js (primary, secondary, success, danger, warning, info, dark)**
+  - **Disable TypeScript strict checking và i18n tạm thời để tránh compatibility issues**
+  - **✅ Dev server và build production đều chạy thành công**
+
+- **✅ Đã tổ chức lại cấu trúc theo Nuxt conventions:**
+  - **Tách types ra folder riêng: types/account.ts, types/api.ts, types/index.ts**
+  - **Tạo composable useApi.ts cho API calls chung**
+  - **Cập nhật nuxt.config.ts với runtime config cho API base URL**
+
+- **✅ Đã bổ sung menu navigation:**
+  - **Thêm menu "Accounts" vào sidebar trong phần Apps**
+  - **Sử dụng icon-credit-card có sẵn**
+  - **Menu link đến /apps/accounts**
+
+- **✅ Đã fix FilterBodyRequest format mismatch:**
+  - **Cập nhật frontend FilterBodyRequest interface để khớp với backend structure**
+  - **Thay đổi từ simple object sang complex filtering system với FilterRequest, FilterDetailsRequest**
+  - **Cập nhật Pagination structure: pageNumber → pageIndex, totalRecords → totalRow, totalPages → pageCount**
+  - **Thêm support cho FilterOperator, FilterLogicalOperator, SortDescriptor**
+  - **Cập nhật ApiResponse interface: result → data để khớp với backend IBasePaging**
+  - **Fix useApi.ts để không expect wrapper object { data: T }**
+  - **Cập nhật tất cả usage trong pages/apps/accounts/index.vue**
+  - **Đảm bảo gửi đúng format theo curl example: langId="", filter={}, orders=[] thay vì undefined**
+  - **Làm cho tất cả properties trong FilterBodyRequest bắt buộc để tránh undefined values**
+
+- **✅ Đã fix CreateAccountRequest validation bằng form data approach:**
+  - **Thêm support cho form data trong useApi.ts với isFormData option**
+  - **Thêm postForm() và putForm() methods cho form data requests**
+  - **Cập nhật useAccounts để sử dụng postForm/putForm cho create/update operations**
+  - **Giữ nguyên backend với [FromForm] attribute như thiết kế ban đầu**
+  - **Thêm FluentValidation auto-validation middleware để tự động validate form data**
+  - **Frontend giờ gửi FormData thay vì JSON cho CRUD operations**
+
+- **✅ Đã remove userId requirement:**
+  - **Xóa userId khỏi AccountCreateRequest trong frontend**
+  - **userId đã là optional trong type definition**
+  - **Sẽ bổ sung lại khi implement authentication system**
+  - **Giúp đơn giản hóa testing và development hiện tại**
+
+## Quyết định và cân nhắc hiện tại
+- **Architecture: Chỉ sử dụng Nuxt làm frontend, không sử dụng backend Nuxt - tất cả API calls đến .NET Core backend**
+- **API Endpoint: https://localhost:7293 (có thể thay đổi qua environment variable NUXT_PUBLIC_API_BASE)**
+- **TypeScript: Tạm thời disable strict checking để tránh conflicts với third-party libraries**
+- **Tailwind CSS: Sử dụng version 3.4.0 ổn định thay vì v4 beta**
+- **Dependencies: Đã resolve conflicts với apexcharts, sử dụng v4.0.0 + vue3-apexcharts v1.8.0**
+- **API Structure: Frontend và backend đã đồng bộ về FilterBodyRequest và response format**
+
+## Patterns và preferences quan trọng
+- **Sử dụng Composition API với `<script setup>` syntax**
+- **Types thay vì interfaces, tránh enums (trừ khi cần khớp với backend enums)**
+- **Auto-import cho composables nhưng manual import cho types**
+- **VRISTO theme patterns với Tailwind CSS**
+- **Mobile-first responsive design**
+- **Dark mode support**
+- **RTL support**
+- **Internationalization với @nuxtjs/i18n**
+- **Complex filtering system với FilterRequest structure để khớp với backend**
+
+## Learnings và project insights
+- **Nuxt 3 auto-import có thể gây conflicts với types, cần cấu hình cẩn thận**
+- **Tailwind CSS v4 beta còn nhiều issues, nên dùng v3 stable**
+- **Third-party libraries trong VRISTO template có thể thiếu type definitions**
+- **VRISTO theme có custom CSS classes (bg-success, text-white-dark, etc.) được định nghĩa trong tailwind.css**
+- **Cần import đúng thứ tự: main.css → tailwind.css → @tailwind directives + custom classes**
+- **Runtime config là cách tốt nhất để manage API endpoints trong Nuxt**
+- **Frontend và backend cần đồng bộ chính xác về data structures, đặc biệt FilterBodyRequest và response format**
+- **Backend .NET Core sử dụng IBasePaging<T> với properties: Data, Pagination**
+- **Pagination object có: PageIndex, PageSize, TotalRow, PageCount (không phải pageNumber, totalRecords)**
+
+## Bước tiếp theo
+- **✅ HOÀN THÀNH: Setup và cấu hình Nuxt frontend thành công**
+- **✅ HOÀN THÀNH: Fix FilterBodyRequest format mismatch**
+- **Test các trang Account management với .NET API thực tế**
+- **Re-enable i18n khi có compatible version**
+- **Enable TypeScript strict checking sau khi fix third-party library types**
+- **Implement error handling và loading states tốt hơn**
+- **Thêm validation cho forms**
+- **Optimize performance và SEO**
+- **Implement authentication/authorization nếu cần**
+
+## Đảm bảo mọi service có health check, logging, monitoring, alerting tự động.
 - **Đã cấu hình Dependency Injection cho Unit of Work, RecurringTransactionTemplateService và ExpectedTransactionService trong ServiceExtensions.**
 - **Đã tạo các validator bằng FluentValidation cho các request DTOs liên quan đến RecurringTransactionTemplate và ExpectedTransaction, và đăng ký chúng tập trung bằng extension method AddApplicationValidators.**
 - **Đã cập nhật DataAnnotations cho tất cả Entity trong CoreFinance.Domain:**
@@ -32,45 +117,15 @@
   - **RecurringTransactionTemplate: UserId, AccountId → Guid?**
   - **ExpectedTransaction: RecurringTransactionTemplateId, UserId, AccountId → Guid?**
   - **Mục đích: Tăng tính linh hoạt, hỗ trợ import dữ liệu không đầy đủ, soft delete, orphaned records management**
-
-## Bước tiếp theo
-- **Triển khai background job service (sử dụng Quartz.NET hoặc Hangfire) để tự động sinh giao dịch dự kiến.**
-- **Tích hợp với NotificationService để gửi thông báo về giao dịch định kỳ sắp đến hạn.**
-- **Cập nhật ReportingService để tạo báo cáo kế hoạch tiền mặt kết hợp giao dịch thực tế và dự kiến.**
-- **Triển khai API Controllers cho RecurringTransactionTemplate và ExpectedTransaction.**
-- **Thiết kế và triển khai giao diện người dùng cho việc quản lý mẫu giao dịch định kỳ.**
-- Bổ sung chi tiết user stories, acceptance criteria cho từng chức năng còn lại.
-- Làm việc với đội UI/UX để hoàn thiện mockup, wireframe.
-- Xác định giải pháp frontend cụ thể.
-
-## Quyết định quan trọng
-- **Quyết định triển khai tính năng Recurring Transactions trong Core Finance thay vì Planning & Investment để tận dụng cơ sở hạ tầng sẵn có và đơn giản hóa việc tích hợp.**
-- **Sử dụng enum RecurrenceFrequency với các giá trị cố định (Daily=1, Weekly=7, Monthly=30, etc.) và hỗ trợ Custom frequency với CustomIntervalDays.**
-- **Thiết kế ExpectedTransaction với lifecycle đầy đủ: Pending → Confirmed/Cancelled/Completed.**
-- **Hỗ trợ điều chỉnh giao dịch dự kiến (adjustment) với lưu trữ OriginalAmount và AdjustmentReason.**
-- **Quyết định sử dụng nullable Foreign Keys (Guid?) thay vì non-nullable (Guid) để tạo mối quan hệ linh hoạt hơn giữa các Entity.**
-- Ưu tiên triển khai core service (Identity, Core Finance, Reporting) trước.
-- Import statement: bắt đầu với manual upload, lên kế hoạch tích hợp API ngân hàng/aggregator sau.
-- Đảm bảo mọi service có health check, logging, monitoring, alerting tự động.
-- Định nghĩa rõ acceptance criteria, test coverage >80%.
-
-## Pattern, insight, lưu ý
-- **Đã áp dụng thành công pattern tổ chức unit test với partial class, giúp code dễ maintain và tìm kiếm.**
-- **RecurringTransactionTemplateService có khả năng sinh giao dịch dự kiến theo batch (GenerateExpectedTransactionsForAllActiveTemplatesAsync) phù hợp cho background job.**
-- **ExpectedTransactionService cung cấp các method dự báo dòng tiền (GetCashFlowForecastAsync, GetCategoryForecastAsync) hỗ trợ báo cáo tài chính.**
-- **Thiết kế domain models với đầy đủ navigation properties hỗ trợ Entity Framework relationships.**
-- **Foreign Key Design Pattern với nullable Guid cho phép:**
-  - **Tạo Entity mà không cần liên kết ngay lập tức**
-  - **Xử lý dữ liệu import không đầy đủ từ nguồn bên ngoài**
-  - **Hỗ trợ soft delete và quản lý orphaned records**
-  - **Tăng tính linh hoạt trong thiết kế API và business logic**
-- Mọi thay đổi lớn về nghiệp vụ, kiến trúc, công nghệ đều phải cập nhật vào Memory Bank.
-- Đảm bảo các yêu cầu phi chức năng (NFR) được kiểm thử và giám sát liên tục.
-- Luôn review lại BA Design và Memory Bank trước khi bắt đầu task mới.
-- Đã chuẩn hóa sử dụng Bogus cho fake data trong unit test, tuân thủ .NET rule.
-- Checklist phát triển/test phải có hướng dẫn sử dụng Bogus cho data giả lập.
+- **Đã tổ chức lại cấu trúc unit tests theo pattern mới:**
+  - **Sử dụng partial class cho mỗi service test (AccountServiceTests, ExpectedTransactionServiceTests, RecurringTransactionTemplateServiceTests).**
+  - **Mỗi method của service có file test riêng theo format ServiceNameTests.MethodName.cs.**
+  - **Tất cả test files được tổ chức trong thư mục con theo tên service.**
+  - **Di chuyển helper functions vào TestHelpers.cs trong thư mục Helpers.**
+- **Đã viết comprehensive unit tests cho tất cả methods của cả hai services mới.**
+- **Đã chuẩn hóa sử dụng Bogus cho fake data trong unit test, tuân thủ .NET rule.**
 - **Chỉ sử dụng xUnit cho unit test, không dùng NUnit hay framework khác.**
 - **Chuẩn hóa sử dụng FluentAssertions cho assert kết quả trong unit test, tuân thủ .NET rule.**
 - **Quy ước sử dụng instance AutoMapper thật (không mock) cho unit test ở tầng service, dựa vào các AutoMapper profile đã được cấu hình đúng và đã được test riêng.**
 - **Đã chuẩn hóa việc đăng ký validator bằng extension method AddApplicationValidators để dễ quản lý.**
-- **Lưu ý về việc đồng bộ dữ liệu giữa giao dịch dự kiến (ExpectedTransaction) và giao dịch thực tế (Transaction) thông qua ActualTransactionId khi confirm expected transaction.** 
+- **Lưu ý về việc đồng bộ dữ liệu giữa giao dịch dự kiến (ExpectedTransaction) và giao dịch thực tế (Transaction) thông qua ActualTransactionId khi confirm expected transaction.**
