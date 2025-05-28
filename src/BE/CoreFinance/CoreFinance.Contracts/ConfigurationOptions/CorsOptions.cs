@@ -1,4 +1,4 @@
-﻿namespace CoreFinance.Contracts;
+﻿namespace CoreFinance.Contracts.ConfigurationOptions;
 
 public class CorsOptions
 {

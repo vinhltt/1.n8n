@@ -2,10 +2,7 @@
 using CoreFinance.Api.Infrastructures.Interceptors;
 using CoreFinance.Application.Interfaces;
 using CoreFinance.Application.Services;
-using CoreFinance.Application.Validators;
 using CoreFinance.Contracts.Extensions;
-using FluentValidation;
-using FluentValidation.AspNetCore;
 using CoreFinance.Domain.UnitOfWorks;
 using CoreFinance.Infrastructure;
 using CoreFinance.Infrastructure.UnitOfWorks;
@@ -18,16 +15,12 @@ public static class ServiceExtensions
     {
         services.AddSingleton<IProxyGenerator, ProxyGenerator>();
         services.AddScoped<IAsyncInterceptor, MonitoringInterceptor>();
-        services.AddProxiedScoped<IAccountService, AccountService>();
-        services.AddProxiedScoped<ITransactionService, TransactionService>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork<CoreFinanceDbContext>>();
 
-        // Register new services
+        services.AddProxiedScoped<IAccountService, AccountService>();
+        services.AddProxiedScoped<ITransactionService, TransactionService>();
         services.AddProxiedScoped<IRecurringTransactionTemplateService, RecurringTransactionTemplateService>();
         services.AddProxiedScoped<IExpectedTransactionService, ExpectedTransactionService>();
-
-        services.AddFluentValidationAutoValidation();
-        services.AddFluentValidationClientsideAdapters();
     }
 }

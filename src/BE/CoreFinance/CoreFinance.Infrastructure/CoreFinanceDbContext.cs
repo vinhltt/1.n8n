@@ -10,6 +10,7 @@ public class CoreFinanceDbContext : DbContext
 {
     // ReSharper disable once NotAccessedField.Local
     private readonly IConfiguration _configuration;
+    public const string DEFAULT_CONNECTION_STRING = "CoreFinanceDb";
 
     public CoreFinanceDbContext()
     {

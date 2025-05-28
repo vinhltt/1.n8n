@@ -182,7 +182,7 @@
                 type="button"
                 class="btn btn-sm"
                 :class="page === pagination.pageIndex ? 'btn-primary' : 'btn-outline-primary'"
-                @click="changePage(page)"
+                @click="changePage(Number(page))"
               >
                 {{ page }}
               </button>
@@ -214,7 +214,8 @@
 <script setup lang="ts">
 import { useAppStore } from '@/stores/index'
 import { useAccounts } from '@/composables/useAccounts'
-import type { Account, AccountFilters, Pagination, FilterBodyRequest, ApiResponse, FilterRequest, FilterDetailsRequest, FilterLogicalOperator, FilterOperator } from '~/types'
+import type { Account, AccountFilters, Pagination, FilterBodyRequest, ApiResponse, FilterRequest, FilterDetailsRequest } from '~/types'
+import { FilterLogicalOperator, FilterOperator } from '~/types'
 import Swal from 'sweetalert2'
 
 const store = useAppStore()

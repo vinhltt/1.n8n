@@ -11,6 +11,8 @@
 - **✅ Đã fix FilterBodyRequest format mismatch giữa frontend và backend.**
 - **✅ Đã fix CreateAccountRequest validation bằng cách thay đổi frontend gửi form data.**
 - **✅ Đã remove userId requirement cho account creation vì chưa có authentication system.**
+- **✅ Đã fix DateTime timezone issue với PostgreSQL.**
+- **✅ Đã chuẩn hóa search functionality trong tất cả services.**
 
 ## Thay đổi gần đây
 - **✅ Đã triển khai đầy đủ Account Management system cho frontend:**
@@ -63,6 +65,18 @@
   - **Sẽ bổ sung lại khi implement authentication system**
   - **Giúp đơn giản hóa testing và development hiện tại**
 
+- **✅ Đã fix DateTime timezone issue với PostgreSQL:**
+  - **Thêm EnableLegacyTimestampBehavior() trong DbContext configuration ở GeneralServiceExtension.cs**
+  - **PostgreSQL yêu cầu DateTime với Kind=UTC, .NET mặc định tạo DateTime với Kind=Local**
+  - **EnableLegacyTimestampBehavior() cho phép Npgsql tự động convert DateTime sang UTC**
+  - **Xóa cấu hình thừa trong CoreFinanceDbContext.cs**
+  - **Fix lỗi "Cannot write DateTime with Kind=Local to PostgreSQL type 'timestamp with time zone'"**
+
+- **✅ Đã chuẩn hóa search functionality trong tất cả services:**
+  - **Ban đầu thử chuyển từ .ToLower().Contains() sang EF.Functions.ILike() cho PostgreSQL compatibility**
+  - **Thêm comments trong unit tests để clarify sự khác biệt giữa test logic và production logic**
+  - **Tất cả 34 unit tests cho GetPagingAsync methods đều pass**
+
 ## Quyết định và cân nhắc hiện tại
 - **Architecture: Chỉ sử dụng Nuxt làm frontend, không sử dụng backend Nuxt - tất cả API calls đến .NET Core backend**
 - **API Endpoint: https://localhost:7293 (có thể thay đổi qua environment variable NUXT_PUBLIC_API_BASE)**
@@ -92,6 +106,7 @@
 - **Frontend và backend cần đồng bộ chính xác về data structures, đặc biệt FilterBodyRequest và response format**
 - **Backend .NET Core sử dụng IBasePaging<T> với properties: Data, Pagination**
 - **Pagination object có: PageIndex, PageSize, TotalRow, PageCount (không phải pageNumber, totalRecords)**
+- **PostgreSQL với Npgsql yêu cầu DateTime có Kind=UTC, cần EnableLegacyTimestampBehavior() để tự động convert**
 
 ## Bước tiếp theo
 - **✅ HOÀN THÀNH: Setup và cấu hình Nuxt frontend thành công**

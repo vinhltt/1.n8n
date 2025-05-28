@@ -5,8 +5,7 @@ using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text.Json.Serialization;
-using CoreFinance.Contracts;
-using CoreFinance.Contracts.Utilities;
+using CoreFinance.Contracts.ConfigurationOptions;
 
 namespace CoreFinance.Api.Infrastructures.ServicesExtensions;
 
@@ -33,11 +32,17 @@ public static class GeneralServiceExtension
         CorsOptions corsOption
     )
     {
+        var dbSettingOptions = builder.Configuration.GetOptions<DbSettingOptions>(nameof(DbSettingOptions));
         // Add DbContext
         builder.Services.AddDbContext<CoreFinanceDbContext>(options =>
-            options.UseNpgsql(builder.Configuration.GetConnectionString("CoreFinanceDb"),
-                    _ => AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true))
-                .UseSnakeCaseNamingConvention());
+        {
+            options.UseNpgsql(builder.Configuration.GetConnectionString(CoreFinanceDbContext.DEFAULT_CONNECTION_STRING),
+                _ => AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true));
+
+            options.UseSnakeCaseNamingConvention();
+            options.EnableDetailedErrors(dbSettingOptions?.EnableDetailedErrors ?? false);
+            options.EnableSensitiveDataLogging(dbSettingOptions?.EnableSensitiveDataLogging ?? false);
+        });
         // Add services to the container.
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
@@ -67,7 +72,7 @@ public static class GeneralServiceExtension
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "App Api", Version = "v1" });
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                Description = @"Example Token: 'Bearer {Token}'",
+                Description = "Example Token: 'Bearer {Token}'",
                 Name = "Authorization",
                 In = ParameterLocation.Header,
                 Type = SecuritySchemeType.ApiKey,
