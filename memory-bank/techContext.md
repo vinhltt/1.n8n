@@ -70,4 +70,26 @@
 - **Unit test pattern: partial class với file riêng cho mỗi method, helper functions trong TestHelpers.cs**
 - **AutoMapper configuration: profile classes riêng cho mỗi domain entity, test mapping logic riêng**
 - **Repository pattern với UnitOfWork cho data access layer**
-- **Validation: Sử dụng FluentValidation với tính năng tự động validate qua middleware của ASP.NET Core.** 
+- **Validation: Sử dụng FluentValidation với tính năng tự động validate qua middleware của ASP.NET Core.**
+
+## Code Style and Documentation
+- Ưu tiên sử dụng XML comments cho các lớp, phương thức và thuộc tính công khai trong mã C# để tạo tài liệu API tự động (ví dụ: Swagger).
+- Khi cần comment song ngữ (tiếng Anh và tiếng Việt) trong XML comments, sử dụng định dạng sau:
+  - Viết nội dung tiếng Anh trước, kết thúc bằng ` (EN)`.
+  - Sử dụng thẻ `<br/>` để xuống dòng.
+  - Viết nội dung tiếng Việt tiếp theo, kết thúc bằng ` (VI)`.
+  - Áp dụng cho các thẻ như `<summary>`, `<param>`, `<returns>`, v.v.
+- Ví dụ:
+  ```csharp
+  /// <summary>
+  /// English summary here (EN)
+  /// <br/>
+  /// Tóm tắt tiếng Việt ở đây (VI)
+  /// </summary>
+  /// <param name="paramName">
+  /// English description for parameter (EN)
+  /// <br/>
+  /// Mô tả tiếng Việt cho tham số (VI)
+  /// </param>
+  // ... rest of the code
+  ``` 

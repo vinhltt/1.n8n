@@ -2,23 +2,33 @@ using CoreFinance.Application.DTOs.Account;
 using CoreFinance.Application.Services;
 using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Contracts.Enums;
-using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
 using Microsoft.Extensions.Logging;
 using MockQueryable;
 using Moq;
 using FluentAssertions;
 using CoreFinance.Application.Tests.Helpers;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.UnitOfWorks;
 
 namespace CoreFinance.Application.Tests.AccountServiceTests;
 
+/// <summary>
+/// Contains test cases for the GetPagingAsync method of the AccountService. (EN)
+/// <br/>
+/// Chứa các trường hợp kiểm thử cho phương thức GetPagingAsync của AccountService. (VI)
+/// </summary>
 // Tests for the GetPagingAsync method of AccountService
 public partial class AccountServiceTests
 {
     // Helper method has been moved to TestHelpers.cs
     // private static IQueryable<Account> GenerateFakeAccounts(int count) { ... }
 
+    /// <summary>
+    /// Verifies that GetPagingAsync returns a paged result correctly. (EN)
+    /// <br/>
+    /// Xác minh rằng GetPagingAsync trả về kết quả phân trang một cách chính xác. (VI)
+    /// </summary>
     [Fact]
     public async Task GetPagingAsync_ShouldReturnPagedResult()
     {
@@ -68,6 +78,11 @@ public partial class AccountServiceTests
         result.Pagination.PageIndex.Should().Be(pageIndex);
     }
 
+    /// <summary>
+    /// Verifies that GetPagingAsync filters results by search value. (EN)
+    /// <br/>
+    /// Xác minh rằng GetPagingAsync lọc kết quả theo giá trị tìm kiếm. (VI)
+    /// </summary>
     [Fact]
     public async Task GetPagingAsync_ShouldFilterBySearchValue()
     {
@@ -105,6 +120,11 @@ public partial class AccountServiceTests
         result.Data.First().Should().BeEquivalentTo(expectedViewModel);
     }
 
+    /// <summary>
+    /// Verifies that GetPagingAsync filters results by search value in a case-insensitive manner. (EN)
+    /// <br/>
+    /// Xác minh rằng GetPagingAsync lọc kết quả theo giá trị tìm kiếm mà không phân biệt chữ hoa chữ thường. (VI)
+    /// </summary>
     [Fact]
     public async Task GetPagingAsync_ShouldFilterBySearchValue_CaseInsensitive()
     {
@@ -147,6 +167,11 @@ public partial class AccountServiceTests
         result.Data.Should().BeEquivalentTo(expectedViewModels);
     }
 
+    /// <summary>
+    /// Verifies that GetPagingAsync returns an empty result when the search value has no match. (EN)
+    /// <br/>
+    /// Xác minh rằng GetPagingAsync trả về kết quả rỗng khi giá trị tìm kiếm không có kết quả khớp. (VI)
+    /// </summary>
     [Fact]
     public async Task GetPagingAsync_ShouldReturnEmpty_WhenSearchValueHasNoMatch()
     {
@@ -180,6 +205,11 @@ public partial class AccountServiceTests
         result.Pagination.TotalRow.Should().Be(0);
     }
 
+    /// <summary>
+    /// Verifies that GetPagingAsync handles the case where the repository returns no data. (EN)
+    /// <br/>
+    /// Xác minh rằng GetPagingAsync xử lý trường hợp repository không trả về dữ liệu. (VI)
+    /// </summary>
     [Fact]
     public async Task GetPagingAsync_ShouldHandleRepositoryReturningNoData()
     {
@@ -214,6 +244,11 @@ public partial class AccountServiceTests
         result.Pagination.PageSize.Should().Be(10);
     }
 
+    /// <summary>
+    /// Verifies that GetPagingAsync handles pagination edge cases correctly. (EN)
+    /// <br/>
+    /// Xác minh rằng GetPagingAsync xử lý đúng các trường hợp biên của phân trang. (VI)
+    /// </summary>
     [Theory]
     [InlineData(1, 5, 3, 1, 3)] // Total items < PageSize
     [InlineData(2, 2, 5, 2, 2)] // Requesting page that has fewer items than PageSize

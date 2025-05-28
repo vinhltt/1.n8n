@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Domain.Enums;
 
-namespace CoreFinance.Domain;
+namespace CoreFinance.Domain.Entities;
 
 public class Transaction : BaseEntity<Guid>
 {

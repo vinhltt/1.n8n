@@ -1,7 +1,7 @@
 using CoreFinance.Application.DTOs.ExpectedTransaction;
 using CoreFinance.Application.Services;
-using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.Enums;
 using CoreFinance.Domain.Exceptions;
 using CoreFinance.Domain.UnitOfWorks;
@@ -12,8 +12,18 @@ using Moq;
 
 namespace CoreFinance.Application.Tests.ExpectedTransactionServiceTests;
 
+/// <summary>
+/// Contains test cases for the CreateAsync method of ExpectedTransactionService. (EN)
+/// <br/>
+/// Chứa các trường hợp kiểm thử cho phương thức CreateAsync của ExpectedTransactionService. (VI)
+/// </summary>
 public partial class ExpectedTransactionServiceTests
 {
+    /// <summary>
+    /// Verifies that CreateAsync returns a ViewModel when the creation of a single expected transaction is successful. (EN)
+    /// <br/>
+    /// Xác minh rằng CreateAsync trả về ViewModel khi việc tạo một giao dịch dự kiến đơn lẻ thành công. (VI)
+    /// </summary>
     [Fact]
     public async Task CreateAsync_ShouldReturnViewModel_WhenCreationIsSuccessful()
     {
@@ -66,6 +76,11 @@ public partial class ExpectedTransactionServiceTests
         transactionMock.Verify(t => t.DisposeAsync(), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that CreateAsync sets the default status to Pending when the status is not explicitly provided in the request. (EN)
+    /// <br/>
+    /// Xác minh rằng CreateAsync đặt trạng thái mặc định là Pending khi trạng thái không được cung cấp rõ ràng trong yêu cầu. (VI)
+    /// </summary>
     [Fact]
     public async Task CreateAsync_ShouldSetDefaultStatus_WhenStatusIsNotProvided()
     {
@@ -103,6 +118,11 @@ public partial class ExpectedTransactionServiceTests
         result.Status.Should().Be(ExpectedTransactionStatus.Pending);
     }
 
+    /// <summary>
+    /// Verifies that CreateAsync throws a CreateFailedException when the repository's create operation returns zero affected count. (EN)
+    /// <br/>
+    /// Xác minh rằng CreateAsync ném ra CreateFailedException khi thao tác tạo của repository trả về số bản ghi bị ảnh hưởng bằng không. (VI)
+    /// </summary>
     [Fact]
     public async Task CreateAsync_ShouldThrowCreateFailedException_WhenRepositoryReturnsZeroAffectedCount()
     {
@@ -142,6 +162,11 @@ public partial class ExpectedTransactionServiceTests
         transactionMock.Verify(t => t.DisposeAsync(), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that CreateAsync rolls back the transaction when the repository's create operation throws an exception. (EN)
+    /// <br/>
+    /// Xác minh rằng CreateAsync rollback transaction khi thao tác tạo của repository ném ra một ngoại lệ. (VI)
+    /// </summary>
     [Fact]
     public async Task CreateAsync_ShouldRollbackTransaction_WhenRepositoryThrowsException()
     {

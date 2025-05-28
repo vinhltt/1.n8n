@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 namespace CoreFinance.Infrastructure.Repositories.Base;
 
 /// <summary>
-/// Base class for repositories.
+/// Base class for repositories.<br/>(EN) Base class for repositories.<br/>(VI) Lớp cơ sở cho các repository.
 /// </summary>
 public class BaseRepository<TEntity, TKey>(
     CoreFinanceDbContext context,
@@ -33,6 +33,11 @@ public class BaseRepository<TEntity, TKey>(
 
     #region public
 
+    /// <summary>
+    /// Retrieves entities without tracking, including specified navigation properties.<br/>(EN) Retrieves entities without tracking, including specified navigation properties.<br/>(VI) Truy xuất các thực thể không theo dõi, bao gồm các thuộc tính điều hướng được chỉ định.
+    /// </summary>
+    /// <param name="includes">Navigation properties to include. (EN)<br/>Các thuộc tính điều hướng cần bao gồm. (VI)</param>
+    /// <returns>An IQueryable of entities.</returns>
     public IQueryable<TEntity> GetNoTrackingEntities(
         params Expression<Func<TEntity, object>>[] includes)
     {
@@ -42,6 +47,11 @@ public class BaseRepository<TEntity, TKey>(
         return query;
     }
 
+    /// <summary>
+    /// Retrieves entities without tracking and with identity resolution, including specified navigation properties.<br/>(EN) Retrieves entities without tracking and with identity resolution, including specified navigation properties.<br/>(VI) Truy xuất các thực thể không theo dõi và với độ phân giải định danh, bao gồm các thuộc tính điều hướng được chỉ định.
+    /// </summary>
+    /// <param name="includes">Navigation properties to include. (EN)<br/>Các thuộc tính điều hướng cần bao gồm. (VI)</param>
+    /// <returns>An IQueryable of entities.</returns>
     public IQueryable<TEntity> GetNoTrackingEntitiesIdentityResolution(
         params Expression<Func<TEntity, object>>[] includes)
     {
@@ -51,6 +61,11 @@ public class BaseRepository<TEntity, TKey>(
         return query;
     }
 
+    /// <summary>
+    /// Retrieves a queryable table for the entity, including specified navigation properties.<br/>(EN) Retrieves a queryable table for the entity, including specified navigation properties.<br/>(VI) Truy xuất một bảng có thể truy vấn cho thực thể, bao gồm các thuộc tính điều hướng được chỉ định.
+    /// </summary>
+    /// <param name="includes">Navigation properties to include. (EN)<br/>Các thuộc tính điều hướng cần bao gồm. (VI)</param>
+    /// <returns>An IQueryable of entities.</returns>
     public IQueryable<TEntity> GetQueryableTable(
         params Expression<Func<TEntity, object>>[] includes)
     {
@@ -60,6 +75,11 @@ public class BaseRepository<TEntity, TKey>(
         return query;
     }
 
+    /// <summary>
+    /// Retrieves all entities asynchronously, including specified navigation properties.<br/>(EN) Retrieves all entities asynchronously, including specified navigation properties.<br/>(VI) Truy xuất tất cả các thực thể một cách bất đồng bộ, bao gồm các thuộc tính điều hướng được chỉ định.
+    /// </summary>
+    /// <param name="includes">Navigation properties to include. (EN)<br/>Các thuộc tính điều hướng cần bao gồm. (VI)</param>
+    /// <returns>A task representing the asynchronous operation, containing a list of all entities.</returns>
     public virtual Task<List<TEntity>> GetAllAsync(
         params Expression<Func<TEntity, object>>[] includes)
     {
@@ -69,6 +89,12 @@ public class BaseRepository<TEntity, TKey>(
         return entities;
     }
 
+    /// <summary>
+    /// Retrieves an entity by its identifier asynchronously, including specified navigation properties.<br/>(EN) Retrieves an entity by its identifier asynchronously, including specified navigation properties.<br/>(VI) Truy xuất một thực thể bằng mã định danh của nó một cách bất đồng bộ, bao gồm các thuộc tính điều hướng được chỉ định.
+    /// </summary>
+    /// <param name="id">The identifier of the entity. (EN)<br/>Mã định danh của thực thể. (VI)</param>
+    /// <param name="includes">Navigation properties to include. (EN)<br/>Các thuộc tính điều hướng cần bao gồm. (VI)</param>
+    /// <returns>A task representing the asynchronous operation, containing the entity if found, otherwise null.</returns>
     public virtual Task<TEntity?> GetByIdAsync(TKey id,
         params Expression<Func<TEntity, object>>[] includes)
     {
@@ -79,6 +105,12 @@ public class BaseRepository<TEntity, TKey>(
         return entity;
     }
 
+    /// <summary>
+    /// Retrieves an entity by its identifier without tracking asynchronously, including specified navigation properties.<br/>(EN) Retrieves an entity by its identifier without tracking asynchronously, including specified navigation properties.<br/>(VI) Truy xuất một thực thể bằng mã định danh của nó mà không theo dõi một cách bất đồng bộ, bao gồm các thuộc tính điều hướng được chỉ định.
+    /// </summary>
+    /// <param name="id">The identifier of the entity. (EN)<br/>Mã định danh của thực thể. (VI)</param>
+    /// <param name="includes">Navigation properties to include. (EN)<br/>Các thuộc tính điều hướng cần bao gồm. (VI)</param>
+    /// <returns>A task representing the asynchronous operation, containing the entity if found, otherwise null.</returns>
     public virtual Task<TEntity?> GetByIdNoTrackingAsync(TKey id,
         params Expression<Func<TEntity, object>>[] includes)
     {
@@ -88,6 +120,11 @@ public class BaseRepository<TEntity, TKey>(
         return entity;
     }
 
+    /// <summary>
+    /// Creates a new entity asynchronously.<br/>(EN) Creates a new entity asynchronously.<br/>(VI) Tạo một thực thể mới một cách bất đồng bộ.
+    /// </summary>
+    /// <param name="entity">The entity to create. (EN)<br/>Thực thể cần tạo. (VI)</param>
+    /// <returns>A task representing the asynchronous operation, containing the number of state entries written to the database.</returns>
     public virtual async Task<int> CreateAsync(TEntity entity)
     {
         ValidateAndThrow(entity);
@@ -98,6 +135,11 @@ public class BaseRepository<TEntity, TKey>(
         return countAffect;
     }
 
+    /// <summary>
+    /// Creates a list of new entities asynchronously.<br/>(EN) Creates a list of new entities asynchronously.<br/>(VI) Tạo một danh sách các thực thể mới một cách bất đồng bộ.
+    /// </summary>
+    /// <param name="entities">The list of entities to create. (EN)<br/>Danh sách các thực thể cần tạo. (VI)</param>
+    /// <returns>A task representing the asynchronous operation, containing the number of state entries written to the database.</returns>
     public virtual async Task<int> CreateAsync(List<TEntity> entities)
     {
         ValidateAndThrow(entities);
@@ -109,6 +151,11 @@ public class BaseRepository<TEntity, TKey>(
         return countAffect;
     }
 
+    /// <summary>
+    /// Updates an existing entity asynchronously.<br/>(EN) Updates an existing entity asynchronously.<br/>(VI) Cập nhật một thực thể hiện có một cách bất đồng bộ.
+    /// </summary>
+    /// <param name="entity">The entity to update. (EN)<br/>Thực thể cần cập nhật. (VI)</param>
+    /// <returns>A task representing the asynchronous operation, containing the number of state entries written to the database.</returns>
     public virtual Task<int> UpdateAsync(TEntity entity)
     {
         ValidateAndThrow(entity);
@@ -120,6 +167,11 @@ public class BaseRepository<TEntity, TKey>(
         return countAffect;
     }
 
+    /// <summary>
+    /// Updates a collection of existing entities asynchronously.<br/>(EN) Updates a collection of existing entities asynchronously.<br/>(VI) Cập nhật một tập hợp các thực thể hiện có một cách bất đồng bộ.
+    /// </summary>
+    /// <param name="entities">The collection of entities to update. (EN)<br/>Tập hợp các thực thể cần cập nhật. (VI)</param>
+    /// <returns>A task representing the asynchronous operation, containing the number of state entries written to the database.</returns>
     public virtual Task<int> UpdateAsync(IEnumerable<TEntity> entities)
     {
         var currentUserName = GetUserNameInHttpContext();
@@ -136,6 +188,12 @@ public class BaseRepository<TEntity, TKey>(
         return countAffect;
     }
 
+    /// <summary>
+    /// Deletes an entity permanently from the database asynchronously based on its key values.<br/>(EN) Deletes an entity permanently from the database asynchronously based on its key values.<br/>(VI) Xóa vĩnh viễn một thực thể khỏi cơ sở dữ liệu một cách bất đồng bộ dựa trên giá trị khóa của nó.
+    /// </summary>
+    /// <param name="keyValues">The key values of the entity to delete. (EN)<br/>Các giá trị khóa của thực thể cần xóa. (VI)</param>
+    /// <returns>A task representing the asynchronous operation, containing the number of state entries written to the database.</returns>
+    /// <exception cref="ArgumentException">Thrown if the number of key values does not match the number of primary key properties. (EN)<br/>Ném ngoại lệ nếu số lượng giá trị khóa không khớp với số lượng thuộc tính khóa chính. (VI)</exception>
     public virtual async Task<int> DeleteHardAsync(params object[] keyValues)
     {
         // Logic phức tạp hơn bên trong DeleteHardAsync để xây dựng biểu thức Where động
@@ -167,12 +225,21 @@ public class BaseRepository<TEntity, TKey>(
         return await Entities.Where(predicate).ExecuteDeleteAsync();
     }
 
+    /// <summary>
+    /// Deletes an entity permanently from the database.<br/>(EN) Deletes an entity permanently from the database.<br/>(VI) Xóa vĩnh viễn một thực thể khỏi cơ sở dữ liệu.
+    /// </summary>
+    /// <param name="entity">The entity to delete. (EN)<br/>Thực thể cần xóa. (VI)</param>
     public virtual void DeleteHard(TEntity entity)
     {
         ValidateAndThrow(entity);
         Entities.Remove(entity);
     }
 
+    /// <summary>
+    /// Soft deletes an entity asynchronously based on its key values by marking it as deleted.<br/>(EN) Soft deletes an entity asynchronously based on its key values by marking it as deleted.<br/>(VI) Xóa mềm một thực thể một cách bất đồng bộ dựa trên giá trị khóa của nó bằng cách đánh dấu nó đã bị xóa.
+    /// </summary>
+    /// <param name="keyValues">The key values of the entity to soft delete. (EN)<br/>Các giá trị khóa của thực thể cần xóa mềm. (VI)</param>
+    /// <returns>A task representing the asynchronous operation, containing the number of state entries written to the database.</returns>
     public virtual async Task<int> DeleteSoftAsync(params object[] keyValues)
     {
         var entity = await context.Set<TEntity>().FindAsync(keyValues);
@@ -181,6 +248,11 @@ public class BaseRepository<TEntity, TKey>(
         return await UpdateAsync(entity);
     }
 
+    /// <summary>
+    /// Soft deletes an entity asynchronously by marking it as deleted.<br/>(EN) Soft deletes an entity asynchronously by marking it as deleted.<br/>(VI) Xóa mềm một thực thể một cách bất đồng bộ bằng cách đánh dấu nó đã bị xóa.
+    /// </summary>
+    /// <param name="entity">The entity to soft delete. (EN)<br/>Thực thể cần xóa mềm. (VI)</param>
+    /// <returns>A task representing the asynchronous operation, containing the number of state entries written to the database.</returns>
     public virtual async Task<int> DeleteSoftAsync(TEntity entity)
     {
         ValidateAndThrow(entity);
@@ -194,6 +266,11 @@ public class BaseRepository<TEntity, TKey>(
 
     protected DbSet<TEntity> Entities => EntitiesDbSet ??= context.Set<TEntity>();
 
+    /// <summary>
+    /// Retrieves the user name from the HTTP context.<br/>(EN) Retrieves the user name from the HTTP context.<br/>(VI) Truy xuất tên người dùng từ ngữ cảnh HTTP.
+    /// </summary>
+    /// <returns>The user name.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if the user name is null. (EN)<br/>Ném ngoại lệ nếu tên người dùng là null. (VI)</exception>
     protected string GetUserNameInHttpContext()
     {
         var userName = httpContextAccessor?.HttpContext?.User
@@ -203,12 +280,20 @@ public class BaseRepository<TEntity, TKey>(
         return userName;
     }
 
+    /// <summary>
+    /// Validates an entity and throws an ArgumentNullException if it is null.<br/>(EN) Validates an entity and throws an ArgumentNullException if it is null.<br/>(VI) Xác thực một thực thể và ném ArgumentNullException nếu nó là null.
+    /// </summary>
+    /// <param name="entity">The entity to validate. (EN)<br/>Thực thể cần xác thực. (VI)</param>
     protected void ValidateAndThrow(TEntity? entity)
     {
         if (entity != null) return;
         throw new ArgumentNullException(nameof(entity));
     }
 
+    /// <summary>
+    /// Validates a collection of entities and throws an ArgumentNullException if it is null or empty.<br/>(EN) Validates a collection of entities and throws an ArgumentNullException if it is null or empty.<br/>(VI) Xác thực một tập hợp các thực thể và ném ArgumentNullException nếu nó là null hoặc trống.
+    /// </summary>
+    /// <param name="entities">The collection of entities to validate. (EN)<br/>Tập hợp các thực thể cần xác thực. (VI)</param>
     protected void ValidateAndThrow(IEnumerable<TEntity> entities)
     {
         if (entities == null || !entities.Any()) throw new ArgumentNullException(nameof(entities));

@@ -1,7 +1,7 @@
 using CoreFinance.Application.DTOs.Account;
 using CoreFinance.Application.Services;
-using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.Enums;
 using CoreFinance.Domain.Exceptions;
 using CoreFinance.Domain.UnitOfWorks;
@@ -14,6 +14,11 @@ namespace CoreFinance.Application.Tests.AccountServiceTests;
 
 public partial class AccountServiceTests
 {
+    /// <summary>
+    /// Verifies that CreateAsync returns a ViewModel when the creation is successful. (EN)
+    /// <br/>
+    /// Xác minh rằng CreateAsync trả về ViewModel khi việc tạo thành công. (VI)
+    /// </summary>
     [Fact]
     public async Task CreateAsync_ShouldReturnViewModel_WhenCreationIsSuccessful()
     {
@@ -63,6 +68,11 @@ public partial class AccountServiceTests
         transactionMock.Verify(t => t.DisposeAsync(), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that CreateAsync throws a CreateFailedException when the repository returns a zero affected count. (EN)
+    /// <br/>
+    /// Xác minh rằng CreateAsync ném ra CreateFailedException khi repository trả về số bản ghi bị ảnh hưởng bằng không. (VI)
+    /// </summary>
     [Fact]
     public async Task CreateAsync_ShouldThrowNullReferenceException_WhenRepositoryReturnsZeroAffectedCount()
     {
@@ -99,6 +109,11 @@ public partial class AccountServiceTests
         transactionMock.Verify(t => t.DisposeAsync(), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that CreateAsync rolls back the transaction when the repository throws an exception during creation. (EN)
+    /// <br/>
+    /// Xác minh rằng CreateAsync thực hiện rollback giao dịch khi repository ném ra một ngoại lệ trong quá trình tạo. (VI)
+    /// </summary>
     [Fact]
     public async Task CreateAsync_ShouldRollbackTransaction_WhenRepositoryThrowsException()
     {

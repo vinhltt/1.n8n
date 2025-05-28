@@ -5,12 +5,15 @@ using CoreFinance.Application.Services.Base;
 using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Contracts.DTOs;
 using CoreFinance.Contracts.EntityFrameworkUtilities;
-using CoreFinance.Domain;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.UnitOfWorks;
 using Microsoft.Extensions.Logging;
 
 namespace CoreFinance.Application.Services;
 
+/// <summary>
+/// Service for managing accounts.<br/>(EN) Service for managing accounts.<br/>(VI) Dịch vụ quản lý tài khoản.
+/// </summary>
 public class AccountService(
     IMapper mapper,
     IUnitOfWork unitOffWork,
@@ -19,6 +22,11 @@ public class AccountService(
             logger),
         IAccountService
 {
+    /// <summary>
+    /// Gets a paginated list of accounts based on a filter request.<br/>(EN) Gets a paginated list of accounts based on a filter request.<br/>(VI) Lấy danh sách tài khoản có phân trang dựa trên yêu cầu lọc.
+    /// </summary>
+    /// <param name="request">The filter request body.</param>
+    /// <returns>A paginated list of account view models.</returns>
     public async Task<IBasePaging<AccountViewModel>?> GetPagingAsync(IFilterBodyRequest request)
     {
         var query =

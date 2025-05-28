@@ -1,6 +1,6 @@
 using CoreFinance.Application.Services;
-using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.Enums;
 using CoreFinance.Domain.UnitOfWorks;
 using Microsoft.Extensions.Logging;
@@ -13,6 +13,11 @@ namespace CoreFinance.Application.Tests.RecurringTransactionTemplateServiceTests
 // Tests for the GetTemplatesByAccountAsync method of RecurringTransactionTemplateService
 public partial class RecurringTransactionTemplateServiceTests
 {
+    /// <summary>
+    /// Verifies that GetTemplatesByAccountAsync returns templates associated with the specified account ID.<br/>
+    /// (EN) Verifies that GetTemplatesByAccountAsync returns templates associated with the specified account ID.<br/>
+    /// (VI) Xác minh rằng GetTemplatesByAccountAsync trả về các mẫu liên quan đến ID tài khoản được chỉ định.
+    /// </summary>
     [Fact]
     public async Task GetTemplatesByAccountAsync_ShouldReturnTemplatesForSpecificAccount()
     {
@@ -66,9 +71,14 @@ public partial class RecurringTransactionTemplateServiceTests
         recurringTransactionTemplateViewModels.Should().HaveCount(2);
         recurringTransactionTemplateViewModels.Should().OnlyContain(t => t.AccountId == accountId);
         recurringTransactionTemplateViewModels.Select(t => t.Name).Should()
-            .Contain(new[] { "Account Template 1", "Account Template 2" });
+            .Contain(["Account Template 1", "Account Template 2"]);
     }
 
+    /// <summary>
+    /// Verifies that GetTemplatesByAccountAsync returns an empty list when the account has no associated templates.<br/>
+    /// (EN) Verifies that GetTemplatesByAccountAsync returns an empty list when the account has no associated templates.<br/>
+    /// (VI) Xác minh rằng GetTemplatesByAccountAsync trả về danh sách rỗng khi tài khoản không có mẫu liên quan.
+    /// </summary>
     [Fact]
     public async Task GetTemplatesByAccountAsync_ShouldReturnEmptyList_WhenAccountHasNoTemplates()
     {
@@ -108,6 +118,11 @@ public partial class RecurringTransactionTemplateServiceTests
         recurringTransactionTemplateViewModels.Should().BeEmpty();
     }
 
+    /// <summary>
+    /// Verifies that GetTemplatesByAccountAsync returns an empty list when no templates exist in the repository.<br/>
+    /// (EN) Verifies that GetTemplatesByAccountAsync returns an empty list when no templates exist in the repository.<br/>
+    /// (VI) Xác minh rằng GetTemplatesByAccountAsync trả về danh sách rỗng khi không có mẫu nào tồn tại trong repository.
+    /// </summary>
     [Fact]
     public async Task GetTemplatesByAccountAsync_ShouldReturnEmptyList_WhenNoTemplatesExist()
     {
@@ -134,6 +149,11 @@ public partial class RecurringTransactionTemplateServiceTests
         recurringTransactionTemplateViewModels.Should().BeEmpty();
     }
 
+    /// <summary>
+    /// Verifies that GetTemplatesByAccountAsync returns both active and inactive templates for the specified account.<br/>
+    /// (EN) Verifies that GetTemplatesByAccountAsync returns both active and inactive templates for the specified account.<br/>
+    /// (VI) Xác minh rằng GetTemplatesByAccountAsync trả về cả mẫu đang hoạt động và không hoạt động cho tài khoản được chỉ định.
+    /// </summary>
     [Fact]
     public async Task GetTemplatesByAccountAsync_ShouldReturnBothActiveAndInactiveTemplates()
     {
@@ -195,6 +215,11 @@ public partial class RecurringTransactionTemplateServiceTests
         inactiveTemplate.TransactionType.Should().Be(RecurringTransactionType.Expense);
     }
 
+    /// <summary>
+    /// Verifies that GetTemplatesByAccountAsync returns recurring transaction templates with the correct properties mapped to the ViewModel.<br/>
+    /// (EN) Verifies that GetTemplatesByAccountAsync returns recurring transaction templates with the correct properties mapped to the ViewModel.<br/>
+    /// (VI) Xác minh rằng GetTemplatesByAccountAsync trả về các mẫu giao dịch định kỳ với các thuộc tính chính xác được ánh xạ tới ViewModel.
+    /// </summary>
     [Fact]
     public async Task GetTemplatesByAccountAsync_ShouldReturnCorrectTemplateProperties()
     {
@@ -259,6 +284,11 @@ public partial class RecurringTransactionTemplateServiceTests
         template.DaysInAdvance.Should().Be(30);
     }
 
+    /// <summary>
+    /// Verifies that GetTemplatesByAccountAsync returns multiple templates with different frequencies for the specified account.<br/>
+    /// (EN) Verifies that GetTemplatesByAccountAsync returns multiple templates with different frequencies for the specified account.<br/>
+    /// (VI) Xác minh rằng GetTemplatesByAccountAsync trả về nhiều mẫu với các tần suất khác nhau cho tài khoản được chỉ định.
+    /// </summary>
     [Fact]
     public async Task GetTemplatesByAccountAsync_ShouldReturnMultipleTemplatesWithDifferentFrequencies()
     {

@@ -5,7 +5,7 @@ using CoreFinance.Application.Services.Base;
 using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Contracts.DTOs;
 using CoreFinance.Contracts.EntityFrameworkUtilities;
-using CoreFinance.Domain;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.Enums;
 using CoreFinance.Domain.UnitOfWorks;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +13,9 @@ using Microsoft.Extensions.Logging;
 
 namespace CoreFinance.Application.Services;
 
+/// <summary>
+/// Service for managing recurring transaction templates.<br/>(EN) Service for managing recurring transaction templates.<br/>(VI) Dịch vụ quản lý các mẫu giao dịch định kỳ.
+/// </summary>
 public class RecurringTransactionTemplateService(
     IMapper mapper,
     IUnitOfWork unitOfWork,
@@ -22,6 +25,11 @@ public class RecurringTransactionTemplateService(
             logger),
         IRecurringTransactionTemplateService
 {
+    /// <summary>
+    /// Gets a paginated list of recurring transaction templates based on a filter request.<br/>(EN) Gets a paginated list of recurring transaction templates based on a filter request.<br/>(VI) Lấy danh sách mẫu giao dịch định kỳ có phân trang dựa trên yêu cầu lọc.
+    /// </summary>
+    /// <param name="request">The filter request body.</param>
+    /// <returns>A paginated list of recurring transaction template view models.</returns>
     public async Task<IBasePaging<RecurringTransactionTemplateViewModel>?> GetPagingAsync(IFilterBodyRequest request)
     {
         var query = Mapper.ProjectTo<RecurringTransactionTemplateViewModel>(
@@ -40,6 +48,11 @@ public class RecurringTransactionTemplateService(
         return await query.ToPagingAsync(request);
     }
 
+    /// <summary>
+    /// Gets a list of active recurring transaction templates for a user.<br/>(EN) Gets a list of active recurring transaction templates for a user.<br/>(VI) Lấy danh sách các mẫu giao dịch định kỳ đang hoạt động cho người dùng.
+    /// </summary>
+    /// <param name="userId">The user ID.</param>
+    /// <returns>A list of active recurring transaction templates.</returns>
     public async Task<IEnumerable<RecurringTransactionTemplateViewModel>> GetActiveTemplatesAsync(Guid userId)
     {
         var query = UnitOffWork.Repository<RecurringTransactionTemplate, Guid>()
@@ -49,6 +62,11 @@ public class RecurringTransactionTemplateService(
         return await Mapper.ProjectTo<RecurringTransactionTemplateViewModel>(query).ToListAsync();
     }
 
+    /// <summary>
+    /// Gets a list of recurring transaction templates associated with a specific account.<br/>(EN) Gets a list of recurring transaction templates associated with a specific account.<br/>(VI) Lấy danh sách các mẫu giao dịch định kỳ liên quan đến một tài khoản cụ thể.
+    /// </summary>
+    /// <param name="accountId">The account ID.</param>
+    /// <returns>A list of recurring transaction templates by account.</returns>
     public async Task<IEnumerable<RecurringTransactionTemplateViewModel>> GetTemplatesByAccountAsync(Guid accountId)
     {
         var query = UnitOffWork.Repository<RecurringTransactionTemplate, Guid>()
@@ -58,6 +76,12 @@ public class RecurringTransactionTemplateService(
         return await Mapper.ProjectTo<RecurringTransactionTemplateViewModel>(query).ToListAsync();
     }
 
+    /// <summary>
+    /// Toggles the active status of a recurring transaction template.<br/>(EN) Toggles the active status of a recurring transaction template.<br/>(VI) Chuyển đổi trạng thái hoạt động của một mẫu giao dịch định kỳ.
+    /// </summary>
+    /// <param name="templateId">The ID of the template to toggle.</param>
+    /// <param name="isActive">The new active status.</param>
+    /// <returns>True if the status was successfully toggled, false otherwise.</returns>
     public async Task<bool> ToggleActiveStatusAsync(Guid templateId, bool isActive)
     {
         await using var trans = await UnitOffWork.BeginTransactionAsync();
@@ -86,6 +110,11 @@ public class RecurringTransactionTemplateService(
         }
     }
 
+    /// <summary>
+    /// Calculates the next execution date for a recurring transaction template.<br/>(EN) Calculates the next execution date for a recurring transaction template.<br/>(VI) Tính toán ngày thực hiện tiếp theo cho một mẫu giao dịch định kỳ.
+    /// </summary>
+    /// <param name="templateId">The ID of the template.</param>
+    /// <returns>The next execution date.</returns>
     public async Task<DateTime> CalculateNextExecutionDateAsync(Guid templateId)
     {
         var template = await UnitOffWork.Repository<RecurringTransactionTemplate, Guid>()
@@ -97,6 +126,12 @@ public class RecurringTransactionTemplateService(
         return CalculateNextExecutionDate(template.NextExecutionDate, template.Frequency, template.CustomIntervalDays);
     }
 
+    /// <summary>
+    /// Generates expected transactions for a specific recurring transaction template within a number of days in advance.<br/>(EN) Generates expected transactions for a specific recurring transaction template within a number of days in advance.<br/>(VI) Tạo các giao dịch dự kiến cho một mẫu giao dịch định kỳ cụ thể trong một số ngày tới.
+    /// </summary>
+    /// <param name="templateId">The ID of the template.</param>
+    /// <param name="daysInAdvance">The number of days in advance to generate transactions for.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task GenerateExpectedTransactionsAsync(Guid templateId, int daysInAdvance)
     {
         await using var trans = await UnitOffWork.BeginTransactionAsync();
@@ -113,6 +148,12 @@ public class RecurringTransactionTemplateService(
         }
     }
 
+    /// <summary>
+    /// Generates expected transactions internally for a specific recurring transaction template within a number of days in advance.<br/>(EN) Generates expected transactions internally for a specific recurring transaction template within a number of days in advance.<br/>(VI) Tạo các giao dịch dự kiến nội bộ cho một mẫu giao dịch định kỳ cụ thể trong một số ngày tới.
+    /// </summary>
+    /// <param name="templateId">The ID of the template.</param>
+    /// <param name="daysInAdvance">The number of days in advance to generate transactions for.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     private async Task GenerateExpectedTransactionsInternalAsync(Guid templateId, int daysInAdvance)
     {
         var template = await UnitOffWork.Repository<RecurringTransactionTemplate, Guid>()
@@ -176,6 +217,10 @@ public class RecurringTransactionTemplateService(
         await UnitOffWork.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Generates expected transactions for all active recurring transaction templates.<br/>(EN) Generates expected transactions for all active recurring transaction templates.<br/>(VI) Tạo các giao dịch dự kiến cho tất cả các mẫu giao dịch định kỳ đang hoạt động.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task GenerateExpectedTransactionsForAllActiveTemplatesAsync()
     {
         await using var trans = await UnitOffWork.BeginTransactionAsync();
@@ -201,6 +246,13 @@ public class RecurringTransactionTemplateService(
         }
     }
 
+    /// <summary>
+    /// Calculates the next execution date based on the current date, frequency, and custom interval.<br/>(EN) Calculates the next execution date based on the current date, frequency, and custom interval.<br/>(VI) Tính toán ngày thực hiện tiếp theo dựa trên ngày hiện tại, tần suất và khoảng thời gian tùy chỉnh.
+    /// </summary>
+    /// <param name="currentDate">The current date.</param>
+    /// <param name="frequency">The recurrence frequency.</param>
+    /// <param name="customIntervalDays">The custom interval in days (if frequency is Custom).</param>
+    /// <returns>The next execution date.</returns>
     private static DateTime CalculateNextExecutionDate(DateTime currentDate, RecurrenceFrequency frequency,
         int? customIntervalDays)
     {
@@ -218,6 +270,11 @@ public class RecurringTransactionTemplateService(
         };
     }
 
+    /// <summary>
+    /// Creates a new recurring transaction template.<br/>(EN) Creates a new recurring transaction template.<br/>(VI) Tạo một mẫu giao dịch định kỳ mới.
+    /// </summary>
+    /// <param name="request">The create request.</param>
+    /// <returns>The created recurring transaction template view model.</returns>
     public override async Task<RecurringTransactionTemplateViewModel?> CreateAsync(
         RecurringTransactionTemplateCreateRequest request)
     {
@@ -238,6 +295,12 @@ public class RecurringTransactionTemplateService(
         return result;
     }
 
+    /// <summary>
+    /// Updates an existing recurring transaction template.<br/>(EN) Updates an existing recurring transaction template.<br/>(VI) Cập nhật một mẫu giao dịch định kỳ hiện có.
+    /// </summary>
+    /// <param name="id">The ID of the template to update.</param>
+    /// <param name="request">The update request.</param>
+    /// <returns>The updated recurring transaction template view model.</returns>
     public override async Task<RecurringTransactionTemplateViewModel?> UpdateAsync(Guid id,
         RecurringTransactionTemplateUpdateRequest request)
     {

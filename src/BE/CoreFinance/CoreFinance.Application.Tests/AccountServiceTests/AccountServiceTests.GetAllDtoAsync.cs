@@ -1,7 +1,7 @@
 using CoreFinance.Application.DTOs.Account;
 using CoreFinance.Application.Services;
-using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.Enums;
 using CoreFinance.Domain.UnitOfWorks;
 using FluentAssertions;
@@ -11,9 +11,19 @@ using Moq;
 
 namespace CoreFinance.Application.Tests.AccountServiceTests;
 
+/// <summary>
+/// Contains test cases for the GetAllDtoAsync method of AccountService. (EN)
+/// <br/>
+/// Chứa các trường hợp kiểm thử cho phương thức GetAllDtoAsync của AccountService. (VI)
+/// </summary>
 // Tests for the GetAllDtoAsync method of AccountService
 public partial class AccountServiceTests
 {
+    /// <summary>
+    /// Verifies that GetAllDtoAsync returns all accounts correctly when accounts exist. (EN)
+    /// <br/>
+    /// Xác minh rằng GetAllDtoAsync trả về tất cả các tài khoản một cách chính xác khi có tài khoản tồn tại. (VI)
+    /// </summary>
     [Fact]
     public async Task GetAllDtoAsync_ShouldReturnAllAccounts_WhenAccountsExist()
     {
@@ -64,6 +74,11 @@ public partial class AccountServiceTests
         repoMock.Verify(r => r.GetNoTrackingEntities(), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that GetAllDtoAsync returns an empty list when no accounts exist in the repository. (EN)
+    /// <br/>
+    /// Xác minh rằng GetAllDtoAsync trả về danh sách rỗng khi không có tài khoản nào tồn tại trong repository. (VI)
+    /// </summary>
     [Fact]
     public async Task GetAllDtoAsync_ShouldReturnEmptyList_WhenNoAccountsExist()
     {

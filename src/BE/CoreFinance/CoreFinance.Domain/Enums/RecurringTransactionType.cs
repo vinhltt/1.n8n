@@ -1,22 +1,30 @@
 namespace CoreFinance.Domain.Enums;
 
 /// <summary>
-/// Represents the type of recurring transaction
+/// Represents the type of recurring transaction. (EN)
+/// <br/>
+/// Biểu thị loại giao dịch định kỳ. (VI)
 /// </summary>
 public enum RecurringTransactionType
 {
     /// <summary>
-    /// Income transaction
+    /// Income transaction. (EN)
+    /// <br/>
+    /// Giao dịch thu nhập. (VI)
     /// </summary>
     Income,
     
     /// <summary>
-    /// Expense transaction
+    /// Expense transaction. (EN)
+    /// <br/>
+    /// Giao dịch chi tiêu. (VI)
     /// </summary>
     Expense,
     
     /// <summary>
-    /// Transfer transaction
+    /// Transfer transaction. (EN)
+    /// <br/>
+    /// Giao dịch chuyển khoản. (VI)
     /// </summary>
     Transfer
 } 

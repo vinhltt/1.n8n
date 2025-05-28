@@ -3,8 +3,18 @@ using CoreFinance.Application.DTOs.ExpectedTransaction;
 
 namespace CoreFinance.Application.Validators;
 
+/// <summary>
+/// Validates the <see cref="ExpectedTransactionUpdateRequest"/>. (EN)
+/// <br/>
+/// Thực hiện xác thực cho <see cref="ExpectedTransactionUpdateRequest"/>. (VI)
+/// </summary>
 public class ExpectedTransactionUpdateRequestValidator : AbstractValidator<ExpectedTransactionUpdateRequest>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExpectedTransactionUpdateRequestValidator"/> class. (EN)
+    /// <br/>
+    /// Khởi tạo một phiên bản mới của lớp <see cref="ExpectedTransactionUpdateRequestValidator"/>. (VI)
+    /// </summary>
     public ExpectedTransactionUpdateRequestValidator()
     {
         RuleFor(x => x.Id).NotEmpty();

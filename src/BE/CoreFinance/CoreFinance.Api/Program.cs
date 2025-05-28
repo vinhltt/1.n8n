@@ -1,9 +1,10 @@
+using CoreFinance.Api.Infrastructures.Modules;
+using CoreFinance.Api.Infrastructures.ServicesExtensions;
+using CoreFinance.Contracts.ConfigurationOptions;
+using CoreFinance.Contracts.Utilities;
 using CoreFinance.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using CoreFinance.Api.Infrastructures.ServicesExtensions;
-using CoreFinance.Contracts.Utilities;
 using Serilog;
-using CoreFinance.Contracts.ConfigurationOptions;
 
 async Task CreateDbIfNotExistsAsync(IHost host)
 {
@@ -44,6 +45,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var corsOption = configuration.GetOptions<CorsOptions>("CorsOptions");
 var policyName = corsOption!.PolicyName.Nullify("AppCorsPolicy");
+builder.AddConfigurationSettings();
 builder.AddGeneralConfigurations(policyName, corsOption);
 builder.Services.AddInjectedServices();
 builder.Host.UseSerilog((hostingContext, loggerConfiguration) =>

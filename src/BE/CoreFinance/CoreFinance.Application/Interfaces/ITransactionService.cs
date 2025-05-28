@@ -2,13 +2,20 @@ using CoreFinance.Application.DTOs.Transaction;
 using CoreFinance.Application.Services.Base;
 using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Contracts.DTOs;
-using CoreFinance.Domain;
+using CoreFinance.Domain.Entities;
 
 namespace CoreFinance.Application.Interfaces;
 
+/// <summary>
+/// Represents the service interface for managing transactions.<br/>(EN) Represents the service interface for managing transactions.<br/>(VI) Đại diện cho interface dịch vụ quản lý giao dịch.
+/// </summary>
 public interface ITransactionService :
     IBaseService<Transaction, TransactionCreateRequest, TransactionUpdateRequest, TransactionViewModel, Guid>
 {
-    // Add custom methods for Transaction if needed
+    /// <summary>
+    /// Gets a paginated list of transactions.<br/>(EN) Gets a paginated list of transactions.<br/>(VI) Lấy danh sách giao dịch có phân trang.
+    /// </summary>
+    /// <param name="request">The filter request body.</param>
+    /// <returns>A paginated list of transactions.</returns>
     Task<IBasePaging<TransactionViewModel>?> GetPagingAsync(IFilterBodyRequest request);
 }

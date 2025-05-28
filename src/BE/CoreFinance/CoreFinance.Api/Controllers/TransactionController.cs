@@ -1,13 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using CoreFinance.Application.Interfaces;
-using CoreFinance.Domain;
 using CoreFinance.Api.Controllers.Base;
 using CoreFinance.Application.DTOs.Transaction;
 using CoreFinance.Contracts.BaseEfModels;
 using CoreFinance.Contracts.DTOs;
+using CoreFinance.Domain.Entities;
 
 namespace CoreFinance.Api.Controllers;
 
+/// <summary>
+/// Controller for managing transactions. (EN)
+/// <br/>
+/// Controller để quản lý các giao dịch. (VI)
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class TransactionController(

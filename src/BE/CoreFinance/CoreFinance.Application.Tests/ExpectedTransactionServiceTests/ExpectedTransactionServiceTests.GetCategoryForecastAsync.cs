@@ -1,6 +1,6 @@
 using CoreFinance.Application.Services;
-using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.Enums;
 using CoreFinance.Domain.UnitOfWorks;
 using Microsoft.Extensions.Logging;
@@ -13,6 +13,9 @@ namespace CoreFinance.Application.Tests.ExpectedTransactionServiceTests;
 // Tests for the GetCategoryForecastAsync method of ExpectedTransactionService
 public partial class ExpectedTransactionServiceTests
 {
+    /// <summary>
+    /// Verifies that GetCategoryForecastAsync returns the correct category breakdown with aggregated amounts.<br/>(EN) Verifies that GetCategoryForecastAsync returns the correct category breakdown with aggregated amounts.<br/>(VI) Xác minh rằng GetCategoryForecastAsync trả về phân tích danh mục chính xác với tổng số tiền.
+    /// </summary>
     [Fact]
     public async Task GetCategoryForecastAsync_ShouldReturnCorrectCategoryBreakdown()
     {
@@ -88,6 +91,9 @@ public partial class ExpectedTransactionServiceTests
         result["Transport"].Should().Be(-1500m); // Expense is negative
     }
 
+    /// <summary>
+    /// Verifies that GetCategoryForecastAsync ignores transactions with null or empty category.<br/>(EN) Verifies that GetCategoryForecastAsync ignores transactions with null or empty category.<br/>(VI) Xác minh rằng GetCategoryForecastAsync bỏ qua các giao dịch có danh mục null hoặc rỗng.
+    /// </summary>
     [Fact]
     public async Task GetCategoryForecastAsync_ShouldIgnoreTransactionsWithNullOrEmptyCategory()
     {
@@ -162,6 +168,9 @@ public partial class ExpectedTransactionServiceTests
         result["Food"].Should().Be(-800m);
     }
 
+    /// <summary>
+    /// Verifies that GetCategoryForecastAsync ignores non-pending transactions.<br/>(EN) Verifies that GetCategoryForecastAsync ignores non-pending transactions.<br/>(VI) Xác minh rằng GetCategoryForecastAsync bỏ qua các giao dịch không ở trạng thái chờ xử lý.
+    /// </summary>
     [Fact]
     public async Task GetCategoryForecastAsync_ShouldIgnoreNonPendingTransactions()
     {
@@ -225,6 +234,9 @@ public partial class ExpectedTransactionServiceTests
         result["Salary"].Should().Be(5000m);
     }
 
+    /// <summary>
+    /// Verifies that GetCategoryForecastAsync filters transactions by User ID.<br/>(EN) Verifies that GetCategoryForecastAsync filters transactions by User ID.<br/>(VI) Xác minh rằng GetCategoryForecastAsync lọc các giao dịch theo ID người dùng.
+    /// </summary>
     [Fact]
     public async Task GetCategoryForecastAsync_ShouldFilterByUserId()
     {
@@ -279,6 +291,11 @@ public partial class ExpectedTransactionServiceTests
         result["Salary"].Should().Be(5000m); // Only the transaction for the specified user
     }
 
+    /// <summary>
+    /// Verifies that GetCategoryForecastAsync returns an empty dictionary when there are no valid transactions (within date range, with category, pending). (EN)
+    /// <br/>
+    /// Xác minh rằng GetCategoryForecastAsync trả về một dictionary rỗng khi không có giao dịch hợp lệ nào (trong phạm vi ngày, có danh mục, đang chờ xử lý). (VI)
+    /// </summary>
     [Fact]
     public async Task GetCategoryForecastAsync_ShouldReturnEmptyDictionary_WhenNoValidTransactions()
     {
@@ -331,6 +348,11 @@ public partial class ExpectedTransactionServiceTests
         result.Should().BeEmpty();
     }
 
+    /// <summary>
+    /// Verifies that GetCategoryForecastAsync correctly handles mixed income and expense transactions within the same category. (EN)
+    /// <br/>
+    /// Xác minh rằng GetCategoryForecastAsync xử lý đúng các giao dịch thu nhập và chi phí hỗn hợp trong cùng một danh mục. (VI)
+    /// </summary>
     [Fact]
     public async Task GetCategoryForecastAsync_ShouldHandleMixedIncomeAndExpenseInSameCategory()
     {

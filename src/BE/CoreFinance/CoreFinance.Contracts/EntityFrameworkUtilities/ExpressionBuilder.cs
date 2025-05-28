@@ -20,12 +20,12 @@ internal class Criteria
 public static class ExpressionBuilder
 {
     /// <summary>
-    ///     Builds the filter expression by filter descriptor.
+    /// Builds a filter expression from a single filter descriptor.<br/>(EN) Builds a filter expression from a single filter descriptor.<br/>(VI) Xây dựng biểu thức lọc từ một mô tả lọc duy nhất.
     /// </summary>
-    /// <typeparam name="TModel">The type of the model.</typeparam>
-    /// <param name="filterDescriptor">The filter descriptor.</param>
-    /// <param name="parameterName">Name of the parameter.</param>
-    /// <returns></returns>
+    /// <typeparam name="TModel">The type of the model to filter. (EN)<br/>Kiểu dữ liệu của model cần lọc. (VI)</typeparam>
+    /// <param name="filterDescriptor">The filter descriptor. (EN)<br/>Mô tả lọc. (VI)</param>
+    /// <param name="parameterName">The name of the parameter in the lambda expression. (EN)<br/>Tên của tham số trong biểu thức lambda. (VI)</param>
+    /// <returns>A lambda expression that can be used for filtering.</returns>
     public static Expression<Func<TModel, bool>> Build<TModel>(FilterDescriptor? filterDescriptor,
         string parameterName = "x")
         where TModel : class
@@ -42,12 +42,13 @@ public static class ExpressionBuilder
     }
 
     /// <summary>
-    ///     Builds the filter expression by filter descriptor.
+    /// Builds a filter expression from a collection of filter descriptors.<br/>(EN) Builds a filter expression from a collection of filter descriptors.<br/>(VI) Xây dựng biểu thức lọc từ một tập hợp các mô tả lọc.
     /// </summary>
-    /// <typeparam name="TModel">The type of the model.</typeparam>
-    /// <param name="filterDescriptors">The filter descriptors.</param>
-    /// <param name="parameterName">Name of the parameter.</param>
-    /// <returns></returns>
+    /// <typeparam name="TModel">The type of the model to filter. (EN)<br/>Kiểu dữ liệu của model cần lọc. (VI)</typeparam>
+    /// <param name="filterDescriptors">The collection of filter descriptors. (EN)<br/>Tập hợp các mô tả lọc. (VI)</param>
+    /// <param name="parameterName">The name of the parameter in the lambda expression. (EN)<br/>Tên của tham số trong biểu thức lambda. (VI)</param>
+    /// <returns>A lambda expression that can be used for filtering.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if filterDescriptors is null.</exception>
     public static Expression<Func<TModel, bool>> Build<TModel>(
         IEnumerable<FilterDescriptor>? filterDescriptors, string parameterName = "x")
         where TModel : class
@@ -78,17 +79,13 @@ public static class ExpressionBuilder
     }
 
     /// <summary>
-    ///     Creates the filter expression by filter descriptor.
+    /// Creates an expression for a specific filter criterion.<br/>(EN) Creates an expression for a specific filter criterion.<br/>(VI) Tạo biểu thức cho một tiêu chí lọc cụ thể.
     /// </summary>
-    /// <param name="parameter">The parameter.</param>
-    /// <param name="filterDescriptor">The filter descriptor.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">
-    ///     parameter
-    ///     or
-    ///     filterDescriptor
-    /// </exception>
-    /// <exception cref="NotSupportedException"></exception>
+    /// <param name="parameter">The parameter expression. (EN)<br/>Biểu thức tham số. (VI)</param>
+    /// <param name="filterDescriptor">The criteria for filtering. (EN)<br/>Tiêu chí lọc. (VI)</param>
+    /// <returns>An Expression representing the filter criterion.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if parameter or filterDescriptor is null.</exception>
+    /// <exception cref="NotSupportedException">Thrown if the filter operator is not supported for the value type.</exception>
     private static Expression? CreateExpression(Expression parameter, Criteria filterDescriptor)
     {
         ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
@@ -250,13 +247,13 @@ public static class ExpressionBuilder
     }
 
     /// <summary>
-    ///     Creates the type of the expression for enum.
+    /// Creates an expression for filtering enum types.<br/>(EN) Creates an expression for filtering enum types.<br/>(VI) Tạo biểu thức để lọc các kiểu enum.
     /// </summary>
-    /// <param name="member">The member.</param>
-    /// <param name="value">The value.</param>
-    /// <param name="filterDescriptor">The filter descriptor.</param>
-    /// <returns></returns>
-    /// <exception cref="NotSupportedException">'{operationType}' is not supported by '{value.Type}'</exception>
+    /// <param name="member">The member expression representing the enum property. (EN)<br/>Biểu thức thành viên biểu thị thuộc tính enum. (VI)</param>
+    /// <param name="value">The value expression to filter by. (EN)<br/>Biểu thức giá trị để lọc theo. (VI)</param>
+    /// <param name="filterDescriptor">The criteria for filtering. (EN)<br/>Tiêu chí lọc. (VI)</param>
+    /// <returns>An Expression representing the filter criterion for enum types.</returns>
+    /// <exception cref="NotSupportedException">Thrown if the filter operator is not supported for enum types.</exception>
     private static Expression CreateExpressionForEnumType(Expression member, Expression value,
         Criteria filterDescriptor)
     {
@@ -285,12 +282,13 @@ public static class ExpressionBuilder
     }
 
     /// <summary>
-    ///     Throws if invalid.
+    /// Converts a FilterDescriptor object into a Criteria object for internal use.<br/>(EN) Converts a FilterDescriptor object into a Criteria object for internal use.<br/>(VI) Chuyển đổi đối tượng FilterDescriptor thành đối tượng Criteria để sử dụng nội bộ.
     /// </summary>
-    /// <param name="filter">The filter.</param>
-    /// <exception cref="ArgumentNullException">filter</exception>
-    /// <exception cref="ArgumentException">
-    /// </exception>
+    /// <param name="filter">The FilterDescriptor object. (EN)<br/>Đối tượng FilterDescriptor. (VI)</param>
+    /// <returns>A Criteria object representing the filter.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if filter is null.</exception>
+    /// <exception cref="ArgumentException">Thrown if the filter descriptor is invalid for the specified operator.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the filter operator is not recognized.</exception>
     private static Criteria GetCriteria(FilterDescriptor? filter)
     {
         ArgumentNullException.ThrowIfNull(filter, nameof(filter));

@@ -1,6 +1,6 @@
 using CoreFinance.Application.Services;
-using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.Enums;
 using CoreFinance.Domain.UnitOfWorks;
 using FluentAssertions;
@@ -10,8 +10,18 @@ using Moq;
 
 namespace CoreFinance.Application.Tests.ExpectedTransactionServiceTests;
 
+/// <summary>
+/// Contains test cases for the AdjustExpectedTransactionAsync method of ExpectedTransactionService. (EN)
+/// <br/>
+/// Chứa các trường hợp kiểm thử cho phương thức AdjustExpectedTransactionAsync của ExpectedTransactionService. (VI)
+/// </summary>
 public partial class ExpectedTransactionServiceTests
 {
+    /// <summary>
+    /// Verifies that AdjustExpectedTransactionAsync returns true and updates the transaction when the adjustment is successful. (EN)
+    /// <br/>
+    /// Xác minh rằng AdjustExpectedTransactionAsync trả về true và cập nhật giao dịch khi việc điều chỉnh thành công. (VI)
+    /// </summary>
     [Fact]
     public async Task AdjustExpectedTransactionAsync_ShouldReturnTrue_WhenTransactionIsAdjustedSuccessfully()
     {
@@ -66,6 +76,11 @@ public partial class ExpectedTransactionServiceTests
         transactionMock.Verify(t => t.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that AdjustExpectedTransactionAsync does not override the original amount if the transaction has already been adjusted. (EN)
+    /// <br/>
+    /// Xác minh rằng AdjustExpectedTransactionAsync không ghi đè số tiền gốc nếu giao dịch đã được điều chỉnh. (VI)
+    /// </summary>
     [Fact]
     public async Task AdjustExpectedTransactionAsync_ShouldNotOverrideOriginalAmount_WhenAlreadyAdjusted()
     {
@@ -120,6 +135,11 @@ public partial class ExpectedTransactionServiceTests
         transactionMock.Verify(t => t.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that AdjustExpectedTransactionAsync returns false when the transaction to adjust is not found. (EN)
+    /// <br/>
+    /// Xác minh rằng AdjustExpectedTransactionAsync trả về false khi không tìm thấy giao dịch cần điều chỉnh. (VI)
+    /// </summary>
     [Fact]
     public async Task AdjustExpectedTransactionAsync_ShouldReturnFalse_WhenTransactionNotFound()
     {
@@ -153,6 +173,11 @@ public partial class ExpectedTransactionServiceTests
         unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Never);
     }
 
+    /// <summary>
+    /// Verifies that AdjustExpectedTransactionAsync returns false when the transaction is not in the Pending status. (EN)
+    /// <br/>
+    /// Xác minh rằng AdjustExpectedTransactionAsync trả về false khi giao dịch không ở trạng thái Đang chờ xử lý. (VI)
+    /// </summary>
     [Fact]
     public async Task AdjustExpectedTransactionAsync_ShouldReturnFalse_WhenTransactionIsNotPending()
     {
@@ -194,6 +219,11 @@ public partial class ExpectedTransactionServiceTests
         unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Never);
     }
 
+    /// <summary>
+    /// Verifies that AdjustExpectedTransactionAsync returns false and logs an error when an exception occurs during the process. (EN)
+    /// <br/>
+    /// Xác minh rằng AdjustExpectedTransactionAsync trả về false và ghi log lỗi khi có ngoại lệ xảy ra trong quá trình. (VI)
+    /// </summary>
     [Fact]
     public async Task AdjustExpectedTransactionAsync_ShouldReturnFalse_WhenExceptionOccurs()
     {

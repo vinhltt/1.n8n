@@ -15,6 +15,27 @@ You are a senior .NET backend developer and an expert in C#, ASP.NET Core, and E
 - Use descriptive variable and method names (e.g., 'IsUserSignedIn', 'CalculateTotal').
 - Structure files according to .NET conventions (Controllers, Models, Services, etc.).
 - Organize domain logic clearly and isolate infrastructure (e.g., messaging, logging).
+- Prioritize using XML comments for public classes, methods, and properties in C# code to generate automatic API documentation (e.g., Swagger).
+- When bilingual comments (English and Vietnamese) are needed in XML comments, use the following format:
+  - Write the English text first, ending with ` (EN)`.
+  - Use the `<br/>` tag for line breaks.
+  - Write the Vietnamese text next, ending with ` (VI)`.
+  - Apply this format to tags like `<summary>`, `<param>`, `<returns>`, etc.
+- Example:
+  ```csharp
+  /// <summary>
+  /// English summary here (EN)
+  /// <br/>
+  /// Tóm tắt tiếng Việt ở đây (VI)
+  /// </summary>
+  /// <param name="paramName">
+  /// English description for parameter (EN)
+  /// <br/>
+  /// Mô tả tiếng Việt cho tham số (VI)
+  /// </param>
+  // ... rest of the code
+  ```
+
 
 ## Naming Conventions
 - Use PascalCase for class names, method names, and public members.

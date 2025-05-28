@@ -1,6 +1,6 @@
 using CoreFinance.Application.Services;
-using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.Enums;
 using CoreFinance.Domain.UnitOfWorks;
 using FluentAssertions;
@@ -10,8 +10,18 @@ using Moq;
 
 namespace CoreFinance.Application.Tests.ExpectedTransactionServiceTests;
 
+/// <summary>
+/// Contains test cases for the ConfirmExpectedTransactionAsync method of ExpectedTransactionService. (EN)
+/// <br/>
+/// Chứa các trường hợp kiểm thử cho phương thức ConfirmExpectedTransactionAsync của ExpectedTransactionService. (VI)
+/// </summary>
 public partial class ExpectedTransactionServiceTests
 {
+    /// <summary>
+    /// Verifies that ConfirmExpectedTransactionAsync returns true and updates the transaction status and ActualTransactionId when confirmation is successful. (EN)
+    /// <br/>
+    /// Xác minh rằng ConfirmExpectedTransactionAsync trả về true và cập nhật trạng thái giao dịch cùng ActualTransactionId khi xác nhận thành công. (VI)
+    /// </summary>
     [Fact]
     public async Task ConfirmExpectedTransactionAsync_ShouldReturnTrue_WhenTransactionIsConfirmedSuccessfully()
     {
@@ -63,6 +73,11 @@ public partial class ExpectedTransactionServiceTests
         transactionMock.Verify(t => t.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that ConfirmExpectedTransactionAsync returns false when the expected transaction to confirm is not found. (EN)
+    /// <br/>
+    /// Xác minh rằng ConfirmExpectedTransactionAsync trả về false khi không tìm thấy giao dịch dự kiến cần xác nhận. (VI)
+    /// </summary>
     [Fact]
     public async Task ConfirmExpectedTransactionAsync_ShouldReturnFalse_WhenTransactionNotFound()
     {
@@ -95,6 +110,11 @@ public partial class ExpectedTransactionServiceTests
         unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Never);
     }
 
+    /// <summary>
+    /// Verifies that ConfirmExpectedTransactionAsync returns false when the transaction is not in the Pending status. (EN)
+    /// <br/>
+    /// Xác minh rằng ConfirmExpectedTransactionAsync trả về false khi giao dịch không ở trạng thái Đang chờ xử lý. (VI)
+    /// </summary>
     [Fact]
     public async Task ConfirmExpectedTransactionAsync_ShouldReturnFalse_WhenTransactionIsNotPending()
     {
@@ -135,6 +155,11 @@ public partial class ExpectedTransactionServiceTests
         unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Never);
     }
 
+    /// <summary>
+    /// Verifies that ConfirmExpectedTransactionAsync returns false and logs an error when an exception occurs during the confirmation process. (EN)
+    /// <br/>
+    /// Xác minh rằng ConfirmExpectedTransactionAsync trả về false và ghi log lỗi khi có ngoại lệ xảy ra trong quá trình xác nhận. (VI)
+    /// </summary>
     [Fact]
     public async Task ConfirmExpectedTransactionAsync_ShouldReturnFalse_WhenExceptionOccurs()
     {

@@ -1,20 +1,50 @@
 using AutoMapper;
 using Bogus;
 using CoreFinance.Application.Mapper;
-using CoreFinance.Domain;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.Enums;
 using MockQueryable;
 
 namespace CoreFinance.Application.Tests.Helpers;
 
+/// <summary>
+/// Provides helper methods for creating fake data and common utilities for application tests. (EN)
+/// <br/>
+/// Cung cấp các phương thức trợ giúp để tạo dữ liệu giả và các tiện ích chung cho các bài kiểm thử ứng dụng. (VI)
+/// </summary>
 public static class TestHelpers
 {
+    /// <summary>
+    /// Creates and configures an AutoMapper instance with the application's mapping profile. (EN)
+    /// <br/>
+    /// Tạo và cấu hình một thể hiện AutoMapper với profile mapping của ứng dụng. (VI)
+    /// </summary>
+    /// <returns>
+    /// An initialized AutoMapper instance. (EN)
+    /// <br/>
+    /// Một thể hiện AutoMapper đã được khởi tạo. (VI)
+    /// </returns>
     public static IMapper CreateMapper()
     {
         var config = new MapperConfiguration(cfg => { cfg.AddProfile<AutoMapperProfile>(); });
         return config.CreateMapper();
     }
 
+    /// <summary>
+    /// Generates a specified number of fake Account objects. (EN)
+    /// <br/>
+    /// Sinh ra một số lượng tài khoản giả được chỉ định. (VI)
+    /// </summary>
+    /// <param name="count">
+    /// The number of fake accounts to generate. (EN)
+    /// <br/>
+    /// Số lượng tài khoản giả cần sinh. (VI)
+    /// </param>
+    /// <returns>
+    /// An IQueryable of fake Account objects. (EN)
+    /// <br/>
+    /// Một IQueryable các đối tượng Account giả. (VI)
+    /// </returns>
     public static IQueryable<Account> GenerateFakeAccounts(int count)
     {
         var faker = new Faker<Account>()
@@ -29,6 +59,21 @@ public static class TestHelpers
         return faker.Generate(count).AsQueryable().BuildMock();
     }
 
+    /// <summary>
+    /// Generates a specified number of fake ExpectedTransaction objects. (EN)
+    /// <br/>
+    /// Sinh ra một số lượng giao dịch dự kiến giả được chỉ định. (VI)
+    /// </summary>
+    /// <param name="count">
+    /// The number of fake expected transactions to generate. (EN)
+    /// <br/>
+    /// Số lượng giao dịch dự kiến giả cần sinh. (VI)
+    /// </param>
+    /// <returns>
+    /// An IQueryable of fake ExpectedTransaction objects. (EN)
+    /// <br/>
+    /// Một IQueryable các đối tượng ExpectedTransaction giả. (VI)
+    /// </returns>
     public static IQueryable<ExpectedTransaction> GenerateFakeExpectedTransactions(int count)
     {
         var faker = new Faker<ExpectedTransaction>()
@@ -54,6 +99,21 @@ public static class TestHelpers
         return result.AsQueryable().BuildMock();
     }
 
+    /// <summary>
+    /// Generates a specified number of fake RecurringTransactionTemplate objects. (EN)
+    /// <br/>
+    /// Sinh ra một số lượng mẫu giao dịch định kỳ giả được chỉ định. (VI)
+    /// </summary>
+    /// <param name="count">
+    /// The number of fake recurring transaction templates to generate. (EN)
+    /// <br/>
+    /// Số lượng mẫu giao dịch định kỳ giả cần sinh. (VI)
+    /// </param>
+    /// <returns>
+    /// An IQueryable of fake RecurringTransactionTemplate objects. (EN)
+    /// <br/>
+    /// Một IQueryable các đối tượng RecurringTransactionTemplate giả. (VI)
+    /// </returns>
     public static IQueryable<RecurringTransactionTemplate> GenerateFakeRecurringTransactionTemplates(int count)
     {
         var faker = new Faker<RecurringTransactionTemplate>()
@@ -78,6 +138,21 @@ public static class TestHelpers
         return faker.Generate(count).AsQueryable().BuildMock();
     }
 
+    /// <summary>
+    /// Generates a specified number of fake Transaction objects. (EN)
+    /// <br/>
+    /// Sinh ra một số lượng giao dịch giả được chỉ định. (VI)
+    /// </summary>
+    /// <param name="count">
+    /// The number of fake transactions to generate. (EN)
+    /// <br/>
+    /// Số lượng giao dịch giả cần sinh. (VI)
+    /// </param>
+    /// <returns>
+    /// An IQueryable of fake Transaction objects. (EN)
+    /// <br/>
+    /// Một IQueryable các đối tượng Transaction giả. (VI)
+    /// </returns>
     public static IQueryable<Transaction> GenerateFakeTransactions(int count)
     {
         var faker = new Faker<Transaction>()

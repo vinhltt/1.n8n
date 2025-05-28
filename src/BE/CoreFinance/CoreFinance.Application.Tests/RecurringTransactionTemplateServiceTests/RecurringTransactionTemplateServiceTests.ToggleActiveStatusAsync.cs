@@ -1,6 +1,6 @@
 using CoreFinance.Application.Services;
-using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.UnitOfWorks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -11,6 +11,9 @@ namespace CoreFinance.Application.Tests.RecurringTransactionTemplateServiceTests
 
 public partial class RecurringTransactionTemplateServiceTests
 {
+    /// <summary>
+    /// Verifies that ToggleActiveStatusAsync returns true when the template's active status is toggled successfully.<br/>(EN) Verifies that ToggleActiveStatusAsync returns true when the template's active status is toggled successfully.<br/>(VI) Xác minh rằng ToggleActiveStatusAsync trả về true khi trạng thái hoạt động của mẫu được chuyển đổi thành công.
+    /// </summary>
     [Fact]
     public async Task ToggleActiveStatusAsync_ShouldReturnTrue_WhenTemplateIsToggledSuccessfully()
     {
@@ -59,6 +62,9 @@ public partial class RecurringTransactionTemplateServiceTests
         transactionMock.Verify(t => t.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that ToggleActiveStatusAsync returns false when the template is not found.<br/>(EN) Verifies that ToggleActiveStatusAsync returns false when the template is not found.<br/>(VI) Xác minh rằng ToggleActiveStatusAsync trả về false khi không tìm thấy mẫu.
+    /// </summary>
     [Fact]
     public async Task ToggleActiveStatusAsync_ShouldReturnFalse_WhenTemplateNotFound()
     {
@@ -90,6 +96,9 @@ public partial class RecurringTransactionTemplateServiceTests
         unitOfWorkMock.Verify(u => u.SaveChangesAsync(), Times.Never);
     }
 
+    /// <summary>
+    /// Verifies that ToggleActiveStatusAsync toggles the active status from true to false correctly.<br/>(EN) Verifies that ToggleActiveStatusAsync toggles the active status from true to false correctly.<br/>(VI) Xác minh rằng ToggleActiveStatusAsync chuyển đổi trạng thái hoạt động từ true sang false một cách chính xác.
+    /// </summary>
     [Fact]
     public async Task ToggleActiveStatusAsync_ShouldToggleFromTrueToFalse_WhenTemplateIsCurrentlyActive()
     {
@@ -138,6 +147,9 @@ public partial class RecurringTransactionTemplateServiceTests
         transactionMock.Verify(t => t.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that ToggleActiveStatusAsync returns false when an exception occurs during the process.<br/>(EN) Verifies that ToggleActiveStatusAsync returns false when an exception occurs during the process.<br/>(VI) Xác minh rằng ToggleActiveStatusAsync trả về false khi có ngoại lệ xảy ra trong quá trình xử lý.
+    /// </summary>
     [Fact]
     public async Task ToggleActiveStatusAsync_ShouldReturnFalse_WhenExceptionOccurs()
     {

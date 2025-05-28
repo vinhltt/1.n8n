@@ -3,8 +3,18 @@ using CoreFinance.Application.DTOs.RecurringTransactionTemplate;
 
 namespace CoreFinance.Application.Validators;
 
+/// <summary>
+/// Validates the <see cref="RecurringTransactionTemplateUpdateRequest"/>. (EN)
+/// <br/>
+/// Thực hiện xác thực cho <see cref="RecurringTransactionTemplateUpdateRequest"/>. (VI)
+/// </summary>
 public class RecurringTransactionTemplateUpdateRequestValidator : AbstractValidator<RecurringTransactionTemplateUpdateRequest>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RecurringTransactionTemplateUpdateRequestValidator"/> class. (EN)
+    /// <br/>
+    /// Khởi tạo một phiên bản mới của lớp <see cref="RecurringTransactionTemplateUpdateRequestValidator"/>. (VI)
+    /// </summary>
     public RecurringTransactionTemplateUpdateRequestValidator()
     {
         RuleFor(x => x.Id).NotEmpty();

@@ -1,7 +1,7 @@
 using CoreFinance.Application.DTOs.Transaction;
 using CoreFinance.Application.Services;
-using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.UnitOfWorks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -10,8 +10,18 @@ using Moq;
 
 namespace CoreFinance.Application.Tests.TransactionServiceTests;
 
+/// <summary>
+/// Contains test cases for the GetAllDtoAsync method of TransactionService. (EN)
+/// <br/>
+/// Chứa các trường hợp kiểm thử cho phương thức GetAllDtoAsync của TransactionService. (VI)
+/// </summary>
 public partial class TransactionServiceTests
 {
+    /// <summary>
+    /// Verifies that GetAllDtoAsync returns all transactions correctly when transactions exist. (EN)
+    /// <br/>
+    /// Xác minh rằng GetAllDtoAsync trả về tất cả các giao dịch một cách chính xác khi có giao dịch tồn tại. (VI)
+    /// </summary>
     [Fact]
     public async Task GetAllDtoAsync_ShouldReturnAllTransactions_WhenTransactionsExist()
     {
@@ -47,6 +57,11 @@ public partial class TransactionServiceTests
         repoMock.Verify(r => r.GetNoTrackingEntities(), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that GetAllDtoAsync returns an empty list when no transactions exist in the repository. (EN)
+    /// <br/>
+    /// Xác minh rằng GetAllDtoAsync trả về danh sách rỗng khi không có giao dịch nào tồn tại trong repository. (VI)
+    /// </summary>
     [Fact]
     public async Task GetAllDtoAsync_ShouldReturnEmptyList_WhenNoTransactionsExist()
     {

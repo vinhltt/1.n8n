@@ -1,6 +1,6 @@
 using CoreFinance.Application.Services;
-using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.Enums;
 using CoreFinance.Domain.UnitOfWorks;
 using Microsoft.Extensions.Logging;
@@ -10,9 +10,18 @@ using FluentAssertions;
 
 namespace CoreFinance.Application.Tests.ExpectedTransactionServiceTests;
 
-// Tests for the GetTransactionsByTemplateAsync method of ExpectedTransactionService
+/// <summary>
+/// Contains test cases for the GetTransactionsByTemplateAsync method of ExpectedTransactionService. (EN)
+/// <br/>
+/// Chứa các trường hợp kiểm thử cho phương thức GetTransactionsByTemplateAsync của ExpectedTransactionService. (VI)
+/// </summary>
 public partial class ExpectedTransactionServiceTests
 {
+    /// <summary>
+    /// Verifies that GetTransactionsByTemplateAsync returns transactions for a specific template. (EN)
+    /// <br/>
+    /// Xác minh rằng GetTransactionsByTemplateAsync trả về các giao dịch cho một mẫu cụ thể. (VI)
+    /// </summary>
     [Fact]
     public async Task GetTransactionsByTemplateAsync_ShouldReturnTransactionsForSpecificTemplate()
     {
@@ -85,8 +94,9 @@ public partial class ExpectedTransactionServiceTests
         expectedTransactionViewModels.Should().NotBeNull();
         expectedTransactionViewModels.Should().HaveCount(3);
         expectedTransactionViewModels.Should().OnlyContain(t => t.RecurringTransactionTemplateId == templateId);
-        expectedTransactionViewModels.Select(t => t.Description).Should().Contain(new[]
-            { "Template Transaction 1", "Template Transaction 2", "Template Transaction 3" });
+        expectedTransactionViewModels.Select(t => t.Description).Should().Contain([
+            "Template Transaction 1", "Template Transaction 2", "Template Transaction 3"
+        ]);
 
         // Should be ordered by ExpectedDate
         var resultList = expectedTransactionViewModels.ToList();
@@ -95,6 +105,11 @@ public partial class ExpectedTransactionServiceTests
         resultList[2].Description.Should().Be("Template Transaction 3");
     }
 
+    /// <summary>
+    /// Verifies that GetTransactionsByTemplateAsync returns an empty list when the template has no transactions. (EN)
+    /// <br/>
+    /// Xác minh rằng GetTransactionsByTemplateAsync trả về danh sách rỗng khi mẫu không có giao dịch nào. (VI)
+    /// </summary>
     [Fact]
     public async Task GetTransactionsByTemplateAsync_ShouldReturnEmptyList_WhenTemplateHasNoTransactions()
     {
@@ -138,6 +153,11 @@ public partial class ExpectedTransactionServiceTests
         expectedTransactionViewModels.Should().BeEmpty();
     }
 
+    /// <summary>
+    /// Verifies that GetTransactionsByTemplateAsync returns an empty list when no transactions exist in the repository. (EN)
+    /// <br/>
+    /// Xác minh rằng GetTransactionsByTemplateAsync trả về danh sách rỗng khi không có giao dịch nào tồn tại trong repository. (VI)
+    /// </summary>
     [Fact]
     public async Task GetTransactionsByTemplateAsync_ShouldReturnEmptyList_WhenNoTransactionsExist()
     {
@@ -164,6 +184,11 @@ public partial class ExpectedTransactionServiceTests
         expectedTransactionViewModels.Should().BeEmpty();
     }
 
+    /// <summary>
+    /// Verifies that GetTransactionsByTemplateAsync returns transactions ordered by ExpectedDate. (EN)
+    /// <br/>
+    /// Xác minh rằng GetTransactionsByTemplateAsync trả về các giao dịch được sắp xếp theo ExpectedDate. (VI)
+    /// </summary>
     [Fact]
     public async Task GetTransactionsByTemplateAsync_ShouldReturnTransactionsOrderedByExpectedDate()
     {
@@ -236,6 +261,11 @@ public partial class ExpectedTransactionServiceTests
         }
     }
 
+    /// <summary>
+    /// Verifies that GetTransactionsByTemplateAsync returns transactions of all status types. (EN)
+    /// <br/>
+    /// Xác minh rằng GetTransactionsByTemplateAsync trả về các giao dịch của tất cả các loại trạng thái. (VI)
+    /// </summary>
     [Fact]
     public async Task GetTransactionsByTemplateAsync_ShouldReturnAllStatusTypes()
     {
@@ -301,6 +331,11 @@ public partial class ExpectedTransactionServiceTests
         expectedTransactionViewModels.Should().Contain(t => t.Status == ExpectedTransactionStatus.Cancelled);
     }
 
+    /// <summary>
+    /// Verifies that GetTransactionsByTemplateAsync returns the correct transaction properties in the ViewModel. (EN)
+    /// <br/>
+    /// Xác minh rằng GetTransactionsByTemplateAsync trả về đúng các thuộc tính giao dịch trong ViewModel. (VI)
+    /// </summary>
     [Fact]
     public async Task GetTransactionsByTemplateAsync_ShouldReturnCorrectTransactionProperties()
     {
@@ -360,6 +395,11 @@ public partial class ExpectedTransactionServiceTests
         transaction.Status.Should().Be(ExpectedTransactionStatus.Pending);
     }
 
+    /// <summary>
+    /// Verifies that GetTransactionsByTemplateAsync handles past and future transactions correctly, returning them all. (EN)
+    /// <br/>
+    /// Xác minh rằng GetTransactionsByTemplateAsync xử lý đúng các giao dịch quá khứ và tương lai, trả về tất cả chúng. (VI)
+    /// </summary>
     [Fact]
     public async Task GetTransactionsByTemplateAsync_ShouldHandlePastAndFutureTransactions()
     {

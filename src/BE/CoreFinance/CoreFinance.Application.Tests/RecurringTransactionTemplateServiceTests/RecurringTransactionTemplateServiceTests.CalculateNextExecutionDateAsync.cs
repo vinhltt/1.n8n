@@ -1,6 +1,6 @@
 using CoreFinance.Application.Services;
-using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.Enums;
 using CoreFinance.Domain.UnitOfWorks;
 using Microsoft.Extensions.Logging;
@@ -9,9 +9,18 @@ using FluentAssertions;
 
 namespace CoreFinance.Application.Tests.RecurringTransactionTemplateServiceTests;
 
-// Tests for the CalculateNextExecutionDateAsync method of RecurringTransactionTemplateService
+/// <summary>
+/// Contains test cases for the CalculateNextExecutionDateAsync method of RecurringTransactionTemplateService. (EN)
+/// <br/>
+/// Chứa các trường hợp kiểm thử cho phương thức CalculateNextExecutionDateAsync của RecurringTransactionTemplateService. (VI)
+/// </summary>
 public partial class RecurringTransactionTemplateServiceTests
 {
+    /// <summary>
+    /// Verifies that CalculateNextExecutionDateAsync returns the correct date when the template exists and has a standard frequency. (EN)
+    /// <br/>
+    /// Xác minh rằng CalculateNextExecutionDateAsync trả về đúng ngày khi mẫu tồn tại và có tần suất chuẩn. (VI)
+    /// </summary>
     [Fact]
     public async Task CalculateNextExecutionDateAsync_ShouldReturnCorrectDate_WhenTemplateExists()
     {
@@ -50,6 +59,11 @@ public partial class RecurringTransactionTemplateServiceTests
         templateRepoMock.Verify(r => r.GetByIdAsync(templateId), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that CalculateNextExecutionDateAsync throws an ArgumentException when the template is not found. (EN)
+    /// <br/>
+    /// Xác minh rằng CalculateNextExecutionDateAsync ném ra ArgumentException khi không tìm thấy mẫu. (VI)
+    /// </summary>
     [Fact]
     public async Task CalculateNextExecutionDateAsync_ShouldThrowArgumentException_WhenTemplateNotFound()
     {
@@ -76,6 +90,11 @@ public partial class RecurringTransactionTemplateServiceTests
         templateRepoMock.Verify(r => r.GetByIdAsync(templateId), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that CalculateNextExecutionDateAsync calculates the next execution date correctly for different standard frequencies. (EN)
+    /// <br/>
+    /// Xác minh rằng CalculateNextExecutionDateAsync tính toán đúng ngày thực hiện tiếp theo cho các tần suất chuẩn khác nhau. (VI)
+    /// </summary>
     [Theory]
     [InlineData(RecurrenceFrequency.Daily)]
     [InlineData(RecurrenceFrequency.Weekly)]
@@ -146,6 +165,11 @@ public partial class RecurringTransactionTemplateServiceTests
         result.Should().Be(expectedDate);
     }
 
+    /// <summary>
+    /// Verifies that CalculateNextExecutionDateAsync uses the CustomIntervalDays when the frequency is set to Custom. (EN)
+    /// <br/>
+    /// Xác minh rằng CalculateNextExecutionDateAsync sử dụng CustomIntervalDays khi tần suất được đặt là Custom. (VI)
+    /// </summary>
     [Fact]
     public async Task CalculateNextExecutionDateAsync_ShouldUseCustomInterval_WhenFrequencyIsCustom()
     {
@@ -182,6 +206,11 @@ public partial class RecurringTransactionTemplateServiceTests
         result.Should().Be(expectedDate);
     }
 
+    /// <summary>
+    /// Verifies that CalculateNextExecutionDateAsync defaults to adding one day when the frequency is Custom and CustomIntervalDays is null. (EN)
+    /// <br/>
+    /// Xác minh rằng CalculateNextExecutionDateAsync mặc định cộng thêm một ngày khi tần suất là Custom và CustomIntervalDays là null. (VI)
+    /// </summary>
     [Fact]
     public async Task CalculateNextExecutionDateAsync_ShouldDefaultToOneDay_WhenCustomIntervalIsNull()
     {
@@ -217,6 +246,11 @@ public partial class RecurringTransactionTemplateServiceTests
         result.Should().Be(expectedDate);
     }
 
+    /// <summary>
+    /// Verifies that CalculateNextExecutionDateAsync handles monthly frequency correctly, including different month lengths and leap years. (EN)
+    /// <br/>
+    /// Xác minh rằng CalculateNextExecutionDateAsync xử lý tần suất hàng tháng một cách chính xác, bao gồm độ dài tháng khác nhau và năm nhuận. (VI)
+    /// </summary>
     [Fact]
     public async Task CalculateNextExecutionDateAsync_ShouldHandleMonthlyFrequency_WithDifferentMonthLengths()
     {

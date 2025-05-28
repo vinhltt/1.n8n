@@ -14,6 +14,13 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
 {
     public static class QueryableExtensions
     {
+        /// <summary>
+        /// Filters a queryable source based on a FilterRequest object.<br/>(EN) Filters a queryable source based on a FilterRequest object.<br/>(VI) Lọc nguồn có thể truy vấn dựa trên đối tượng FilterRequest.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
+        /// <param name="source">The queryable source to filter. (EN)<br/>Nguồn có thể truy vấn cần lọc. (VI)</param>
+        /// <param name="filter">The FilterRequest containing filter details. (EN)<br/>FilterRequest chứa thông tin chi tiết về lọc. (VI)</param>
+        /// <returns>A new queryable source with the filter applied, or the original source if no filter is provided.</returns>
         public static IQueryable<T> Filter<T>(this IQueryable<T> source, FilterRequest? filter) where T : class
         {
             if (filter == null || filter.Details.IsNullOrEmpty())
@@ -34,15 +41,15 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
             return source.Where(ExpressionBuilder.Build<T>(filters));
         }
 
-        /// <summary> 
-        /// Determines whether this instance is ordered. 
+        /// <summary>
+        /// Determines whether a queryable source is already ordered.<br/>(EN) Determines whether a queryable source is already ordered.<br/>(VI) Xác định xem nguồn có thể truy vấn đã được sắp xếp hay chưa.
         /// </summary>
-        /// <typeparam name = "T" ></typeparam >
-        /// <param name="source">The queryable.</param> 
-        /// <returns> 
-        /// <c>true</c> if the specified queryable is ordered; otherwise, <c>false</c>. 
-        /// </returns> 
-        /// <exception cref="ArgumentNullException">queryable</exception> O references 
+        /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
+        /// <param name="source">The queryable source to check. (EN)<br/>Nguồn có thể truy vấn cần kiểm tra. (VI)</param>
+        /// <returns>
+        /// <c>true</c> if the specified queryable is ordered; otherwise, <c>false</c>.<br/>(EN) <c>true</c> nếu nguồn có thể truy vấn được sắp xếp; ngược lại, <c>false</c>.<br/>(VI) <c>true</c> nếu nguồn có thể truy vấn đã được sắp xếp; ngược lại, <c>false</c>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Thrown if source is null.</exception>
         public static bool IsOrdered<T>(this IQueryable<T> source)
         {
             ArgumentNullException.ThrowIfNull(source, nameof(source));
@@ -51,12 +58,14 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
 
         #region Where
 
-        /// <summary> 
-        /// Filters data in the given source with filter descriptor. 
-        /// </summary> WII <typeparam name="T"></typeparam> 
-        /// <param name="source">The source.</param> WII <param name="filter">The filter.</param> 
-        /// <param name="parameterName">Name of the parameter.</param> 
-        /// <returns></returns> 2 references 
+        /// <summary>
+        /// Filters data in the given source using a single filter descriptor.<br/>(EN) Filters data in the given source using a single filter descriptor.<br/>(VI) Lọc dữ liệu trong nguồn đã cho sử dụng một mô tả lọc duy nhất.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
+        /// <param name="source">The queryable source to filter. (EN)<br/>Nguồn có thể truy vấn cần lọc. (VI)</param>
+        /// <param name="filter">The filter descriptor. (EN)<br/>Mô tả lọc. (VI)</param>
+        /// <param name="parameterName">The name of the parameter in the lambda expression. (EN)<br/>Tên của tham số trong biểu thức lambda. (VI)</param>
+        /// <returns>A new queryable source with the filter applied.</returns>
         public static IQueryable<T> Where<T>(this IQueryable<T> source, FilterDescriptor filter,
             string parameterName = "x")
             where T : class
@@ -70,13 +79,14 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
             return source.Where(expression);
         }
 
-        /// <summary> 
-        /// Filters data in the given source with filter descriptors. 
-        /// </summary> 
-        /// <typeparam name="T"></typeparam> 
-        /// <param name="source">The source.</param> W <param name="filters">The filters.</param> 
-        /// <param name="parameterName">Name of the parameter.</param> 
-        /// <returns></returns> 4 references 
+        /// <summary>
+        /// Filters data in the given source using a collection of filter descriptors.<br/>(EN) Filters data in the given source using a collection of filter descriptors.<br/>(VI) Lọc dữ liệu trong nguồn đã cho sử dụng một tập hợp các mô tả lọc.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
+        /// <param name="source">The queryable source to filter. (EN)<br/>Nguồn có thể truy vấn cần lọc. (VI)</param>
+        /// <param name="filters">The collection of filter descriptors. (EN)<br/>Tập hợp các mô tả lọc. (VI)</param>
+        /// <param name="parameterName">The name of the parameter in the lambda expression. (EN)<br/>Tên của tham số trong biểu thức lambda. (VI)</param>
+        /// <returns>A new queryable source with the filters applied.</returns>
         public static IQueryable<T> Where<T>(this IQueryable<T> source, IEnumerable<FilterDescriptor> filters,
             string parameterName = "x")
             where T : class
@@ -94,13 +104,14 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
 
         #region OrderBy
 
-        /// <summary> 
-        /// Orders data in the given source with sort descriptor. 
-        /// </summary> VII <typeparam name="T"></typeparam>, 
-        /// <param name="source">The source.</param> 
-        /// <param name="sort">The sort.</param>
-        /// <param name = "replaceOrder" >if set to<c>true</c> [replace the current order in source].</param> 
-        /// <returns></returns> O references 
+        /// <summary>
+        /// Orders data in the given source using a single sort descriptor.<br/>(EN) Orders data in the given source using a single sort descriptor.<br/>(VI) Sắp xếp dữ liệu trong nguồn đã cho sử dụng một mô tả sắp xếp duy nhất.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
+        /// <param name="source">The queryable source to order. (EN)<br/>Nguồn có thể truy vấn cần sắp xếp. (VI)</param>
+        /// <param name="sort">The sort descriptor. (EN)<br/>Mô tả sắp xếp. (VI)</param>
+        /// <param name="replaceOrder">if set to <c>true</c>, replaces the current order in the source; otherwise, appends to the current order. (EN)<br/>nếu đặt là <c>true</c>, thay thế thứ tự hiện tại trong nguồn; ngược lại, thêm vào thứ tự hiện tại. (VI)</param>
+        /// <returns>A new queryable source with the sort applied, or the original source if no sort is provided.</returns>
         public static IQueryable<T>? OrderBy<T>(this IQueryable<T>? source, SortDescriptor? sort,
             bool replaceOrder = true)
             where T : class
@@ -112,13 +123,14 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
             return source.OrderBy(property, parameter, sort.Direction, replaceOrder);
         }
 
-        /// <summary> 
-        /// Orders data in the given source with sort descriptors. 
-        /// </summary> 
-        /// <typeparam name="T"></typeparam> 
-        /// <param name="source">The source.</param> MI <param name="sorts">The sorts.</param>
-        /// <param name = "replaceOrder" >if set to<c>true</c> [replace the current order in source].</param>)
-        /// <returns></returns> 5 references 
+        /// <summary>
+        /// Orders data in the given source using a collection of sort descriptors.<br/>(EN) Orders data in the given source using a collection of sort descriptors.<br/>(VI) Sắp xếp dữ liệu trong nguồn đã cho sử dụng một tập hợp các mô tả sắp xếp.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
+        /// <param name="source">The queryable source to order. (EN)<br/>Nguồn có thể truy vấn cần sắp xếp. (VI)</param>
+        /// <param name="sorts">The collection of sort descriptors. (EN)<br/>Tập hợp các mô tả sắp xếp. (VI)</param>
+        /// <param name="replaceOrder">if set to <c>true</c>, replaces the current order in the source for the first sort descriptor; otherwise, appends to the current order for all sort descriptors. (EN)<br/>nếu đặt là <c>true</c>, thay thế thứ tự hiện tại trong nguồn cho mô tả sắp xếp đầu tiên; ngược lại, thêm vào thứ tự hiện tại cho tất cả các mô tả sắp xếp. (VI)</param>
+        /// <returns>A new queryable source with the sorts applied, or the original source if no sorts are provided.</returns>
         public static IQueryable<T> OrderBy<T>(this IQueryable<T> source, IEnumerable<SortDescriptor>? sorts,
             bool replaceOrder = true)
             where T : class
@@ -139,15 +151,16 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
             return source;
         }
 
-        /// <summary> 
-        /// Orders data in the given source. 
+        /// <summary>
+        /// Orders data in the given source by a specific property.<br/>(EN) Orders data in the given source by a specific property.<br/>(VI) Sắp xếp dữ liệu trong nguồn đã cho theo một thuộc tính cụ thể.
         /// </summary>
-        /// <typeparam name="T"></typeparam> MI <param name="source">The source.</param> 
-        /// <param name="property">The property.</param>
-        /// <param name="parameter">The parameter.</param> 
-        /// <param name="direction">The direction.</param>
-        /// <param name = "replaceOrder" >if set to<c>true</c> [replace the current order in source].</param> 
-        /// <returns></returns> 2 references 
+        /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
+        /// <param name="source">The queryable source to order. (EN)<br/>Nguồn có thể truy vấn cần sắp xếp. (VI)</param>
+        /// <param name="property">The MemberExpression representing the property to order by. (EN)<br/>MemberExpression biểu thị thuộc tính để sắp xếp. (VI)</param>
+        /// <param name="parameter">The parameter expression. (EN)<br/>Biểu thức tham số. (VI)</param>
+        /// <param name="direction">The sort direction (ascending or descending). (EN)<br/>Hướng sắp xếp (tăng dần hoặc giảm dần). (VI)</param>
+        /// <param name="replaceOrder">if set to <c>true</c>, replaces the current order in the source; otherwise, appends to the current order. (EN)<br/>nếu đặt là <c>true</c>, thay thế thứ tự hiện tại trong nguồn; ngược lại, thêm vào thứ tự hiện tại. (VI)</param>
+        /// <returns>A new queryable source with the sort applied.</returns>
         private static IQueryable<T> OrderBy<T>(this IQueryable<T> source, MemberExpression property,
             ParameterExpression parameter, SortDirection direction, bool replaceOrder = true)
             where T : class
@@ -240,14 +253,17 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
             return source.OrderBy<T, dynamic>(property, parameter, direction, replaceOrder);
         }
 
-        /// <summary> 
-        /// Orders data in the given source. 
-        /// </summary> 777 <typeparam name="T"></typeparam> 
-        /// <typeparam name="TProperty">The type of the property.</typeparam> 
-        /// <param name="source">The source.</param> W <param name="property">The property.</param> 
-        /// <param name="parameter">The parameter.</param> III <param name="direction">The direction.</param>
-        /// <param name="replaceOrder">if set to <c>true</c> [replace the current order in source.</param> 
-        /// <returns></returns> 24 references 
+        /// <summary>
+        /// Orders data in the given source by a specific property of a specified type.<br/>(EN) Orders data in the given source by a specific property of a specified type.<br/>(VI) Sắp xếp dữ liệu trong nguồn đã cho theo một thuộc tính cụ thể thuộc kiểu được chỉ định.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
+        /// <typeparam name="TProperty">The type of the property to order by. (EN)<br/>Kiểu của thuộc tính để sắp xếp. (VI)</typeparam>
+        /// <param name="source">The queryable source to order. (EN)<br/>Nguồn có thể truy vấn cần sắp xếp. (VI)</param>
+        /// <param name="property">The MemberExpression representing the property to order by. (EN)<br/>MemberExpression biểu thị thuộc tính để sắp xếp. (VI)</param>
+        /// <param name="parameter">The parameter expression. (EN)<br/>Biểu thức tham số. (VI)</param>
+        /// <param name="direction">The sort direction (ascending or descending). (EN)<br/>Hướng sắp xếp (tăng dần hoặc giảm dần). (VI)</param>
+        /// <param name="replaceOrder">if set to <c>true</c>, replaces the current order in the source; otherwise, appends to the current order. (EN)<br/>nếu đặt là <c>true</c>, thay thế thứ tự hiện tại trong nguồn; ngược lại, thêm vào thứ tự hiện tại. (VI)</param>
+        /// <returns>A new queryable source with the sort applied.</returns>
         private static IOrderedQueryable<T> OrderBy<T, TProperty>(this IQueryable<T> source, MemberExpression property,
             ParameterExpression parameter, SortDirection direction, bool replaceOrder = true)
         {
@@ -267,14 +283,14 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         #region Paging
 
         /// <summary>
-        /// 
+        /// Converts a queryable source to a paginated result asynchronously.<br/>(EN) Converts a queryable source to a paginated result asynchronously.<br/>(VI) Chuyển đổi nguồn có thể truy vấn thành kết quả phân trang một cách bất đồng bộ.
         /// </summary>
-        /// <typeparam name="TSource"></typeparam>
-        /// <param name="queryable"></param>
-        /// <param name="pagination"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <typeparam name="TSource">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
+        /// <param name="queryable">The queryable source to paginate. (EN)<br/>Nguồn có thể truy vấn cần phân trang. (VI)</param>
+        /// <param name="pagination">The pagination details. (EN)<br/>Thông tin chi tiết về phân trang. (VI)</param>
+        /// <returns>A task representing the asynchronous operation, containing the paginated result.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if queryable or pagination is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if pageIndex or pageSize is less than 1, or if pageIndex is out of range.</exception>
         public static async Task<IBasePaging<TSource>> ToPagingAsync<TSource>(this IQueryable<TSource> queryable,
             Pagination pagination)
         {
@@ -329,12 +345,12 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         }
 
         /// <summary>
-        /// 
+        /// Filters, orders, and paginates a queryable source based on a FilterBodyRequest asynchronously.<br/>(EN) Filters, orders, and paginates a queryable source based on a FilterBodyRequest asynchronously.<br/>(VI) Lọc, sắp xếp và phân trang nguồn có thể truy vấn dựa trên FilterBodyRequest một cách bất đồng bộ.
         /// </summary>
-        /// <typeparam name="TSource"></typeparam>
-        /// <param name="queryable"></param>
-        /// <param name="request"></param>
-        /// <returns></returns>
+        /// <typeparam name="TSource">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
+        /// <param name="queryable">The queryable source. (EN)<br/>Nguồn có thể truy vấn. (VI)</param>
+        /// <param name="request">The FilterBodyRequest containing filtering, sorting, and pagination details. (EN)<br/>FilterBodyRequest chứa thông tin chi tiết về lọc, sắp xếp và phân trang. (VI)</param>
+        /// <returns>A task representing the asynchronous operation, containing the paginated result.</returns>
         public static async Task<IBasePaging<TSource>> ToPagingAsync<TSource>(this IQueryable<TSource> queryable,
             IFilterBodyRequest request)
             where TSource : class
@@ -356,15 +372,15 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         }
 
         /// <summary>
-        /// 
+        /// Filters, orders, and paginates a queryable source and selects a result type based on a FilterBodyRequest and a selector asynchronously.<br/>(EN) Filters, orders, and paginates a queryable source and selects a result type based on a FilterBodyRequest and a selector asynchronously.<br/>(VI) Lọc, sắp xếp và phân trang nguồn có thể truy vấn, đồng thời chọn kiểu kết quả dựa trên FilterBodyRequest và selector một cách bất đồng bộ.
         /// </summary>
-        /// <typeparam name="TResult"></typeparam>
-        /// <typeparam name="TSource"></typeparam>
-        /// <param name="queryable"></param>
-        /// <param name="request"></param>
-        /// <param name="selector"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <typeparam name="TResult">The type of the elements in the result. (EN)<br/>Kiểu của các phần tử trong kết quả. (VI)</typeparam>
+        /// <typeparam name="TSource">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
+        /// <param name="queryable">The queryable source. (EN)<br/>Nguồn có thể truy vấn. (VI)</param>
+        /// <param name="request">The FilterBodyRequest containing filtering, sorting, and pagination details. (EN)<br/>FilterBodyRequest chứa thông tin chi tiết về lọc, sắp xếp và phân trang. (VI)</param>
+        /// <param name="selector">The selector expression to transform the source elements into the result type. (EN)<br/>Biểu thức selector để chuyển đổi các phần tử nguồn thành kiểu kết quả. (VI)</param>
+        /// <returns>A task representing the asynchronous operation, containing the paginated result of the specified result type.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if request, request.Pagination, or selector is null.</exception>
         public static async Task<IBasePaging<TResult>> ToPagingAsync<TResult, TSource>(
             this IQueryable<TSource> queryable, IFilterBodyRequest request, Expression<Func<TSource, TResult>> selector)
             where TResult : class

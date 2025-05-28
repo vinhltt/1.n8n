@@ -117,8 +117,8 @@ flowchart TD
     Start --> Process
 
 Rule per folder:
-- file .NET.mdc apply cho code được sinh ra trong folder src/BE/*
-- file .nuxt.mdc apply cho code được sinh ra trong folder src/FE/nuxt/*
+- file dotnet_rule.mdc apply cho code được sinh ra trong folder src/BE/**
+- file nuxt_rule.mdc apply cho code được sinh ra trong folder src/FE/nuxt/**
 
 Note: When triggered by **update memory bank**, I MUST review every memory bank file, even if some don't require updates. Focus particularly on activeContext.md and progress.md as they track current state.
 

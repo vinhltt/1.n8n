@@ -10,7 +10,9 @@ using Microsoft.Extensions.Logging;
 namespace CoreFinance.Application.Services.Base;
 
 /// <summary>
-/// Base service class providing common CRUD operations for entities.
+/// Base service class providing common CRUD operations for entities. (EN)
+/// <br/>
+/// Lớp dịch vụ cơ bản cung cấp các thao tác CRUD chung cho các thực thể. (VI)
 /// </summary>
 /// <typeparam name="TEntity">The type of the entity.</typeparam>
 /// <typeparam name="TCreateRequest">The type of the create request DTO.</typeparam>
@@ -34,7 +36,9 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
     private readonly ILogger _logger = logger;
 
     /// <summary>
-    /// Deletes an entity permanently by its identifier asynchronously.
+    /// Deletes an entity permanently by its identifier asynchronously. (EN)
+    /// <br/>
+    /// Xóa vĩnh viễn một thực thể dựa trên định danh của nó một cách bất đồng bộ. (VI)
     /// </summary>
     /// <param name="id">The identifier of the entity.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the number of state entries written to the database.</returns>
@@ -45,7 +49,9 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
     }
 
     /// <summary>
-    /// Soft deletes an entity by its identifier asynchronously.
+    /// Soft deletes an entity by its identifier asynchronously. (EN)
+    /// <br/>
+    /// Xóa mềm một thực thể dựa trên định danh của nó một cách bất đồng bộ. (VI)
     /// </summary>
     /// <param name="id">The identifier of the entity.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the number of state entries written to the database.</returns>
@@ -56,7 +62,9 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
     }
 
     /// <summary>
-    /// Gets all entities as view models asynchronously.
+    /// Gets all entities as view models asynchronously. (EN)
+    /// <br/>
+    /// Lấy tất cả các thực thể dưới dạng view model một cách bất đồng bộ. (VI)
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains the collection of view models.</returns>
     public virtual async Task<IEnumerable<TViewModel>?> GetAllDtoAsync()
@@ -69,7 +77,9 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
     }
 
     /// <summary>
-    /// Gets an entity by its identifier as a view model asynchronously.
+    /// Gets an entity by its identifier as a view model asynchronously. (EN)
+    /// <br/>
+    /// Lấy một thực thể dựa trên định danh của nó dưới dạng view model một cách bất đồng bộ. (VI)
     /// </summary>
     /// <param name="id">The identifier of the entity.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the view model, or null if the entity is not found.</returns>
@@ -83,7 +93,9 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
     }
 
     /// <summary>
-    /// Updates an entity asynchronously.
+    /// Updates an entity asynchronously. (EN)
+    /// <br/>
+    /// Cập nhật một thực thể một cách bất đồng bộ. (VI)
     /// </summary>
     /// <param name="id">The identifier of the entity to update.</param>
     /// <param name="request">The update request containing the new data.</param>
@@ -118,7 +130,9 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
     }
 
     /// <summary>
-    /// Creates a new entity asynchronously.
+    /// Creates a new entity asynchronously. (EN)
+    /// <br/>
+    /// Tạo một thực thể mới một cách bất đồng bộ. (VI)
     /// </summary>
     /// <param name="request">The create request containing the data for the new entity.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created view model, or null if the creation failed.</returns>
@@ -149,7 +163,9 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
     }
 
     /// <summary>
-    /// Creates multiple new entities asynchronously.
+    /// Creates multiple new entities asynchronously. (EN)
+    /// <br/>
+    /// Tạo nhiều thực thể mới một cách bất đồng bộ. (VI)
     /// </summary>
     /// <param name="request">The list of create requests containing the data for the new entities.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the collection of created view models, or an empty collection if the creation failed.</returns>

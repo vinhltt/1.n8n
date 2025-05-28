@@ -1,6 +1,6 @@
 using CoreFinance.Application.Services;
-using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.UnitOfWorks;
 using Microsoft.Extensions.Logging;
 using MockQueryable;
@@ -13,6 +13,9 @@ namespace CoreFinance.Application.Tests.RecurringTransactionTemplateServiceTests
 // Tests for the GenerateExpectedTransactionsForAllActiveTemplatesAsync method of RecurringTransactionTemplateService
 public partial class RecurringTransactionTemplateServiceTests
 {
+    /// <summary>
+    /// Verifies that GenerateExpectedTransactionsForAllActiveTemplatesAsync processes only active templates with auto-generate enabled.<br/>(EN) Verifies that GenerateExpectedTransactionsForAllActiveTemplatesAsync processes only active templates with auto-generate enabled.<br/>(VI) Xác minh rằng GenerateExpectedTransactionsForAllActiveTemplatesAsync chỉ xử lý các mẫu đang hoạt động có bật tự động tạo.
+    /// </summary>
     [Fact]
     public async Task
         GenerateExpectedTransactionsForAllActiveTemplatesAsync_ShouldProcessOnlyActiveTemplatesWithAutoGenerate()
@@ -78,6 +81,9 @@ public partial class RecurringTransactionTemplateServiceTests
         templateRepoMock.Verify(r => r.GetNoTrackingEntities(), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that GenerateExpectedTransactionsForAllActiveTemplatesAsync handles an empty template list correctly.<br/>(EN) Verifies that GenerateExpectedTransactionsForAllActiveTemplatesAsync handles an empty template list correctly.<br/>(VI) Xác minh rằng GenerateExpectedTransactionsForAllActiveTemplatesAsync xử lý danh sách mẫu rỗng một cách chính xác.
+    /// </summary>
     [Fact]
     public async Task GenerateExpectedTransactionsForAllActiveTemplatesAsync_ShouldHandleEmptyTemplateList()
     {
@@ -108,6 +114,9 @@ public partial class RecurringTransactionTemplateServiceTests
         templateRepoMock.Verify(r => r.GetNoTrackingEntities(), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that GenerateExpectedTransactionsForAllActiveTemplatesAsync rolls back the transaction on exception.<br/>(EN) Verifies that GenerateExpectedTransactionsForAllActiveTemplatesAsync rolls back the transaction on exception.<br/>(VI) Xác minh rằng GenerateExpectedTransactionsForAllActiveTemplatesAsync thực hiện rollback giao dịch khi có ngoại lệ.
+    /// </summary>
     [Fact]
     public async Task GenerateExpectedTransactionsForAllActiveTemplatesAsync_ShouldRollbackOnException()
     {
@@ -156,6 +165,9 @@ public partial class RecurringTransactionTemplateServiceTests
         transactionMock.Verify(t => t.CommitAsync(CancellationToken.None), Times.Never);
     }
 
+    /// <summary>
+    /// Verifies that GenerateExpectedTransactionsForAllActiveTemplatesAsync filters templates correctly.<br/>(EN) Verifies that GenerateExpectedTransactionsForAllActiveTemplatesAsync filters templates correctly.<br/>(VI) Xác minh rằng GenerateExpectedTransactionsForAllActiveTemplatesAsync lọc các mẫu một cách chính xác.
+    /// </summary>
     [Fact]
     public async Task GenerateExpectedTransactionsForAllActiveTemplatesAsync_ShouldFilterCorrectly()
     {
@@ -228,6 +240,9 @@ public partial class RecurringTransactionTemplateServiceTests
         templateRepoMock.Verify(r => r.GetNoTrackingEntities(), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that GenerateExpectedTransactionsForAllActiveTemplatesAsync logs an error on exception.<br/>(EN) Verifies that GenerateExpectedTransactionsForAllActiveTemplatesAsync logs an error on exception.<br/>(VI) Xác minh rằng GenerateExpectedTransactionsForAllActiveTemplatesAsync ghi nhật ký lỗi khi có ngoại lệ.
+    /// </summary>
     [Fact]
     public async Task GenerateExpectedTransactionsForAllActiveTemplatesAsync_ShouldLogErrorOnException()
     {

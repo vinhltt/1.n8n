@@ -1,6 +1,6 @@
 using CoreFinance.Application.Services;
-using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.Enums;
 using CoreFinance.Domain.UnitOfWorks;
 using Microsoft.Extensions.Logging;
@@ -10,9 +10,18 @@ using FluentAssertions;
 
 namespace CoreFinance.Application.Tests.ExpectedTransactionServiceTests;
 
-// Tests for the GetUpcomingTransactionsAsync method of ExpectedTransactionService
+/// <summary>
+/// Contains test cases for the GetUpcomingTransactionsAsync method of ExpectedTransactionService. (EN)
+/// <br/>
+/// Chứa các trường hợp kiểm thử cho phương thức GetUpcomingTransactionsAsync của ExpectedTransactionService. (VI)
+/// </summary>
 public partial class ExpectedTransactionServiceTests
 {
+    /// <summary>
+    /// Verifies that GetUpcomingTransactionsAsync returns upcoming pending transactions within the default number of days (30). (EN)
+    /// <br/>
+    /// Xác minh rằng GetUpcomingTransactionsAsync trả về các giao dịch sắp tới đang chờ xử lý trong số ngày mặc định (30). (VI)
+    /// </summary>
     [Fact]
     public async Task GetUpcomingTransactionsAsync_ShouldReturnUpcomingPendingTransactions_WithDefaultDays()
     {
@@ -92,8 +101,9 @@ public partial class ExpectedTransactionServiceTests
         expectedTransactionViewModels.Should().OnlyContain(t => t.Status == ExpectedTransactionStatus.Pending);
         expectedTransactionViewModels.Should()
             .OnlyContain(t => t.ExpectedDate >= today && t.ExpectedDate <= today.AddDays(30));
-        expectedTransactionViewModels.Select(t => t.Description).Should().Contain(new[]
-            { "Transaction Today", "Transaction in 15 days", "Transaction in 29 days" });
+        expectedTransactionViewModels.Select(t => t.Description).Should().Contain([
+            "Transaction Today", "Transaction in 15 days", "Transaction in 29 days"
+        ]);
 
         // Should be ordered by ExpectedDate
         var resultList = expectedTransactionViewModels.ToList();
@@ -102,6 +112,11 @@ public partial class ExpectedTransactionServiceTests
         resultList[2].Description.Should().Be("Transaction in 29 days");
     }
 
+    /// <summary>
+    /// Verifies that GetUpcomingTransactionsAsync returns upcoming pending transactions within a custom number of days. (EN)
+    /// <br/>
+    /// Xác minh rằng GetUpcomingTransactionsAsync trả về các giao dịch sắp tới đang chờ xử lý trong số ngày tùy chỉnh. (VI)
+    /// </summary>
     [Fact]
     public async Task GetUpcomingTransactionsAsync_ShouldReturnUpcomingPendingTransactions_WithCustomDays()
     {
@@ -163,9 +178,14 @@ public partial class ExpectedTransactionServiceTests
         expectedTransactionViewModels.Should()
             .OnlyContain(t => t.ExpectedDate >= today && t.ExpectedDate <= today.AddDays(customDays));
         expectedTransactionViewModels.Select(t => t.Description).Should()
-            .Contain(new[] { "Transaction in 3 days", "Transaction in 7 days" });
+            .Contain(["Transaction in 3 days", "Transaction in 7 days"]);
     }
 
+    /// <summary>
+    /// Verifies that GetUpcomingTransactionsAsync ignores non-pending transactions. (EN)
+    /// <br/>
+    /// Xác minh rằng GetUpcomingTransactionsAsync bỏ qua các giao dịch không ở trạng thái đang chờ xử lý. (VI)
+    /// </summary>
     [Fact]
     public async Task GetUpcomingTransactionsAsync_ShouldIgnoreNonPendingTransactions()
     {
@@ -227,6 +247,11 @@ public partial class ExpectedTransactionServiceTests
         expectedTransactionViewModels.First().Description.Should().Be("Pending Transaction");
     }
 
+    /// <summary>
+    /// Verifies that GetUpcomingTransactionsAsync filters transactions by User ID. (EN)
+    /// <br/>
+    /// Xác minh rằng GetUpcomingTransactionsAsync lọc các giao dịch theo ID người dùng. (VI)
+    /// </summary>
     [Fact]
     public async Task GetUpcomingTransactionsAsync_ShouldFilterByUserId()
     {
@@ -280,6 +305,11 @@ public partial class ExpectedTransactionServiceTests
         expectedTransactionViewModels.First().Description.Should().Be("User Transaction");
     }
 
+    /// <summary>
+    /// Verifies that GetUpcomingTransactionsAsync returns an empty list when there are no upcoming transactions within the specified date range. (EN)
+    /// <br/>
+    /// Xác minh rằng GetUpcomingTransactionsAsync trả về danh sách rỗng khi không có giao dịch sắp tới nào trong phạm vi ngày được chỉ định. (VI)
+    /// </summary>
     [Fact]
     public async Task GetUpcomingTransactionsAsync_ShouldReturnEmptyList_WhenNoUpcomingTransactions()
     {
@@ -330,6 +360,11 @@ public partial class ExpectedTransactionServiceTests
         expectedTransactionViewModels.Should().BeEmpty();
     }
 
+    /// <summary>
+    /// Verifies that GetUpcomingTransactionsAsync returns an empty list when no transactions exist in the repository. (EN)
+    /// <br/>
+    /// Xác minh rằng GetUpcomingTransactionsAsync trả về danh sách rỗng khi không có giao dịch nào tồn tại trong repository. (VI)
+    /// </summary>
     [Fact]
     public async Task GetUpcomingTransactionsAsync_ShouldReturnEmptyList_WhenNoTransactionsExist()
     {
@@ -356,6 +391,11 @@ public partial class ExpectedTransactionServiceTests
         expectedTransactionViewModels.Should().BeEmpty();
     }
 
+    /// <summary>
+    /// Verifies that GetUpcomingTransactionsAsync returns transactions ordered by ExpectedDate. (EN)
+    /// <br/>
+    /// Xác minh rằng GetUpcomingTransactionsAsync trả về các giao dịch được sắp xếp theo ExpectedDate. (VI)
+    /// </summary>
     [Fact]
     public async Task GetUpcomingTransactionsAsync_ShouldReturnTransactionsOrderedByExpectedDate()
     {

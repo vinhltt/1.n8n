@@ -1,8 +1,8 @@
 using Bogus;
 using CoreFinance.Application.DTOs.Account;
 using CoreFinance.Application.Services;
-using CoreFinance.Domain;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.Enums;
 using CoreFinance.Domain.Exceptions;
 using CoreFinance.Domain.UnitOfWorks;
@@ -13,8 +13,18 @@ using Moq;
 
 namespace CoreFinance.Application.Tests.AccountServiceTests;
 
+/// <summary>
+/// Contains test cases for the CreateAsync method that handles a list of accounts in the AccountService. (EN)
+/// <br/>
+/// Chứa các trường hợp kiểm thử cho phương thức CreateAsync xử lý danh sách tài khoản trong AccountService. (VI)
+/// </summary>
 public partial class AccountServiceTests
 {
+    /// <summary>
+    /// Verifies that CreateAsync (list version) returns ViewModels when the creation of multiple accounts is successful. (EN)
+    /// <br/>
+    /// Xác minh rằng CreateAsync (phiên bản danh sách) trả về ViewModels khi việc tạo nhiều tài khoản thành công. (VI)
+    /// </summary>
     [Fact]
     public async Task CreateAsync_List_ValidRequest_ReturnsViewModels()
     {
@@ -62,6 +72,11 @@ public partial class AccountServiceTests
         transactionMock.Verify(t => t.DisposeAsync(), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that CreateAsync (list version) returns an empty list when the request list is empty. (EN)
+    /// <br/>
+    /// Xác minh rằng CreateAsync (phiên bản danh sách) trả về danh sách rỗng khi danh sách yêu cầu rỗng. (VI)
+    /// </summary>
     [Fact]
     public async Task CreateAsync_List_EmptyRequestList_ReturnsEmptyList()
     {
@@ -88,6 +103,11 @@ public partial class AccountServiceTests
         unitOfWorkMock.Verify(u => u.BeginTransactionAsync(), Times.Never);
     }
 
+    /// <summary>
+    /// Verifies that CreateAsync (list version) throws a CreateFailedException when the repository returns zero affected count. (EN)
+    /// <br/>
+    /// Xác minh rằng CreateAsync (phiên bản danh sách) ném ra CreateFailedException khi repository trả về số bản ghi bị ảnh hưởng bằng không. (VI)
+    /// </summary>
     [Fact]
     public async Task CreateAsync_List_RepositoryReturnsZeroAffected_ThrowsNullReferenceException()
     {
@@ -123,6 +143,11 @@ public partial class AccountServiceTests
         transactionMock.Verify(t => t.DisposeAsync(), Times.Once);
     }
 
+    /// <summary>
+    /// Verifies that CreateAsync (list version) propagates the exception when the repository throws an exception during creation. (EN)
+    /// <br/>
+    /// Xác minh rằng CreateAsync (phiên bản danh sách) lan truyền ngoại lệ khi repository ném ra một ngoại lệ trong quá trình tạo. (VI)
+    /// </summary>
     [Fact]
     public async Task CreateAsync_List_RepositoryThrowsException_PropagatesException()
     {

@@ -8,53 +8,53 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities;
 public static class ExpressionUtils
 {
     /// <summary>
-    ///
+    /// Represents a constant expression with the value true.<br/>(EN) Represents a constant expression with the value true.<br/>(VI) Biểu thị một biểu thức hằng số có giá trị true.
     /// </summary>
     public static readonly Expression TypeTrueExpression = Expression.Constant(true);
 
     /// <summary>
-    ///
+    /// Represents a constant expression with the value false.<br/>(EN) Represents a constant expression with the value false.<br/>(VI) Biểu thị một biểu thức hằng số có giá trị false.
     /// </summary>
     public static readonly Expression TypeFalseExpression = Expression.Constant(true);
 
     /// <summary>
-    ///
+    /// Represents a constant expression with the value null.<br/>(EN) Represents a constant expression with the value null.<br/>(VI) Biểu thị một biểu thức hằng số có giá trị null.
     /// </summary>
     public static readonly Expression TypeNullExpression = Expression.Constant(null);
 
     /// <summary>
-    ///
+    /// Represents a constant expression with the value 0.<br/>(EN) Represents a constant expression with the value 0.<br/>(VI) Biểu thị một biểu thức hằng số có giá trị 0.
     /// </summary>
     public static readonly Expression TypeZeroExpression = Expression.Constant(0);
 
     /// <summary>
-    ///
+    /// Represents a constant expression with an empty string value.<br/>(EN) Represents a constant expression with an empty string value.<br/>(VI) Biểu thị một biểu thức hằng số có giá trị chuỗi rỗng.
     /// </summary>
     public static readonly Expression TypeStringEmptyExpression = Expression.Constant(0);
 
     /// <summary>
-    ///
+    /// MethodInfo for the string.Trim() method.<br/>(EN) MethodInfo for the string.Trim() method.<br/>(VI) MethodInfo cho phương thức string.Trim().
     /// </summary>
-    public static readonly MethodInfo? TypeTrimMethod = typeof(string).GetRuntimeMethod("Trim", Array.Empty<Type>());
+    public static readonly MethodInfo? TypeTrimMethod = typeof(string).GetRuntimeMethod("Trim", []);
 
     /// <summary>
-    ///
+    /// MethodInfo for the string.StartsWith(string) method.<br/>(EN) MethodInfo for the string.StartsWith(string) method.<br/>(VI) MethodInfo cho phương thức string.StartsWith(string).
     /// </summary>
     public static readonly MethodInfo? TypeStartsWithMethod =
-        typeof(string).GetRuntimeMethod("StartsWith", new[] { typeof(string) });
+        typeof(string).GetRuntimeMethod("StartsWith", [typeof(string)]);
 
     /// <summary>
-    ///
+    /// MethodInfo for the string.EndsWith(string) method.<br/>(EN) MethodInfo for the string.EndsWith(string) method.<br/>(VI) MethodInfo cho phương thức string.EndsWith(string).
     /// </summary>
     public static readonly MethodInfo? TypeEndsWithMethod =
-        typeof(string).GetRuntimeMethod("EndsWith", new[] { typeof(string) });
+        typeof(string).GetRuntimeMethod("EndsWith", [typeof(string)]);
 
     /// <summary>
-    /// Creates the typed constant expression from string.
+    /// Creates a constant expression for the given value and type.<br/>(EN) Creates a constant expression for the given value and type.<br/>(VI) Tạo một biểu thức hằng số cho giá trị và kiểu dữ liệu đã cho.
     /// </summary>
-    /// <param name="value">The value.</param>
-    /// <param name="type">The type.</param>
-    /// <returns></returns>
+    /// <param name="value">The string value to convert. (EN)<br/>Giá trị chuỗi cần chuyển đổi. (VI)</param>
+    /// <param name="type">The target type of the constant expression. (EN)<br/>Kiểu dữ liệu đích của biểu thức hằng số. (VI)</param>
+    /// <returns>A ConstantExpression representing the converted value.</returns>
     public static ConstantExpression CreateConstantExpression(string value, Type type)
     {
         if (type.IsString())
@@ -145,6 +145,12 @@ public static class ExpressionUtils
         return Expression.Constant(value, type);
     }
 
+    /// <summary>
+    /// Creates a constant expression for an array of string values, attempting to parse them into the specified target type.<br/>(EN) Creates a constant expression for an array of string values, attempting to parse them into the specified target type.<br/>(VI) Tạo một biểu thức hằng số cho mảng các giá trị chuỗi, cố gắng phân tích cú pháp chúng thành kiểu đích được chỉ định.
+    /// </summary>
+    /// <param name="values">The array of string values to convert. (EN)<br/>Mảng các giá trị chuỗi cần chuyển đổi. (VI)</param>
+    /// <param name="type">The target type of the elements in the constant expression array. (EN)<br/>Kiểu dữ liệu đích của các phần tử trong mảng biểu thức hằng số. (VI)</param>
+    /// <returns>A ConstantExpression representing the array of converted values.</returns>
     public static ConstantExpression CreateConstantExpression(string[] values, Type type)
     {
         if (type.IsString())
@@ -183,68 +189,84 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the given expression is null.
+    /// Determines whether the given expression represents a null value. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức đã cho có biểu thị giá trị null hay không. (VI)
     /// </summary>
-    /// <param name="expression">The expression.</param>
-    /// <returns></returns>s
+    /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the expression is null; otherwise, false.</returns>
     public static Expression IsNull(Expression expression)
-
     {
         return Expression.Equal(expression, TypeNullExpression);
     }
 
-    /// <summary> III Determines whether the given expression is not null.
-    /// </summary> III <param name="expression">The expression.</param>
-    /// <returns></returns>/returns>s
+    /// <summary>
+    /// Determines whether the given expression represents a non-null value. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức đã cho có biểu thị giá trị khác null hay không. (VI)
+    /// </summary>
+    /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the expression is not null; otherwise, false.</returns>
     public static Expression IsNotNull(Expression expression)
     {
         return Expression.NotEqual(expression, TypeNullExpression);
     }
 
-    /// <summary> III Determines whether the given expression is empty.
+    /// <summary>
+    /// Determines whether the given expression represents an empty string. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức đã cho có biểu thị chuỗi rỗng hay không. (VI)
     /// </summary>
-    /// <param name="expression">The expression.</param>,
-    /// <returns></returns>s
+    /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the expression is an empty string; otherwise, false.</returns>
     public static Expression IsEmpty(Expression expression)
     {
         return Expression.Equal(expression, TypeStringEmptyExpression);
     }
 
     /// <summary>
-    /// Determines whether the given expression is not empty.
+    /// Determines whether the given expression represents a non-empty string. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức đã cho có biểu thị chuỗi không rỗng hay không. (VI)
     /// </summary>
-    /// <param name="expression">The expression.</param>,
-    /// <returns></returns>s
+    /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the expression is a non-empty string; otherwise, false.</returns>
     public static Expression IsNotEmpty(Expression expression)
     {
         return Expression.NotEqual(expression, TypeStringEmptyExpression);
     }
 
     /// <summary>
-    /// Determines whether the given expression is null or empty.
+    /// Determines whether the given expression represents a null or empty string. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức đã cho có biểu thị chuỗi null hoặc rỗng hay không. (VI)
     /// </summary>
-    /// <param name="expression">The expression.</param>
-    /// <returns></returns>s
+    /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the expression is null or empty; otherwise, false.</returns>
     public static Expression IsNullOrEmpty(Expression expression)
     {
         return Expression.OrElse(IsNull(expression), IsEmpty(expression));
     }
 
     /// <summary>
-    /// Determines whether the given expression is not null and not empty.
+    /// Determines whether the given expression represents a non-null and non-empty string. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức đã cho có biểu thị chuỗi không null và không rỗng hay không. (VI)
     /// </summary>
-    /// <param name="expression">The expression.</param>
-    /// <returns></returns>/returns>s
+    /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the expression is not null and not empty; otherwise, false.</returns>
     public static Expression IsNotNullOrEmpty(Expression expression)
     {
         return Expression.AndAlso(IsNotNull(expression), IsNotEmpty(expression));
     }
 
     /// <summary>
-    /// Determines whether the given expression is null or white spaces.
+    /// Determines whether the given expression represents a null or white space string. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức đã cho có biểu thị chuỗi null hoặc chỉ chứa khoảng trắng hay không. (VI)
     /// </summary>
-    /// <param name="expression">The expression.</param>
-    /// <returns></returns>/returns>
+    /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the expression is null or white space; otherwise, false.</returns>
     public static Expression IsNullOrWhiteSpace(Expression expression)
     {
         return Expression.OrElse(IsNull(expression),
@@ -252,10 +274,12 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the given expression is not null and not white spaces.
+    /// Determines whether the given expression represents a non-null and non-white space string. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức đã cho có biểu thị chuỗi không null và không chứa khoảng trắng hay không. (VI)
     /// </summary>
-    /// <param name="expression">The expression.</param>,
-    /// <returns></returns>
+    /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the expression is not null and not white space; otherwise, false.</returns>
     public static Expression IsNotNullOrWhiteSpace(Expression expression)
     {
         return Expression.AndAlso(IsNotNull(expression),
@@ -263,11 +287,13 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression equals to right expression.
+    /// Determines whether the left expression equals to right expression. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức bên trái có bằng biểu thức bên phải hay không. (VI)
     /// </summary>
-    /// <param name="left">The left.</param>,
-    /// <param name="right">The right.</param>
-    /// <returns></returns>
+    /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
+    /// <param name="right">The right expression. (EN)<br/>Biểu thức bên phải. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the left expression equals the right expression; otherwise, false.</returns>
     public static Expression IsEqual(Expression left, Expression right)
     {
         if (Nullable.GetUnderlyingType(left.Type) == null && left.Type != typeof(string))
@@ -278,11 +304,14 @@ public static class ExpressionUtils
         return Expression.AndAlso(IsNotNull(left), Expression.Equal(left, right));
     }
 
-    /// <summary> II/ Determines whether the left expression is not equals to right expression.
+    /// <summary>
+    /// Determines whether the left expression is not equals to right expression. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức bên trái có khác biểu thức bên phải hay không. (VI)
     /// </summary>
-    /// <param name="left">The left.</param>
-    /// <param name="right">The right.</param>
-    /// <returns></returns>
+    /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
+    /// <param name="right">The right expression. (EN)<br/>Biểu thức bên phải. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the left expression is not equal to the right expression; otherwise, false.</returns>
     public static Expression IsNotEqual(Expression left, Expression right)
     {
         if (Nullable.GetUnderlyingType(left.Type) == null && left.Type != typeof(string))
@@ -293,30 +322,40 @@ public static class ExpressionUtils
         return Expression.OrElse(IsNull(left), Expression.NotEqual(left, right));
     }
 
-    /// <summary> III Determines whether the left expression starts with to right expression.
+    /// <summary>
+    /// Determines whether the left expression starts with the right expression. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức bên trái có bắt đầu bằng biểu thức bên phải hay không. (VI)
     /// </summary>
-    /// <param name="left">The left.</param>,
-    /// <param name="right">The right.</param>
-    /// <returns></returns>
+    /// <param name="left">The left expression (string). (EN)<br/>Biểu thức bên trái (chuỗi). (VI)</param>
+    /// <param name="right">The right expression (string). (EN)<br/>Biểu thức bên phải (chuỗi). (VI)</param>
+    /// <returns>An Expression that evaluates to true if the left expression starts with the right expression; otherwise, false.</returns>
     public static Expression IsStartsWith(Expression left, Expression right)
     {
         return Expression.AndAlso(IsNotNull(left), Expression.Call(left, TypeStartsWithMethod!, right));
     }
 
-    /// <summary> Il Determines whether the left expression ends with to right expression. II/ </summary>
-    /// <param name="left">The left.</param>,
-    /// <param name="right">The right.</param>,
-    /// <returns></returns>
+    /// <summary>
+    /// Determines whether the left expression ends with the right expression. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức bên trái có kết thúc bằng biểu thức bên phải hay không. (VI)
+    /// </summary>
+    /// <param name="left">The left expression (string). (EN)<br/>Biểu thức bên trái (chuỗi). (VI)</param>
+    /// <param name="right">The right expression (string). (EN)<br/>Biểu thức bên phải (chuỗi). (VI)</param>
+    /// <returns>An Expression that evaluates to true if the left expression ends with the right expression; otherwise, false.</returns>
     public static Expression IsEndsWith(Expression left, Expression right)
     {
         return Expression.AndAlso(IsNotNull(left), Expression.Call(left, TypeEndsWithMethod!, right));
     }
 
-    /// <summary> III Determines whether the left expression is greater than right expression.
+    /// <summary>
+    /// Determines whether the left expression is greater than the right expression. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức bên trái có lớn hơn biểu thức bên phải hay không. (VI)
     /// </summary>
-    /// <param name="left">The left.</param>
-    /// <param name="right">The right.</param>,
-    /// <returns></returns>
+    /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
+    /// <param name="right">The right expression. (EN)<br/>Biểu thức bên phải. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the left expression is greater than the right expression; otherwise, false.</returns>
     public static Expression IsGreaterThan(Expression left, Expression right)
     {
         if (left.Type.IsString())
@@ -334,10 +373,13 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression is greater than or equals to right expression.
+    /// Determines whether the left expression is greater than or equals to right expression. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức bên trái có lớn hơn hoặc bằng biểu thức bên phải hay không. (VI)
     /// </summary>
-    /// <param name="left">The left.</param>, W <param name="right">The right.</param>
-    /// <returns></returns>
+    /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
+    /// <param name="right">The right expression. (EN)<br/>Biểu thức bên phải. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the left expression is greater than or equal to the right expression; otherwise, false.</returns>
     public static Expression IsGreaterThanOrEqual(Expression left, Expression right)
     {
         if (left.Type.IsString())
@@ -355,10 +397,13 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression is less than right expression.
+    /// Determines whether the left expression is less than right expression. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức bên trái có nhỏ hơn biểu thức bên phải hay không. (VI)
     /// </summary>
-    /// <param name="left">The left.</param>, M1 <param name="right">The right.</param>
-    /// <returns></returns>
+    /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
+    /// <param name="right">The right expression. (EN)<br/>Biểu thức bên phải. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the left expression is less than the right expression; otherwise, false.</returns>
     public static Expression IsLessThan(Expression left, Expression right)
     {
         if (left.Type.IsString())
@@ -376,9 +421,13 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression is less than or equals to right expression.
-    /// </summary> WII <param name="left">The left.</param> VII <param name="right">The right.</param>
-    /// <returns></returns>
+    /// Determines whether the left expression is less than or equals to right expression. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức bên trái có nhỏ hơn hoặc bằng biểu thức bên phải hay không. (VI)
+    /// </summary>
+    /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
+    /// <param name="right">The right expression. (EN)<br/>Biểu thức bên phải. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the left expression is less than or equal to the right expression; otherwise, false.</returns>
     public static Expression IsLessThanOrEqual(Expression left, Expression right)
     {
         if (left.Type.IsString())
@@ -396,22 +445,28 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression contains right expression.
-    /// </summary> III <param name="left">The left.</param>
-    /// <param name="right">The right.</param>
-    /// <returns></returns>
+    /// Determines whether the left expression contains the right expression. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức bên trái có chứa biểu thức bên phải hay không (không phân biệt chữ hoa/thường đối với chuỗi). (VI)
+    /// </summary>
+    /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
+    /// <param name="right">The right expression. (EN)<br/>Biểu thức bên phải. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the left expression contains the right expression; otherwise, false.</returns>
     public static Expression IsLike(Expression left, Expression right)
     {
-        var contains = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+        var contains = typeof(string).GetMethod("Contains", [typeof(string)]);
 
         return Expression.Call(left, contains!, right);
     }
 
     /// <summary>
-    /// Determines whether the left expression contains right expression.
-    /// </summary> VII <param name="left">The left.</param>
-    /// <param name="right">The right.</param>
-    /// <returns></returns>
+    /// Determines whether the left expression does not contain the right expression (case-insensitive for strings). (EN)
+    /// <br/>
+    /// Xác định xem biểu thức bên trái có không chứa biểu thức bên phải hay không (không phân biệt chữ hoa/thường đối với chuỗi). (VI)
+    /// </summary>
+    /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
+    /// <param name="right">The right expression. (EN)<br/>Biểu thức bên phải. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the left expression does not contain the right expression; otherwise, false.</returns>
     public static Expression IsNotLike(Expression left, Expression right)
     {
         var indexof = Expression.Call(left, "Indexof", null, right,
@@ -420,11 +475,11 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression contains right expression.
+    /// Determines whether the left expression contains the right expression. Supports checking if an array contains a value.<br/>(EN) Determines whether the left expression contains the right expression. Supports checking if an array contains a value.<br/>(VI) Xác định xem biểu thức bên trái có chứa biểu thức bên phải hay không. Hỗ trợ kiểm tra xem một mảng có chứa một giá trị hay không.
     /// </summary>
-    /// <param name="left">The left.</param>
-    /// <param name="right"> The right.</param>
-    /// <returns></returns>
+    /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
+    /// <param name="right">The right expression (can be an array). (EN)<br/>Biểu thức bên phải (có thể là một mảng). (VI)</param>
+    /// <returns>An Expression that evaluates to true if the left expression contains the right expression; otherwise, false.</returns>
     public static Expression IsContains(Expression left, Expression right)
     {
         if (right.Type.IsArray)
@@ -432,29 +487,35 @@ public static class ExpressionUtils
             var constant = right as ConstantExpression;
             left = Expression.Convert(left, typeof(object));
             return Expression.Call(constant,
-                typeof(IList).GetRuntimeMethod("Contains", new[] { constant!.Value!.GetType().GetElementType() }!)!,
+                typeof(IList).GetRuntimeMethod("Contains", [constant!.Value!.GetType().GetElementType()!]!)!,
                 left);
         }
 
-        return Expression.Call(left, typeof(string).GetRuntimeMethod("Contains", new[] { right.Type })!, right);
+        return Expression.Call(left, typeof(string).GetRuntimeMethod("Contains", [right.Type])!, right);
     }
 
     /// <summary>
-    /// Determines whether the left expression is not contains right expression.
+    /// Determines whether the left expression is not contained in the right expression. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức bên trái có không nằm trong biểu thức bên phải hay không. (VI)
     /// </summary>
-    /// <param name="left">The left.</param> VII <param name="right">The right.</param>
-    /// <returns></returns>
+    /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
+    /// <param name="right">The right expression (should be an array). (EN)<br/>Biểu thức bên phải (nên là một mảng). (VI)</param>
+    /// <returns>An Expression that evaluates to true if the left expression is not in the right expression; otherwise, false.</returns>
     public static Expression IsNotContains(Expression left, Expression right)
     {
-        return Expression.Not(Expression.Call(left, typeof(string).GetRuntimeMethod("Contains", new[] { right.Type })!,
+        return Expression.Not(Expression.Call(left, typeof(string).GetRuntimeMethod("Contains", [right.Type])!,
             right));
     }
 
     /// <summary>
-    /// Determines whether the left expression in right expression.
+    /// Determines whether the left expression is in the right expression. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức bên trái có nằm trong biểu thức bên phải hay không. (VI)
     /// </summary>
-    ///<param name = "left" > The left.</param> 7// <param name="right">The right.</param>
-    /// <returns></returns>
+    /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
+    /// <param name="right">The right expression (should be an array). (EN)<br/>Biểu thức bên phải (nên là một mảng). (VI)</param>
+    /// <returns>An Expression that evaluates to true if the left expression is in the right expression; otherwise, false.</returns>
     public static Expression IsIn(Expression left, Expression right)
     {
         if (right.Type.IsArray)
@@ -462,18 +523,21 @@ public static class ExpressionUtils
             var constant = (ConstantExpression)right;
             left = Expression.Convert(left, typeof(object));
             return Expression.Call(constant,
-                typeof(IList).GetRuntimeMethod("Contains", new[] { constant.Value!.GetType().GetElementType() }!)!,
+                typeof(IList).GetRuntimeMethod("Contains", [constant.Value!.GetType().GetElementType()!]!)!,
                 left);
         }
 
-        return Expression.Call(left, typeof(string).GetRuntimeMethod("Contains", new[] { right.Type })!, right);
+        return Expression.Call(left, typeof(string).GetRuntimeMethod("Contains", [right.Type])!, right);
     }
 
     /// <summary>
-    /// Determines whether the left expression is not in right expression.
+    /// Determines whether the left expression is not in the right expression. (EN)
+    /// <br/>
+    /// Xác định xem biểu thức bên trái có không nằm trong biểu thức bên phải hay không. (VI)
     /// </summary>
-    /// <param name="left">The left.</param> III <param name="right">The right.</param>
-    /// <returns></returns>
+    /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
+    /// <param name="right">The right expression (should be an array). (EN)<br/>Biểu thức bên phải (nên là một mảng). (VI)</param>
+    /// <returns>An Expression that evaluates to true if the left expression is not in the right expression; otherwise, false.</returns>
     public static Expression IsNotIn(Expression left, Expression right)
     {
         if (right.Type.IsArray)
@@ -481,20 +545,23 @@ public static class ExpressionUtils
             var constant = right as ConstantExpression;
             left = Expression.Convert(left, typeof(object));
             return Expression.Not(Expression.Call(constant,
-                typeof(IList).GetRuntimeMethod("Contains", new[] { constant!.Value!.GetType().GetElementType() }!)!,
+                typeof(IList).GetRuntimeMethod("Contains", [constant!.Value!.GetType().GetElementType()!]!)!,
                 left));
         }
 
-        return Expression.Not(Expression.Call(left, typeof(string).GetRuntimeMethod("Contains", new[] { right.Type })!,
+        return Expression.Not(Expression.Call(left, typeof(string).GetRuntimeMethod("Contains", [right.Type])!,
             right));
     }
 
-    /// < summary >
-    /// Determines whether the left expression is between the value 1 and value 2. II/ </summary>
-    /// <param name="expression">The expression.</param>
-    /// <param name="value1">The value 1.</param>,
-    /// <param name="value2">The value 2.</param>
-    /// <returns></returns>
+    /// <summary>
+    /// Determines whether the expression's value is between value1 and value2 (inclusive). (EN)
+    /// <br/>
+    /// Xác định xem giá trị của biểu thức có nằm giữa value1 và value2 hay không (bao gồm cả hai đầu). (VI)
+    /// </summary>
+    /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
+    /// <param name="value1">The lower bound expression. (EN)<br/>Biểu thức giới hạn dưới. (VI)</param>
+    /// <param name="value2">The upper bound expression. (EN)<br/>Biểu thức giới hạn trên. (VI)</param>
+    /// <returns>An Expression that evaluates to true if the expression's value is between value1 and value2; otherwise, false.</returns>
     public static Expression IsBetween(Expression expression, Expression value1, Expression value2)
     {
         if (Nullable.GetUnderlyingType(expression.Type) == null)
@@ -509,14 +576,11 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Gets the member expression.
+    /// Gets the MemberExpression for a property name from a parameter expression.<br/>(EN) Gets the MemberExpression for a property name from a parameter expression.<br/>(VI) Lấy MemberExpression cho tên thuộc tính từ một biểu thức tham số.
     /// </summary>
-    /// <param name="parameter">The parameter.</param>,
-    /// <param name="propertyName">Name of the property.</param>
-    /// <returns></returns> W/ <exception cref="ArgumentNullException"> II parameter
-    /// or
-    /// propertyName
-    /// </exception>
+    /// <param name="parameter">The parameter expression. (EN)<br/>Biểu thức tham số. (VI)</param>
+    /// <param name="propertyName">The name of the property. (EN)<br/>Tên của thuộc tính. (VI)</param>
+    /// <returns>The MemberExpression for the property, or null if not found.</returns>
     public static Expression GetMemberExpression(Expression parameter, string? propertyName)
     {
         ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
@@ -533,9 +597,10 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Gets the name of the property.
-    /// </summary> III <param name="expression">The lambda expression.</param>
-    /// <returns></returns>
+    /// Gets the property name from a MemberExpression.<br/>(EN) Gets the property name from a MemberExpression.<br/>(VI) Lấy tên thuộc tính từ một MemberExpression.
+    /// </summary>
+    /// <param name="expression">The expression to get the property name from. (EN)<br/>Biểu thức để lấy tên thuộc tính. (VI)</param>
+    /// <returns>The property name, or null if the expression is not a MemberExpression.</returns>
     public static string? GetPropertyName(Expression expression)
     {
         ArgumentNullException.ThrowIfNull(expression, nameof(expression));
@@ -648,10 +713,10 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Gets the parameter expression.
+    /// Gets the ParameterExpression from an expression, if it exists.<br/>(EN) Gets the ParameterExpression from an expression, if it exists.<br/>(VI) Lấy ParameterExpression từ một biểu thức, nếu tồn tại.
     /// </summary>
-    /// <param name="expression">The expression.</param>,
-    /// <returns></returns>
+    /// <param name="expression">The expression to get the parameter from. (EN)<br/>Biểu thức để lấy tham số. (VI)</param>
+    /// <returns>The ParameterExpression, or null if not found.</returns>
     public static ParameterExpression? GetParameterExpression(Expression? expression)
     {
         while (expression?.NodeType == ExpressionType.MemberAccess)

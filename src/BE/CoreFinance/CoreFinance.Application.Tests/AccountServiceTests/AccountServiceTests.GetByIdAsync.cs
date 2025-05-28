@@ -1,15 +1,25 @@
 using CoreFinance.Application.Services;
-using CoreFinance.Domain;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using CoreFinance.Domain.BaseRepositories;
+using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.UnitOfWorks;
 
 namespace CoreFinance.Application.Tests.AccountServiceTests;
 
+/// <summary>
+/// Contains test cases for the GetByIdAsync method of AccountService. (EN)
+/// <br/>
+/// Chứa các trường hợp kiểm thử cho phương thức GetByIdAsync của AccountService. (VI)
+/// </summary>
 public partial class AccountServiceTests
 {
+    /// <summary>
+    /// Verifies that GetByIdAsync returns the correct account ViewModel when the account exists. (EN)
+    /// <br/>
+    /// Xác minh rằng GetByIdAsync trả về đúng ViewModel của tài khoản khi tài khoản tồn tại. (VI)
+    /// </summary>
     [Fact]
     public async Task GetByIdAsync_ShouldReturnAccount_WhenAccountExists()
     {
@@ -35,6 +45,11 @@ public partial class AccountServiceTests
         result.Name.Should().Be("Test Account");
     }
 
+    /// <summary>
+    /// Verifies that GetByIdAsync returns null when the account does not exist in the repository. (EN)
+    /// <br/>
+    /// Xác minh rằng GetByIdAsync trả về null khi tài khoản không tồn tại trong repository. (VI)
+    /// </summary>
     [Fact]
     public async Task GetByIdAsync_ShouldReturnNull_WhenAccountDoesNotExist()
     {
