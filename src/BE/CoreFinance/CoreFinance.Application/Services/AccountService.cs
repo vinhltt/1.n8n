@@ -7,6 +7,7 @@ using CoreFinance.Contracts.DTOs;
 using CoreFinance.Contracts.EntityFrameworkUtilities;
 using CoreFinance.Domain.Entities;
 using CoreFinance.Domain.UnitOfWorks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace CoreFinance.Application.Services;
@@ -37,5 +38,14 @@ public class AccountService(
             query = query.Where(e => e.Name!.Contains(request.SearchValue, StringComparison.CurrentCultureIgnoreCase));
 
         return await query.ToPagingAsync(request);
+    }
+
+    public async Task<List<AccountSelectionViewModel>?> GetAccountSelectionAsync()
+    {
+        var query =
+            Mapper.ProjectTo<AccountSelectionViewModel>(UnitOffWork.Repository<Account, Guid>()
+                .GetNoTrackingEntities());
+
+        return await query.ToListAsync();
     }
 }

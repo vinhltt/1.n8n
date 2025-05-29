@@ -12,11 +12,12 @@ public enum FilterLogicalOperator
     /// <br/>
     /// Đại diện cho toán tử logic AND. (VI)
     /// </summary>
-    And,
+    And = 0,
+
     /// <summary>
     /// Represents the logical OR operator. (EN)
     /// <br/>
     /// Đại diện cho toán tử logic OR. (VI)
     /// </summary>
-    Or,
+    Or = 1,
 }
