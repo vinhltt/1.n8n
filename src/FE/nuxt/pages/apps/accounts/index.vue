@@ -215,7 +215,7 @@
 import { useAppStore } from '@/stores/index'
 import { useAccounts } from '@/composables/useAccounts'
 import type { Account, AccountFilters, Pagination, FilterBodyRequest, ApiResponse, FilterRequest, FilterDetailsRequest } from '~/types'
-import { FilterLogicalOperator, FilterOperator } from '~/types'
+import { FilterLogicalOperator, FilterType } from '~/types'
 import Swal from 'sweetalert2'
 
 const store = useAppStore()
@@ -289,16 +289,16 @@ const fetchAccounts = async () => {
     
     if (filters.value.type) {
       filterDetails.push({
-        field: 'type',
-        operator: FilterOperator.Equal,
+        attributeName: 'type',
+        filterType: FilterType.Equal,
         value: filters.value.type
       })
     }
     
     if (filters.value.currency) {
       filterDetails.push({
-        field: 'currency',
-        operator: FilterOperator.Equal,
+        attributeName: 'currency',
+        filterType: FilterType.Equal,
         value: filters.value.currency
       })
     }

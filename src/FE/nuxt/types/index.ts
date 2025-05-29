@@ -3,4 +3,4 @@ export type { AccountType, Account, AccountCreateRequest, AccountUpdateRequest, 
 
 // API types
 export type { Pagination, SortDescriptor, FilterDetailsRequest, FilterRequest, FilterBodyRequest, ApiResponse, ApiError } from './api' 
-export { FilterLogicalOperator, FilterOperator } from './api' 
+export { FilterLogicalOperator, FilterType } from './api' 

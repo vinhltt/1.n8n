@@ -16,6 +16,9 @@ export interface Account {
   updateBy?: string
 }
 
+// Alias for consistency
+export type AccountViewModel = Account
+
 export interface AccountCreateRequest {
   userId?: string
   name: string

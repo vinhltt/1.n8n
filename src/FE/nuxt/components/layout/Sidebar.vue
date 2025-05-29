@@ -24,7 +24,31 @@
                         class="relative h-[calc(100vh-80px)]"
                     >
                         <ul class="relative space-y-0.5 p-4 py-0 font-semibold">
-                            <li class="menu nav-item">
+
+                            <li class="nav-item">
+                                <NuxtLink to="/apps/accounts" class="group" @click="toggleMobileMenu">
+                                    <div class="flex items-center">
+                                        <icon-credit-card class="shrink-0 group-hover:!text-primary" />
+
+                                        <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">
+                                            Accounts
+                                        </span>
+                                    </div>
+                                </NuxtLink>
+                            </li>
+
+                            <li class="nav-item">
+                                <NuxtLink to="/apps/transactions" class="group" @click="toggleMobileMenu">
+                                    <div class="flex items-center">
+                                        <icon-dollar-sign class="shrink-0 group-hover:!text-primary" />
+
+                                        <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">
+                                            Transactions
+                                        </span>
+                                    </div>
+                                </NuxtLink>
+                            </li>
+                            <!-- <li class="menu nav-item">
                                 <button
                                     type="button"
                                     class="nav-link group w-full"
@@ -129,18 +153,6 @@
                                                 <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">{{
                                                     $t('contacts')
                                                 }}</span>
-                                            </div>
-                                        </NuxtLink>
-                                    </li>
-
-                                    <li class="nav-item">
-                                        <NuxtLink to="/apps/accounts" class="group" @click="toggleMobileMenu">
-                                            <div class="flex items-center">
-                                                <icon-credit-card class="shrink-0 group-hover:!text-primary" />
-
-                                                <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">
-                                                    Accounts
-                                                </span>
                                             </div>
                                         </NuxtLink>
                                     </li>
@@ -707,7 +719,7 @@
                                         }}</span>
                                     </div>
                                 </a>
-                            </li>
+                            </li> -->
                         </ul>
                     </perfect-scrollbar>
                 </client-only>
