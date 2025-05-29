@@ -13,7 +13,8 @@ namespace CoreFinance.Application.Tests.RecurringTransactionTemplateServiceTests
 public partial class RecurringTransactionTemplateServiceTests
 {
     /// <summary>
-    /// Verifies that GetActiveTemplatesAsync returns only active templates for a specific user.<br/>(EN) Verifies that GetActiveTemplatesAsync returns only active templates for a specific user.<br/>(VI) Xác minh rằng GetActiveTemplatesAsync chỉ trả về các mẫu đang hoạt động cho một người dùng cụ thể.
+    /// (EN) Verifies that GetActiveTemplatesAsync returns only active templates for a specific user.<br/>
+    /// (VI) Xác minh rằng GetActiveTemplatesAsync chỉ trả về các mẫu đang hoạt động cho một người dùng cụ thể.
     /// </summary>
     [Fact]
     public async Task GetActiveTemplatesAsync_ShouldReturnOnlyActiveTemplates_ForSpecificUser()
@@ -80,7 +81,8 @@ public partial class RecurringTransactionTemplateServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetActiveTemplatesAsync returns an empty list when no active templates exist for the user.<br/>(EN) Verifies that GetActiveTemplatesAsync returns an empty list when no active templates exist for the user.<br/>(VI) Xác minh rằng GetActiveTemplatesAsync trả về danh sách rỗng khi không có mẫu đang hoạt động nào tồn tại cho người dùng.
+    /// (EN) Verifies that GetActiveTemplatesAsync returns an empty list when no active templates exist for the user.<br/>
+    /// (VI) Xác minh rằng GetActiveTemplatesAsync trả về danh sách rỗng khi không có mẫu đang hoạt động nào tồn tại cho người dùng.
     /// </summary>
     [Fact]
     public async Task GetActiveTemplatesAsync_ShouldReturnEmptyList_WhenNoActiveTemplatesExist()
@@ -128,7 +130,8 @@ public partial class RecurringTransactionTemplateServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetActiveTemplatesAsync returns an empty list when the user has no templates.<br/>(EN) Verifies that GetActiveTemplatesAsync returns an empty list when the user has no templates.<br/>(VI) Xác minh rằng GetActiveTemplatesAsync trả về danh sách rỗng khi người dùng không có mẫu nào.
+    /// (EN) Verifies that GetActiveTemplatesAsync returns an empty list when the user has no templates.<br/>
+    /// (VI) Xác minh rằng GetActiveTemplatesAsync trả về danh sách rỗng khi người dùng không có mẫu nào.
     /// </summary>
     [Fact]
     public async Task GetActiveTemplatesAsync_ShouldReturnEmptyList_WhenUserHasNoTemplates()
@@ -170,7 +173,8 @@ public partial class RecurringTransactionTemplateServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetActiveTemplatesAsync returns an empty list when no templates exist in the repository.<br/>(EN) Verifies that GetActiveTemplatesAsync returns an empty list when no templates exist in the repository.<br/>(VI) Xác minh rằng GetActiveTemplatesAsync trả về danh sách rỗng khi không có mẫu nào tồn tại trong repository.
+    /// (EN) Verifies that GetActiveTemplatesAsync returns an empty list when no templates exist in the repository.<br/>
+    /// (VI) Xác minh rằng GetActiveTemplatesAsync trả về danh sách rỗng khi không có mẫu nào tồn tại trong repository.
     /// </summary>
     [Fact]
     public async Task GetActiveTemplatesAsync_ShouldReturnEmptyList_WhenNoTemplatesExist()

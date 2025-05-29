@@ -14,7 +14,8 @@ using Microsoft.Extensions.Logging;
 namespace CoreFinance.Application.Services;
 
 /// <summary>
-/// Service for managing recurring transaction templates.<br/>(EN) Service for managing recurring transaction templates.<br/>(VI) Dịch vụ quản lý các mẫu giao dịch định kỳ.
+    /// (EN) Service for managing recurring transaction templates.<br/>
+    /// (VI) Dịch vụ quản lý các mẫu giao dịch định kỳ.
 /// </summary>
 public class RecurringTransactionTemplateService(
     IMapper mapper,
@@ -26,7 +27,8 @@ public class RecurringTransactionTemplateService(
         IRecurringTransactionTemplateService
 {
     /// <summary>
-    /// Gets a paginated list of recurring transaction templates based on a filter request.<br/>(EN) Gets a paginated list of recurring transaction templates based on a filter request.<br/>(VI) Lấy danh sách mẫu giao dịch định kỳ có phân trang dựa trên yêu cầu lọc.
+    /// (EN) Gets a paginated list of recurring transaction templates based on a filter request.<br/>
+    /// (VI) Lấy danh sách mẫu giao dịch định kỳ có phân trang dựa trên yêu cầu lọc.
     /// </summary>
     /// <param name="request">The filter request body.</param>
     /// <returns>A paginated list of recurring transaction template view models.</returns>
@@ -49,7 +51,8 @@ public class RecurringTransactionTemplateService(
     }
 
     /// <summary>
-    /// Gets a list of active recurring transaction templates for a user.<br/>(EN) Gets a list of active recurring transaction templates for a user.<br/>(VI) Lấy danh sách các mẫu giao dịch định kỳ đang hoạt động cho người dùng.
+    /// (EN) Gets a list of active recurring transaction templates for a user.<br/>
+    /// (VI) Lấy danh sách các mẫu giao dịch định kỳ đang hoạt động cho người dùng.
     /// </summary>
     /// <param name="userId">The user ID.</param>
     /// <returns>A list of active recurring transaction templates.</returns>
@@ -63,7 +66,8 @@ public class RecurringTransactionTemplateService(
     }
 
     /// <summary>
-    /// Gets a list of recurring transaction templates associated with a specific account.<br/>(EN) Gets a list of recurring transaction templates associated with a specific account.<br/>(VI) Lấy danh sách các mẫu giao dịch định kỳ liên quan đến một tài khoản cụ thể.
+    /// (EN) Gets a list of recurring transaction templates associated with a specific account.<br/>
+    /// (VI) Lấy danh sách các mẫu giao dịch định kỳ liên quan đến một tài khoản cụ thể.
     /// </summary>
     /// <param name="accountId">The account ID.</param>
     /// <returns>A list of recurring transaction templates by account.</returns>
@@ -77,7 +81,8 @@ public class RecurringTransactionTemplateService(
     }
 
     /// <summary>
-    /// Toggles the active status of a recurring transaction template.<br/>(EN) Toggles the active status of a recurring transaction template.<br/>(VI) Chuyển đổi trạng thái hoạt động của một mẫu giao dịch định kỳ.
+    /// (EN) Toggles the active status of a recurring transaction template.<br/>
+    /// (VI) Chuyển đổi trạng thái hoạt động của một mẫu giao dịch định kỳ.
     /// </summary>
     /// <param name="templateId">The ID of the template to toggle.</param>
     /// <param name="isActive">The new active status.</param>
@@ -111,7 +116,8 @@ public class RecurringTransactionTemplateService(
     }
 
     /// <summary>
-    /// Calculates the next execution date for a recurring transaction template.<br/>(EN) Calculates the next execution date for a recurring transaction template.<br/>(VI) Tính toán ngày thực hiện tiếp theo cho một mẫu giao dịch định kỳ.
+    /// (EN) Calculates the next execution date for a recurring transaction template.<br/>
+    /// (VI) Tính toán ngày thực hiện tiếp theo cho một mẫu giao dịch định kỳ.
     /// </summary>
     /// <param name="templateId">The ID of the template.</param>
     /// <returns>The next execution date.</returns>
@@ -127,7 +133,8 @@ public class RecurringTransactionTemplateService(
     }
 
     /// <summary>
-    /// Generates expected transactions for a specific recurring transaction template within a number of days in advance.<br/>(EN) Generates expected transactions for a specific recurring transaction template within a number of days in advance.<br/>(VI) Tạo các giao dịch dự kiến cho một mẫu giao dịch định kỳ cụ thể trong một số ngày tới.
+    /// (EN) Generates expected transactions for a specific recurring transaction template within a number of days in advance.<br/>
+    /// (VI) Tạo các giao dịch dự kiến cho một mẫu giao dịch định kỳ cụ thể trong một số ngày tới.
     /// </summary>
     /// <param name="templateId">The ID of the template.</param>
     /// <param name="daysInAdvance">The number of days in advance to generate transactions for.</param>
@@ -149,7 +156,8 @@ public class RecurringTransactionTemplateService(
     }
 
     /// <summary>
-    /// Generates expected transactions internally for a specific recurring transaction template within a number of days in advance.<br/>(EN) Generates expected transactions internally for a specific recurring transaction template within a number of days in advance.<br/>(VI) Tạo các giao dịch dự kiến nội bộ cho một mẫu giao dịch định kỳ cụ thể trong một số ngày tới.
+    /// (EN) Generates expected transactions internally for a specific recurring transaction template within a number of days in advance.<br/>
+    /// (VI) Tạo các giao dịch dự kiến nội bộ cho một mẫu giao dịch định kỳ cụ thể trong một số ngày tới.
     /// </summary>
     /// <param name="templateId">The ID of the template.</param>
     /// <param name="daysInAdvance">The number of days in advance to generate transactions for.</param>
@@ -218,7 +226,8 @@ public class RecurringTransactionTemplateService(
     }
 
     /// <summary>
-    /// Generates expected transactions for all active recurring transaction templates.<br/>(EN) Generates expected transactions for all active recurring transaction templates.<br/>(VI) Tạo các giao dịch dự kiến cho tất cả các mẫu giao dịch định kỳ đang hoạt động.
+    /// (EN) Generates expected transactions for all active recurring transaction templates.<br/>
+    /// (VI) Tạo các giao dịch dự kiến cho tất cả các mẫu giao dịch định kỳ đang hoạt động.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     public async Task GenerateExpectedTransactionsForAllActiveTemplatesAsync()
@@ -247,7 +256,8 @@ public class RecurringTransactionTemplateService(
     }
 
     /// <summary>
-    /// Calculates the next execution date based on the current date, frequency, and custom interval.<br/>(EN) Calculates the next execution date based on the current date, frequency, and custom interval.<br/>(VI) Tính toán ngày thực hiện tiếp theo dựa trên ngày hiện tại, tần suất và khoảng thời gian tùy chỉnh.
+    /// (EN) Calculates the next execution date based on the current date, frequency, and custom interval.<br/>
+    /// (VI) Tính toán ngày thực hiện tiếp theo dựa trên ngày hiện tại, tần suất và khoảng thời gian tùy chỉnh.
     /// </summary>
     /// <param name="currentDate">The current date.</param>
     /// <param name="frequency">The recurrence frequency.</param>
@@ -271,7 +281,8 @@ public class RecurringTransactionTemplateService(
     }
 
     /// <summary>
-    /// Creates a new recurring transaction template.<br/>(EN) Creates a new recurring transaction template.<br/>(VI) Tạo một mẫu giao dịch định kỳ mới.
+    /// (EN) Creates a new recurring transaction template.<br/>
+    /// (VI) Tạo một mẫu giao dịch định kỳ mới.
     /// </summary>
     /// <param name="request">The create request.</param>
     /// <returns>The created recurring transaction template view model.</returns>
@@ -296,7 +307,8 @@ public class RecurringTransactionTemplateService(
     }
 
     /// <summary>
-    /// Updates an existing recurring transaction template.<br/>(EN) Updates an existing recurring transaction template.<br/>(VI) Cập nhật một mẫu giao dịch định kỳ hiện có.
+    /// (EN) Updates an existing recurring transaction template.<br/>
+    /// (VI) Cập nhật một mẫu giao dịch định kỳ hiện có.
     /// </summary>
     /// <param name="id">The ID of the template to update.</param>
     /// <param name="request">The update request.</param>

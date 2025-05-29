@@ -14,7 +14,9 @@ using Microsoft.Extensions.Logging;
 namespace CoreFinance.Application.Services;
 
 /// <summary>
-/// Service for managing expected transactions.<br/>(EN) Service for managing expected transactions.<br/>(VI) Dịch vụ quản lý các giao dịch dự kiến.
+/// (EN) Service for managing expected transactions.
+/// <br/>
+/// (VI) Dịch vụ quản lý các giao dịch dự kiến.
 /// </summary>
 public class ExpectedTransactionService(
     IMapper mapper,
@@ -25,14 +27,14 @@ public class ExpectedTransactionService(
         IExpectedTransactionService
 {
     /// <summary>
-    /// Gets a paginated list of expected transactions based on a filter request.<br/>(EN) Gets a paginated list of expected transactions based on a filter request.<br/>(VI) Lấy danh sách giao dịch dự kiến có phân trang dựa trên yêu cầu lọc.
+    /// (EN) Gets a paginated list of expected transactions based on a filter request.
+    /// <br/>
+    /// (VI) Lấy danh sách giao dịch dự kiến có phân trang dựa trên yêu cầu lọc.
     /// </summary>
     /// <param name="request">The filter request body.</param>
     /// <returns>A paginated list of expected transaction view models.</returns>
     public async Task<IBasePaging<ExpectedTransactionViewModel>?> GetPagingAsync(IFilterBodyRequest request)
     {
-        //var test = UnitOffWork.Repository<ExpectedTransaction, Guid>()
-        //    .GetNoTrackingEntities();
         var query = Mapper.ProjectTo<ExpectedTransactionViewModel>(
             UnitOffWork.Repository<ExpectedTransaction, Guid>()
                 .GetNoTrackingEntities());
@@ -49,7 +51,9 @@ public class ExpectedTransactionService(
     }
 
     /// <summary>
-    /// Gets a list of pending expected transactions for a user.<br/>(EN) Gets a list of pending expected transactions for a user.<br/>(VI) Lấy danh sách các giao dịch dự kiến đang chờ xử lý cho người dùng.
+    /// (EN) Gets a list of pending expected transactions for a user.
+    /// <br/>
+    /// (VI) Lấy danh sách các giao dịch dự kiến đang chờ xử lý cho người dùng.
     /// </summary>
     /// <param name="userId">The user ID.</param>
     /// <returns>A list of pending expected transactions.</returns>
@@ -63,7 +67,8 @@ public class ExpectedTransactionService(
     }
 
     /// <summary>
-    /// Gets a list of upcoming expected transactions for a user within a specified number of days.<br/>(EN) Gets a list of upcoming expected transactions for a user within a specified number of days.<br/>(VI) Lấy danh sách các giao dịch dự kiến sắp tới cho người dùng trong một số ngày cụ thể.
+    /// (EN) Gets a list of upcoming expected transactions for a user within a specified number of days.<br/>
+    /// (VI) Lấy danh sách các giao dịch dự kiến sắp tới cho người dùng trong một số ngày cụ thể.
     /// </summary>
     /// <param name="userId">The user ID.</param>
     /// <param name="days">The number of upcoming days to consider (default is 30).</param>
@@ -84,7 +89,8 @@ public class ExpectedTransactionService(
     }
 
     /// <summary>
-    /// Gets a list of expected transactions associated with a specific recurring transaction template.<br/>(EN) Gets a list of expected transactions associated with a specific recurring transaction template.<br/>(VI) Lấy danh sách các giao dịch dự kiến liên quan đến một mẫu giao dịch định kỳ cụ thể.
+    /// (EN) Gets a list of expected transactions associated with a specific recurring transaction template.<br/>
+    /// (VI) Lấy danh sách các giao dịch dự kiến liên quan đến một mẫu giao dịch định kỳ cụ thể.
     /// </summary>
     /// <param name="templateId">The recurring transaction template ID.</param>
     /// <returns>A list of expected transactions by template.</returns>
@@ -99,7 +105,8 @@ public class ExpectedTransactionService(
     }
 
     /// <summary>
-    /// Gets a list of expected transactions associated with a specific account.<br/>(EN) Gets a list of expected transactions associated with a specific account.<br/>(VI) Lấy danh sách các giao dịch dự kiến liên quan đến một tài khoản cụ thể.
+    /// (EN) Gets a list of expected transactions associated with a specific account.<br/>
+    /// (VI) Lấy danh sách các giao dịch dự kiến liên quan đến một tài khoản cụ thể.
     /// </summary>
     /// <param name="accountId">The account ID.</param>
     /// <returns>A list of expected transactions by account.</returns>
@@ -114,7 +121,8 @@ public class ExpectedTransactionService(
     }
 
     /// <summary>
-    /// Gets a list of expected transactions for a user within a specified date range.<br/>(EN) Gets a list of expected transactions for a user within a specified date range.<br/>(VI) Lấy danh sách các giao dịch dự kiến cho người dùng trong một khoảng ngày cụ thể.
+    /// (EN) Gets a list of expected transactions for a user within a specified date range.<br/>
+    /// (VI) Lấy danh sách các giao dịch dự kiến cho người dùng trong một khoảng ngày cụ thể.
     /// </summary>
     /// <param name="userId">The user ID.</param>
     /// <param name="startDate">The start date of the range.</param>
@@ -134,7 +142,8 @@ public class ExpectedTransactionService(
     }
 
     /// <summary>
-    /// Confirms an expected transaction by linking it to an actual transaction.<br/>(EN) Confirms an expected transaction by linking it to an actual transaction.<br/>(VI) Xác nhận một giao dịch dự kiến bằng cách liên kết nó với một giao dịch thực tế.
+    /// (EN) Confirms an expected transaction by linking it to an actual transaction.<br/>
+    /// (VI) Xác nhận một giao dịch dự kiến bằng cách liên kết nó với một giao dịch thực tế.
     /// </summary>
     /// <param name="expectedTransactionId">The ID of the expected transaction to confirm.</param>
     /// <param name="actualTransactionId">The ID of the actual transaction.</param>
@@ -170,7 +179,8 @@ public class ExpectedTransactionService(
     }
 
     /// <summary>
-    /// Cancels an expected transaction with a specified reason.<br/>(EN) Cancels an expected transaction with a specified reason.<br/>(VI) Hủy một giao dịch dự kiến với lý do cụ thể.
+    /// (EN) Cancels an expected transaction with a specified reason.<br/>
+    /// (VI) Hủy một giao dịch dự kiến với lý do cụ thể.
     /// </summary>
     /// <param name="expectedTransactionId">The ID of the expected transaction to cancel.</param>
     /// <param name="reason">The reason for canceling the transaction.</param>
@@ -206,7 +216,8 @@ public class ExpectedTransactionService(
     }
 
     /// <summary>
-    /// Adjusts the amount of an expected transaction with a specified reason.<br/>(EN) Adjusts the amount of an expected transaction with a specified reason.<br/>(VI) Điều chỉnh số tiền của một giao dịch dự kiến với lý do cụ thể.
+    /// (EN) Adjusts the amount of an expected transaction with a specified reason.<br/>
+    /// (VI) Điều chỉnh số tiền của một giao dịch dự kiến với lý do cụ thể.
     /// </summary>
     /// <param name="expectedTransactionId">The ID of the expected transaction to adjust.</param>
     /// <param name="newAmount">The new amount for the transaction.</param>
@@ -248,7 +259,8 @@ public class ExpectedTransactionService(
     }
 
     /// <summary>
-    /// Gets the cash flow forecast for a user within a specified date range.<br/>(EN) Gets the cash flow forecast for a user within a specified date range.<br/>(VI) Lấy dự báo dòng tiền cho người dùng trong một khoảng ngày cụ thể.
+    /// (EN) Gets the cash flow forecast for a user within a specified date range.<br/>
+    /// (VI) Lấy dự báo dòng tiền cho người dùng trong một khoảng ngày cụ thể.
     /// </summary>
     /// <param name="userId">The user ID.</param>
     /// <param name="startDate">The start date of the forecast.</param>
@@ -272,7 +284,8 @@ public class ExpectedTransactionService(
     }
 
     /// <summary>
-    /// Gets the category-based cash flow forecast for a user within a specified date range.<br/>(EN) Gets the category-based cash flow forecast for a user within a specified date range.<br/>(VI) Lấy dự báo dòng tiền theo danh mục cho người dùng trong một khoảng ngày cụ thể.
+    /// (EN) Gets the category-based cash flow forecast for a user within a specified date range.<br/>
+    /// (VI) Lấy dự báo dòng tiền theo danh mục cho người dùng trong một khoảng ngày cụ thể.
     /// </summary>
     /// <param name="userId">The user ID.</param>
     /// <param name="startDate">The start date of the forecast.</param>
@@ -294,7 +307,8 @@ public class ExpectedTransactionService(
     }
 
     /// <summary>
-    /// Creates a new expected transaction.<br/>(EN) Creates a new expected transaction.<br/>(VI) Tạo một giao dịch dự kiến mới.
+    /// (EN) Creates a new expected transaction.<br/>
+    /// (VI) Tạo một giao dịch dự kiến mới.
     /// </summary>
     /// <param name="request">The create request.</param>
     /// <returns>The created expected transaction view model.</returns>

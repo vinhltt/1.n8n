@@ -16,7 +16,8 @@ namespace CoreFinance.Application.Tests.RecurringTransactionTemplateServiceTests
 public partial class RecurringTransactionTemplateServiceTests
 {
     /// <summary>
-    /// Verifies that UpdateAsync updates the template and generates expected transactions when auto-generate is enabled.<br/>(EN) Verifies that UpdateAsync updates the template and generates expected transactions when auto-generate is enabled.<br/>(VI) Xác minh rằng UpdateAsync cập nhật mẫu và tạo các giao dịch dự kiến khi bật tự động tạo.
+    /// (EN) Verifies that UpdateAsync updates the template and generates expected transactions when auto-generate is enabled.<br/>
+    /// (VI) Xác minh rằng UpdateAsync cập nhật mẫu và tạo các giao dịch dự kiến khi bật tự động tạo.
     /// </summary>
     [Fact]
     public async Task UpdateAsync_ShouldUpdateTemplateAndGenerateExpectedTransactions_WhenAutoGenerateIsEnabled()
@@ -109,7 +110,8 @@ public partial class RecurringTransactionTemplateServiceTests
     }
 
     /// <summary>
-    /// Verifies that UpdateAsync does not generate expected transactions when auto-generate is disabled.<br/>(EN) Verifies that UpdateAsync does not generate expected transactions when auto-generate is disabled.<br/>(VI) Xác minh rằng UpdateAsync không tạo các giao dịch dự kiến khi tắt tự động tạo.
+    /// (EN) Verifies that UpdateAsync does not generate expected transactions when auto-generate is disabled.<br/>
+    /// (VI) Xác minh rằng UpdateAsync không tạo các giao dịch dự kiến khi tắt tự động tạo.
     /// </summary>
     [Fact]
     public async Task UpdateAsync_ShouldNotGenerateExpectedTransactions_WhenAutoGenerateIsDisabled()
@@ -187,7 +189,8 @@ public partial class RecurringTransactionTemplateServiceTests
     }
 
     /// <summary>
-    /// Verifies that UpdateAsync throws a NullReferenceException when the template to update is not found.<br/>(EN) Verifies that UpdateAsync throws a NullReferenceException when the template to update is not found.<br/>(VI) Xác minh rằng UpdateAsync ném ra NullReferenceException khi không tìm thấy mẫu cần cập nhật.
+    /// (EN) Verifies that UpdateAsync throws a NullReferenceException when the template to update is not found.<br/>
+    /// (VI) Xác minh rằng UpdateAsync ném ra NullReferenceException khi không tìm thấy mẫu cần cập nhật.
     /// </summary>
     [Fact]
     public async Task UpdateAsync_ShouldThrowNullReferenceException_WhenTemplateNotFound()
@@ -234,7 +237,8 @@ public partial class RecurringTransactionTemplateServiceTests
     }
 
     /// <summary>
-    /// Verifies that UpdateAsync updates the correct properties of the recurring transaction template.<br/>(EN) Verifies that UpdateAsync updates the correct properties of the recurring transaction template.<br/>(VI) Xác minh rằng UpdateAsync cập nhật đúng các thuộc tính của mẫu giao dịch định kỳ.
+    /// (EN) Verifies that UpdateAsync updates the correct properties of the recurring transaction template.<br/>
+    /// (VI) Xác minh rằng UpdateAsync cập nhật đúng các thuộc tính của mẫu giao dịch định kỳ.
     /// </summary>
     [Fact]
     public async Task UpdateAsync_ShouldUpdateCorrectProperties()
@@ -335,7 +339,8 @@ public partial class RecurringTransactionTemplateServiceTests
     }
 
     /// <summary>
-    /// Verifies that UpdateAsync preserves the CreatedAt timestamp and updates the UpdatedAt timestamp.<br/>(EN) Verifies that UpdateAsync preserves the CreatedAt timestamp and updates the UpdatedAt timestamp.<br/>(VI) Xác minh rằng UpdateAsync giữ nguyên dấu thời gian CreatedAt và cập nhật dấu thời gian UpdatedAt.
+    /// (EN) Verifies that UpdateAsync preserves the CreatedAt timestamp and updates the UpdatedAt timestamp.<br/>
+    /// (VI) Xác minh rằng UpdateAsync giữ nguyên dấu thời gian CreatedAt và cập nhật dấu thời gian UpdatedAt.
     /// </summary>
     [Fact]
     public async Task UpdateAsync_ShouldPreserveCreatedAtAndUpdateUpdatedAt()

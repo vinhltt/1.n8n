@@ -12,11 +12,12 @@ public enum SortDirection
     /// <br/>
     /// Thứ tự tăng dần. (VI)
     /// </summary>
-    Asc,
+    Asc = 0,
+
     /// <summary>
     /// Descending order. (EN)
     /// <br/>
     /// Thứ tự giảm dần. (VI)
     /// </summary>
-    Desc,
+    Desc = 1,
 }

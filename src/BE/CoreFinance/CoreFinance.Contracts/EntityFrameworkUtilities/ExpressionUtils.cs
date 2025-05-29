@@ -8,49 +8,58 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities;
 public static class ExpressionUtils
 {
     /// <summary>
-    /// Represents a constant expression with the value true.<br/>(EN) Represents a constant expression with the value true.<br/>(VI) Biểu thị một biểu thức hằng số có giá trị true.
+    /// (EN) Represents a constant expression with the value true.<br/>
+    /// (VI) Biểu thị một biểu thức hằng số có giá trị true.
     /// </summary>
     public static readonly Expression TypeTrueExpression = Expression.Constant(true);
 
     /// <summary>
-    /// Represents a constant expression with the value false.<br/>(EN) Represents a constant expression with the value false.<br/>(VI) Biểu thị một biểu thức hằng số có giá trị false.
+    /// (EN) Represents a constant expression with the value false.<br/>
+    /// (VI) Biểu thị một biểu thức hằng số có giá trị false.
     /// </summary>
     public static readonly Expression TypeFalseExpression = Expression.Constant(true);
 
     /// <summary>
-    /// Represents a constant expression with the value null.<br/>(EN) Represents a constant expression with the value null.<br/>(VI) Biểu thị một biểu thức hằng số có giá trị null.
+    /// (EN) Represents a constant expression with the value null.<br/>
+    /// (VI) Biểu thị một biểu thức hằng số có giá trị null.
     /// </summary>
     public static readonly Expression TypeNullExpression = Expression.Constant(null);
 
     /// <summary>
-    /// Represents a constant expression with the value 0.<br/>(EN) Represents a constant expression with the value 0.<br/>(VI) Biểu thị một biểu thức hằng số có giá trị 0.
+    /// (EN) Represents a constant expression with the value 0.<br/>
+    /// (VI) Biểu thị một biểu thức hằng số có giá trị 0.
     /// </summary>
     public static readonly Expression TypeZeroExpression = Expression.Constant(0);
 
     /// <summary>
-    /// Represents a constant expression with an empty string value.<br/>(EN) Represents a constant expression with an empty string value.<br/>(VI) Biểu thị một biểu thức hằng số có giá trị chuỗi rỗng.
+    /// (EN) Represents a constant expression with an empty string value.<br/>
+    /// (VI) Biểu thị một biểu thức hằng số có giá trị chuỗi rỗng.
     /// </summary>
     public static readonly Expression TypeStringEmptyExpression = Expression.Constant(0);
 
     /// <summary>
-    /// MethodInfo for the string.Trim() method.<br/>(EN) MethodInfo for the string.Trim() method.<br/>(VI) MethodInfo cho phương thức string.Trim().
+    /// (EN) MethodInfo for the string.Trim() method.<br/>
+    /// (VI) MethodInfo cho phương thức string.Trim().
     /// </summary>
     public static readonly MethodInfo? TypeTrimMethod = typeof(string).GetRuntimeMethod("Trim", []);
 
     /// <summary>
-    /// MethodInfo for the string.StartsWith(string) method.<br/>(EN) MethodInfo for the string.StartsWith(string) method.<br/>(VI) MethodInfo cho phương thức string.StartsWith(string).
+    /// (EN) MethodInfo for the string.StartsWith(string) method.<br/>
+    /// (VI) MethodInfo cho phương thức string.StartsWith(string).
     /// </summary>
     public static readonly MethodInfo? TypeStartsWithMethod =
         typeof(string).GetRuntimeMethod("StartsWith", [typeof(string)]);
 
     /// <summary>
-    /// MethodInfo for the string.EndsWith(string) method.<br/>(EN) MethodInfo for the string.EndsWith(string) method.<br/>(VI) MethodInfo cho phương thức string.EndsWith(string).
+    /// (EN) MethodInfo for the string.EndsWith(string) method.<br/>
+    /// (VI) MethodInfo cho phương thức string.EndsWith(string).
     /// </summary>
     public static readonly MethodInfo? TypeEndsWithMethod =
         typeof(string).GetRuntimeMethod("EndsWith", [typeof(string)]);
 
     /// <summary>
-    /// Creates a constant expression for the given value and type.<br/>(EN) Creates a constant expression for the given value and type.<br/>(VI) Tạo một biểu thức hằng số cho giá trị và kiểu dữ liệu đã cho.
+    /// (EN) Creates a constant expression for the given value and type.<br/>
+    /// (VI) Tạo một biểu thức hằng số cho giá trị và kiểu dữ liệu đã cho.
     /// </summary>
     /// <param name="value">The string value to convert. (EN)<br/>Giá trị chuỗi cần chuyển đổi. (VI)</param>
     /// <param name="type">The target type of the constant expression. (EN)<br/>Kiểu dữ liệu đích của biểu thức hằng số. (VI)</param>
@@ -146,7 +155,8 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Creates a constant expression for an array of string values, attempting to parse them into the specified target type.<br/>(EN) Creates a constant expression for an array of string values, attempting to parse them into the specified target type.<br/>(VI) Tạo một biểu thức hằng số cho mảng các giá trị chuỗi, cố gắng phân tích cú pháp chúng thành kiểu đích được chỉ định.
+    /// (EN) Creates a constant expression for an array of string values, attempting to parse them into the specified target type.<br/>
+    /// (VI) Tạo một biểu thức hằng số cho mảng các giá trị chuỗi, cố gắng phân tích cú pháp chúng thành kiểu đích được chỉ định.
     /// </summary>
     /// <param name="values">The array of string values to convert. (EN)<br/>Mảng các giá trị chuỗi cần chuyển đổi. (VI)</param>
     /// <param name="type">The target type of the elements in the constant expression array. (EN)<br/>Kiểu dữ liệu đích của các phần tử trong mảng biểu thức hằng số. (VI)</param>
@@ -475,7 +485,8 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression contains the right expression. Supports checking if an array contains a value.<br/>(EN) Determines whether the left expression contains the right expression. Supports checking if an array contains a value.<br/>(VI) Xác định xem biểu thức bên trái có chứa biểu thức bên phải hay không. Hỗ trợ kiểm tra xem một mảng có chứa một giá trị hay không.
+    /// (EN) Determines whether the left expression contains the right expression. Supports checking if an array contains a value.<br/>
+    /// (VI) Xác định xem biểu thức bên trái có chứa biểu thức bên phải hay không. Hỗ trợ kiểm tra xem một mảng có chứa một giá trị hay không.
     /// </summary>
     /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
     /// <param name="right">The right expression (can be an array). (EN)<br/>Biểu thức bên phải (có thể là một mảng). (VI)</param>
@@ -576,7 +587,8 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Gets the MemberExpression for a property name from a parameter expression.<br/>(EN) Gets the MemberExpression for a property name from a parameter expression.<br/>(VI) Lấy MemberExpression cho tên thuộc tính từ một biểu thức tham số.
+    /// (EN) Gets the MemberExpression for a property name from a parameter expression.<br/>
+    /// (VI) Lấy MemberExpression cho tên thuộc tính từ một biểu thức tham số.
     /// </summary>
     /// <param name="parameter">The parameter expression. (EN)<br/>Biểu thức tham số. (VI)</param>
     /// <param name="propertyName">The name of the property. (EN)<br/>Tên của thuộc tính. (VI)</param>
@@ -597,7 +609,8 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Gets the property name from a MemberExpression.<br/>(EN) Gets the property name from a MemberExpression.<br/>(VI) Lấy tên thuộc tính từ một MemberExpression.
+    /// (EN) Gets the property name from a MemberExpression.<br/>
+    /// (VI) Lấy tên thuộc tính từ một MemberExpression.
     /// </summary>
     /// <param name="expression">The expression to get the property name from. (EN)<br/>Biểu thức để lấy tên thuộc tính. (VI)</param>
     /// <returns>The property name, or null if the expression is not a MemberExpression.</returns>
@@ -713,7 +726,8 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Gets the ParameterExpression from an expression, if it exists.<br/>(EN) Gets the ParameterExpression from an expression, if it exists.<br/>(VI) Lấy ParameterExpression từ một biểu thức, nếu tồn tại.
+    /// (EN) Gets the ParameterExpression from an expression, if it exists.<br/>
+    /// (VI) Lấy ParameterExpression từ một biểu thức, nếu tồn tại.
     /// </summary>
     /// <param name="expression">The expression to get the parameter from. (EN)<br/>Biểu thức để lấy tham số. (VI)</param>
     /// <returns>The ParameterExpression, or null if not found.</returns>

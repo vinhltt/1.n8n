@@ -20,8 +20,8 @@ public class Transaction : BaseEntity<Guid>
     public Guid? UserId { get; set; }
 
     /// <summary>
-    ///     Transaction date (EN)
-    ///     Ngày giao dịch (VI)
+    ///     Transaction date and time (EN)
+    ///     Ngày và giờ giao dịch (VI)
     /// </summary>
     [Required]
     public DateTime TransactionDate { get; set; }
@@ -59,6 +59,7 @@ public class Transaction : BaseEntity<Guid>
 
     /// <summary>
     ///     Balance compared to app notification (EN)
+    ///     <br/>
     ///     Số dư so với thông báo giao dịch trên app (VI)
     /// </summary>
     [Column(TypeName = "decimal(18,2)")]
@@ -66,6 +67,7 @@ public class Transaction : BaseEntity<Guid>
 
     /// <summary>
     ///     Available limit (credit card only) (EN)
+    ///     <br/>
     ///     Số tiền khả dụng (chỉ áp dụng cho thẻ tín dụng) (VI)
     /// </summary>
     [Column(TypeName = "decimal(18,2)")]
@@ -74,6 +76,7 @@ public class Transaction : BaseEntity<Guid>
 
     /// <summary>
     ///     Available limit compared to app notification (credit card only) (EN)
+    ///     <br/>
     ///     Số tiền khả dụng so với thông báo giao dịch trên app (chỉ áp dụng cho thẻ tín dụng) (VI)
     /// </summary>
     [Column(TypeName = "decimal(18,2)")]
@@ -81,6 +84,7 @@ public class Transaction : BaseEntity<Guid>
 
     /// <summary>
     ///     Transaction code (EN)
+    ///     <br/>
     ///     Mã giao dịch (VI)
     /// </summary>
     [MaxLength(50)]
@@ -88,24 +92,28 @@ public class Transaction : BaseEntity<Guid>
 
     /// <summary>
     ///     Synced with MISA (EN)
+    ///     <br/>
     ///     Đánh dấu đã đồng bộ với MISA (VI)
     /// </summary>
     public bool SyncMisa { get; set; }
 
     /// <summary>
     ///     Synced with SMS (credit card only) (EN)
+    ///     <br/>
     ///     Đánh dấu đã đồng bộ với SMS (chỉ áp dụng cho thẻ tín dụng) (VI)
     /// </summary>
     public bool SyncSms { get; set; }
 
     /// <summary>
     ///     Marked for Vietnam market (EN)
+    ///     <br/>
     ///     Đánh dấu giao dịch dành cho thị trường Việt Nam (VI)
     /// </summary>
     public bool Vn { get; set; }
 
     /// <summary>
     ///     Transaction category summary (EN)
+    ///     <br/>
     ///     Tóm tắt danh mục giao dịch (VI)
     /// </summary>
     [MaxLength(200)]
@@ -113,6 +121,7 @@ public class Transaction : BaseEntity<Guid>
 
     /// <summary>
     ///     Additional note for transaction (EN)
+    ///     <br/>
     ///     Ghi chú bổ sung cho giao dịch (VI)
     /// </summary>
     [MaxLength(1000)]
@@ -120,6 +129,7 @@ public class Transaction : BaseEntity<Guid>
 
     /// <summary>
     ///     Import source (e.g. file, app, etc.) (EN)
+    ///     <br/>
     ///     Nguồn nhập giao dịch (ví dụ: import từ file, app, v.v.) (VI)
     /// </summary>
     [MaxLength(100)]
@@ -127,6 +137,7 @@ public class Transaction : BaseEntity<Guid>
 
     /// <summary>
     ///     Increased credit limit (credit card only) (EN)
+    ///     <br/>
     ///     Hạn mức tín dụng tăng thêm (chỉ áp dụng cho thẻ tín dụng) (VI)
     /// </summary>
     [Column(TypeName = "decimal(18,2)")]
@@ -135,6 +146,7 @@ public class Transaction : BaseEntity<Guid>
 
     /// <summary>
     ///     Used percent of credit limit (credit card only) (EN)
+    ///     <br/>
     ///     Phần trăm hạn mức đã sử dụng (chỉ áp dụng cho thẻ tín dụng) (VI)
     /// </summary>
     [Column(TypeName = "decimal(5,2)")]
@@ -143,6 +155,7 @@ public class Transaction : BaseEntity<Guid>
 
     /// <summary>
     ///     Transaction category type (EN)
+    ///     <br/>
     ///     Loại giao dịch (thu, chi, chuyển khoản, phí, khác) (VI)
     /// </summary>
     [Required]
@@ -150,6 +163,7 @@ public class Transaction : BaseEntity<Guid>
 
     /// <summary>
     ///     Group of transactions (statement period) (EN)
+    ///     <br/>
     ///     Nhóm giao dịch thuộc kỳ sao kê nào (VI)
     /// </summary>
     [MaxLength(100)]
@@ -157,6 +171,7 @@ public class Transaction : BaseEntity<Guid>
 
     /// <summary>
     ///     Created date (EN)
+    ///     <br/>
     ///     Ngày tạo giao dịch (VI)
     /// </summary>
     [Required]
@@ -164,6 +179,7 @@ public class Transaction : BaseEntity<Guid>
 
     /// <summary>
     ///     Last updated date (EN)
+    ///     <br/>
     ///     Ngày cập nhật cuối cùng (VI)
     /// </summary>
     [Required]
@@ -171,6 +187,7 @@ public class Transaction : BaseEntity<Guid>
 
     /// <summary>
     ///     Navigation property: link to account (EN)
+    ///     <br/>
     ///     Thuộc tính điều hướng: liên kết với tài khoản (VI)
     /// </summary>
     public Account? Account { get; set; }

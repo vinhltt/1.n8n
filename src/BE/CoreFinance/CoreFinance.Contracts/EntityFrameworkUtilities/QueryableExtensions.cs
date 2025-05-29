@@ -15,7 +15,8 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
     public static class QueryableExtensions
     {
         /// <summary>
-        /// Filters a queryable source based on a FilterRequest object.<br/>(EN) Filters a queryable source based on a FilterRequest object.<br/>(VI) Lọc nguồn có thể truy vấn dựa trên đối tượng FilterRequest.
+    /// (EN) Filters a queryable source based on a FilterRequest object.<br/>
+    /// (VI) Lọc nguồn có thể truy vấn dựa trên đối tượng FilterRequest.
         /// </summary>
         /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
         /// <param name="source">The queryable source to filter. (EN)<br/>Nguồn có thể truy vấn cần lọc. (VI)</param>
@@ -42,12 +43,14 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         }
 
         /// <summary>
-        /// Determines whether a queryable source is already ordered.<br/>(EN) Determines whether a queryable source is already ordered.<br/>(VI) Xác định xem nguồn có thể truy vấn đã được sắp xếp hay chưa.
+    /// (EN) Determines whether a queryable source is already ordered.<br/>
+    /// (VI) Xác định xem nguồn có thể truy vấn đã được sắp xếp hay chưa.
         /// </summary>
         /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
         /// <param name="source">The queryable source to check. (EN)<br/>Nguồn có thể truy vấn cần kiểm tra. (VI)</param>
         /// <returns>
-        /// <c>true</c> if the specified queryable is ordered; otherwise, <c>false</c>.<br/>(EN) <c>true</c> nếu nguồn có thể truy vấn được sắp xếp; ngược lại, <c>false</c>.<br/>(VI) <c>true</c> nếu nguồn có thể truy vấn đã được sắp xếp; ngược lại, <c>false</c>.
+    /// (EN) <c>true</c> nếu nguồn có thể truy vấn được sắp xếp; ngược lại, <c>false</c>.<br/>
+    /// (VI) <c>true</c> nếu nguồn có thể truy vấn đã được sắp xếp; ngược lại, <c>false</c>.
         /// </returns>
         /// <exception cref="ArgumentNullException">Thrown if source is null.</exception>
         public static bool IsOrdered<T>(this IQueryable<T> source)
@@ -59,7 +62,8 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         #region Where
 
         /// <summary>
-        /// Filters data in the given source using a single filter descriptor.<br/>(EN) Filters data in the given source using a single filter descriptor.<br/>(VI) Lọc dữ liệu trong nguồn đã cho sử dụng một mô tả lọc duy nhất.
+    /// (EN) Filters data in the given source using a single filter descriptor.<br/>
+    /// (VI) Lọc dữ liệu trong nguồn đã cho sử dụng một mô tả lọc duy nhất.
         /// </summary>
         /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
         /// <param name="source">The queryable source to filter. (EN)<br/>Nguồn có thể truy vấn cần lọc. (VI)</param>
@@ -80,7 +84,8 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         }
 
         /// <summary>
-        /// Filters data in the given source using a collection of filter descriptors.<br/>(EN) Filters data in the given source using a collection of filter descriptors.<br/>(VI) Lọc dữ liệu trong nguồn đã cho sử dụng một tập hợp các mô tả lọc.
+    /// (EN) Filters data in the given source using a collection of filter descriptors.<br/>
+    /// (VI) Lọc dữ liệu trong nguồn đã cho sử dụng một tập hợp các mô tả lọc.
         /// </summary>
         /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
         /// <param name="source">The queryable source to filter. (EN)<br/>Nguồn có thể truy vấn cần lọc. (VI)</param>
@@ -105,7 +110,8 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         #region OrderBy
 
         /// <summary>
-        /// Orders data in the given source using a single sort descriptor.<br/>(EN) Orders data in the given source using a single sort descriptor.<br/>(VI) Sắp xếp dữ liệu trong nguồn đã cho sử dụng một mô tả sắp xếp duy nhất.
+    /// (EN) Orders data in the given source using a single sort descriptor.<br/>
+    /// (VI) Sắp xếp dữ liệu trong nguồn đã cho sử dụng một mô tả sắp xếp duy nhất.
         /// </summary>
         /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
         /// <param name="source">The queryable source to order. (EN)<br/>Nguồn có thể truy vấn cần sắp xếp. (VI)</param>
@@ -124,7 +130,8 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         }
 
         /// <summary>
-        /// Orders data in the given source using a collection of sort descriptors.<br/>(EN) Orders data in the given source using a collection of sort descriptors.<br/>(VI) Sắp xếp dữ liệu trong nguồn đã cho sử dụng một tập hợp các mô tả sắp xếp.
+    /// (EN) Orders data in the given source using a collection of sort descriptors.<br/>
+    /// (VI) Sắp xếp dữ liệu trong nguồn đã cho sử dụng một tập hợp các mô tả sắp xếp.
         /// </summary>
         /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
         /// <param name="source">The queryable source to order. (EN)<br/>Nguồn có thể truy vấn cần sắp xếp. (VI)</param>
@@ -152,7 +159,8 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         }
 
         /// <summary>
-        /// Orders data in the given source by a specific property.<br/>(EN) Orders data in the given source by a specific property.<br/>(VI) Sắp xếp dữ liệu trong nguồn đã cho theo một thuộc tính cụ thể.
+    /// (EN) Orders data in the given source by a specific property.<br/>
+    /// (VI) Sắp xếp dữ liệu trong nguồn đã cho theo một thuộc tính cụ thể.
         /// </summary>
         /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
         /// <param name="source">The queryable source to order. (EN)<br/>Nguồn có thể truy vấn cần sắp xếp. (VI)</param>
@@ -254,7 +262,8 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         }
 
         /// <summary>
-        /// Orders data in the given source by a specific property of a specified type.<br/>(EN) Orders data in the given source by a specific property of a specified type.<br/>(VI) Sắp xếp dữ liệu trong nguồn đã cho theo một thuộc tính cụ thể thuộc kiểu được chỉ định.
+    /// (EN) Orders data in the given source by a specific property of a specified type.<br/>
+    /// (VI) Sắp xếp dữ liệu trong nguồn đã cho theo một thuộc tính cụ thể thuộc kiểu được chỉ định.
         /// </summary>
         /// <typeparam name="T">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
         /// <typeparam name="TProperty">The type of the property to order by. (EN)<br/>Kiểu của thuộc tính để sắp xếp. (VI)</typeparam>
@@ -283,7 +292,8 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         #region Paging
 
         /// <summary>
-        /// Converts a queryable source to a paginated result asynchronously.<br/>(EN) Converts a queryable source to a paginated result asynchronously.<br/>(VI) Chuyển đổi nguồn có thể truy vấn thành kết quả phân trang một cách bất đồng bộ.
+    /// (EN) Converts a queryable source to a paginated result asynchronously.<br/>
+    /// (VI) Chuyển đổi nguồn có thể truy vấn thành kết quả phân trang một cách bất đồng bộ.
         /// </summary>
         /// <typeparam name="TSource">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
         /// <param name="queryable">The queryable source to paginate. (EN)<br/>Nguồn có thể truy vấn cần phân trang. (VI)</param>
@@ -345,7 +355,8 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         }
 
         /// <summary>
-        /// Filters, orders, and paginates a queryable source based on a FilterBodyRequest asynchronously.<br/>(EN) Filters, orders, and paginates a queryable source based on a FilterBodyRequest asynchronously.<br/>(VI) Lọc, sắp xếp và phân trang nguồn có thể truy vấn dựa trên FilterBodyRequest một cách bất đồng bộ.
+    /// (EN) Filters, orders, and paginates a queryable source based on a FilterBodyRequest asynchronously.<br/>
+    /// (VI) Lọc, sắp xếp và phân trang nguồn có thể truy vấn dựa trên FilterBodyRequest một cách bất đồng bộ.
         /// </summary>
         /// <typeparam name="TSource">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>
         /// <param name="queryable">The queryable source. (EN)<br/>Nguồn có thể truy vấn. (VI)</param>
@@ -372,7 +383,8 @@ namespace CoreFinance.Contracts.EntityFrameworkUtilities
         }
 
         /// <summary>
-        /// Filters, orders, and paginates a queryable source and selects a result type based on a FilterBodyRequest and a selector asynchronously.<br/>(EN) Filters, orders, and paginates a queryable source and selects a result type based on a FilterBodyRequest and a selector asynchronously.<br/>(VI) Lọc, sắp xếp và phân trang nguồn có thể truy vấn, đồng thời chọn kiểu kết quả dựa trên FilterBodyRequest và selector một cách bất đồng bộ.
+    /// (EN) Filters, orders, and paginates a queryable source and selects a result type based on a FilterBodyRequest and a selector asynchronously.<br/>
+    /// (VI) Lọc, sắp xếp và phân trang nguồn có thể truy vấn, đồng thời chọn kiểu kết quả dựa trên FilterBodyRequest và selector một cách bất đồng bộ.
         /// </summary>
         /// <typeparam name="TResult">The type of the elements in the result. (EN)<br/>Kiểu của các phần tử trong kết quả. (VI)</typeparam>
         /// <typeparam name="TSource">The type of the elements in the source. (EN)<br/>Kiểu của các phần tử trong nguồn. (VI)</typeparam>

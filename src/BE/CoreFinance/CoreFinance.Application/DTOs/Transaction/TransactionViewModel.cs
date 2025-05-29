@@ -53,9 +53,9 @@ public class TransactionViewModel : BaseViewModel<Guid>
     public string? Description { get; set; }
 
     /// <summary>
-    /// The balance of the account after the transaction. (EN)
+    /// The balance of the account after the transaction (optional). (EN)
     /// <br/>
-    /// Số dư tài khoản sau giao dịch. (VI)
+    /// Số dư tài khoản sau giao dịch (tùy chọn). (VI)
     /// </summary>
     public decimal Balance { get; set; }
 

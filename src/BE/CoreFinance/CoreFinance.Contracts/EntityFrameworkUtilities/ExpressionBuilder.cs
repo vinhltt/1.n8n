@@ -20,7 +20,8 @@ internal class Criteria
 public static class ExpressionBuilder
 {
     /// <summary>
-    /// Builds a filter expression from a single filter descriptor.<br/>(EN) Builds a filter expression from a single filter descriptor.<br/>(VI) Xây dựng biểu thức lọc từ một mô tả lọc duy nhất.
+    /// (EN) Builds a filter expression from a single filter descriptor.<br/>
+    /// (VI) Xây dựng biểu thức lọc từ một mô tả lọc duy nhất.
     /// </summary>
     /// <typeparam name="TModel">The type of the model to filter. (EN)<br/>Kiểu dữ liệu của model cần lọc. (VI)</typeparam>
     /// <param name="filterDescriptor">The filter descriptor. (EN)<br/>Mô tả lọc. (VI)</param>
@@ -42,7 +43,8 @@ public static class ExpressionBuilder
     }
 
     /// <summary>
-    /// Builds a filter expression from a collection of filter descriptors.<br/>(EN) Builds a filter expression from a collection of filter descriptors.<br/>(VI) Xây dựng biểu thức lọc từ một tập hợp các mô tả lọc.
+    /// (EN) Builds a filter expression from a collection of filter descriptors.<br/>
+    /// (VI) Xây dựng biểu thức lọc từ một tập hợp các mô tả lọc.
     /// </summary>
     /// <typeparam name="TModel">The type of the model to filter. (EN)<br/>Kiểu dữ liệu của model cần lọc. (VI)</typeparam>
     /// <param name="filterDescriptors">The collection of filter descriptors. (EN)<br/>Tập hợp các mô tả lọc. (VI)</param>
@@ -79,7 +81,8 @@ public static class ExpressionBuilder
     }
 
     /// <summary>
-    /// Creates an expression for a specific filter criterion.<br/>(EN) Creates an expression for a specific filter criterion.<br/>(VI) Tạo biểu thức cho một tiêu chí lọc cụ thể.
+    /// (EN) Creates an expression for a specific filter criterion.<br/>
+    /// (VI) Tạo biểu thức cho một tiêu chí lọc cụ thể.
     /// </summary>
     /// <param name="parameter">The parameter expression. (EN)<br/>Biểu thức tham số. (VI)</param>
     /// <param name="filterDescriptor">The criteria for filtering. (EN)<br/>Tiêu chí lọc. (VI)</param>
@@ -247,7 +250,8 @@ public static class ExpressionBuilder
     }
 
     /// <summary>
-    /// Creates an expression for filtering enum types.<br/>(EN) Creates an expression for filtering enum types.<br/>(VI) Tạo biểu thức để lọc các kiểu enum.
+    /// (EN) Creates an expression for filtering enum types.<br/>
+    /// (VI) Tạo biểu thức để lọc các kiểu enum.
     /// </summary>
     /// <param name="member">The member expression representing the enum property. (EN)<br/>Biểu thức thành viên biểu thị thuộc tính enum. (VI)</param>
     /// <param name="value">The value expression to filter by. (EN)<br/>Biểu thức giá trị để lọc theo. (VI)</param>
@@ -282,7 +286,8 @@ public static class ExpressionBuilder
     }
 
     /// <summary>
-    /// Converts a FilterDescriptor object into a Criteria object for internal use.<br/>(EN) Converts a FilterDescriptor object into a Criteria object for internal use.<br/>(VI) Chuyển đổi đối tượng FilterDescriptor thành đối tượng Criteria để sử dụng nội bộ.
+    /// (EN) Converts a FilterDescriptor object into a Criteria object for internal use.<br/>
+    /// (VI) Chuyển đổi đối tượng FilterDescriptor thành đối tượng Criteria để sử dụng nội bộ.
     /// </summary>
     /// <param name="filter">The FilterDescriptor object. (EN)<br/>Đối tượng FilterDescriptor. (VI)</param>
     /// <returns>A Criteria object representing the filter.</returns>

@@ -1,4 +1,5 @@
 ﻿namespace CoreFinance.Contracts.BaseEfModels;
+
 /// <summary>
 /// Represents a filter request body with pagination and sorting options. (EN)
 /// <br/>

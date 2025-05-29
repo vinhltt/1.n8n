@@ -7,13 +7,15 @@ using CoreFinance.Domain.Entities;
 namespace CoreFinance.Application.Interfaces;
 
 /// <summary>
-/// Represents the service interface for managing transactions.<br/>(EN) Represents the service interface for managing transactions.<br/>(VI) Đại diện cho interface dịch vụ quản lý giao dịch.
+    /// (EN) Represents the service interface for managing transactions.<br/>
+    /// (VI) Đại diện cho interface dịch vụ quản lý giao dịch.
 /// </summary>
 public interface ITransactionService :
     IBaseService<Transaction, TransactionCreateRequest, TransactionUpdateRequest, TransactionViewModel, Guid>
 {
     /// <summary>
-    /// Gets a paginated list of transactions.<br/>(EN) Gets a paginated list of transactions.<br/>(VI) Lấy danh sách giao dịch có phân trang.
+    /// (EN) Gets a paginated list of transactions.<br/>
+    /// (VI) Lấy danh sách giao dịch có phân trang.
     /// </summary>
     /// <param name="request">The filter request body.</param>
     /// <returns>A paginated list of transactions.</returns>

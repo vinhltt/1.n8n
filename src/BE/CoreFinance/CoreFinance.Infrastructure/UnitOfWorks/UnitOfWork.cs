@@ -33,7 +33,8 @@ public class UnitOfWork<TContext>(
     private Dictionary<Type, object?>? _repositories;
 
     /// <summary>
-    ///     Saves all changes made in this context to the database asynchronously.<br/>(EN) Saves all changes made in this context to the database asynchronously.<br/>(VI) Lưu tất cả các thay đổi được thực hiện trong ngữ cảnh này vào cơ sở dữ liệu một cách bất đồng bộ.
+    /// (EN) Saves all changes made in this context to the database asynchronously.<br/>
+    /// (VI) Lưu tất cả các thay đổi được thực hiện trong ngữ cảnh này vào cơ sở dữ liệu một cách bất đồng bộ.
     /// </summary>
     /// <returns>
     /// A task that represents the asynchronous save operation. The task result contains the number of state entries written to the database.
@@ -44,7 +45,8 @@ public class UnitOfWork<TContext>(
     }
 
     /// <summary>
-    /// Begins a new database transaction asynchronously.<br/>(EN) Begins a new database transaction asynchronously.<br/>(VI) Bắt đầu một giao dịch cơ sở dữ liệu mới một cách bất đồng bộ.
+    /// (EN) Begins a new database transaction asynchronously.<br/>
+    /// (VI) Bắt đầu một giao dịch cơ sở dữ liệu mới một cách bất đồng bộ.
     /// </summary>
     /// <returns>
     ///     A task that represents the asynchronous operation. The task result contains the newly created transaction.
@@ -89,8 +91,9 @@ public class UnitOfWork<TContext>(
     }
 
     /// <summary>
-    ///     <br/>(EN) Gets a repository for the specified entity type.
-    ///     <br/>(VI) Lấy một repository cho kiểu thực thể được chỉ định.
+    /// (EN) Gets a repository for the specified entity type.
+    ///     <br/>
+    /// (VI) Lấy một repository cho kiểu thực thể được chỉ định.
     /// </summary>
     /// <typeparam name="TEntity">
     ///     The type of the entity. (EN)
@@ -121,7 +124,8 @@ public class UnitOfWork<TContext>(
     }
 
     /// <summary>
-    /// Finalizes an instance of the <see cref="UnitOfWork{TContext}"/> class.<br/>(EN) Finalizes an instance of the <see cref="UnitOfWork{TContext}"/> class.<br/>(VI) Kết thúc một phiên bản của lớp <see cref="UnitOfWork{TContext}"/>.
+    /// (EN) Finalizes an instance of the <see cref="UnitOfWork{TContext}"/> class.<br/>
+    /// (VI) Kết thúc một phiên bản của lớp <see cref="UnitOfWork{TContext}"/>.
     /// </summary>
     ~UnitOfWork()
     {
@@ -129,7 +133,8 @@ public class UnitOfWork<TContext>(
     }
 
     /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.<br/>(EN) Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.<br/>(VI) Thực hiện các tác vụ do ứng dụng định nghĩa liên quan đến việc giải phóng, phát hành hoặc đặt lại các tài nguyên không được quản lý.
+    /// (EN) Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.<br/>
+    /// (VI) Thực hiện các tác vụ do ứng dụng định nghĩa liên quan đến việc giải phóng, phát hành hoặc đặt lại các tài nguyên không được quản lý.
     /// </summary>
     public void Dispose()
     {
@@ -138,7 +143,8 @@ public class UnitOfWork<TContext>(
     }
 
     /// <summary>
-    /// Releases the unmanaged resources used by the UnitOfWork and optionally releases the managed resources.<br/>(EN) Releases the unmanaged resources used by the UnitOfWork and optionally releases the managed resources.<br/>(VI) Giải phóng các tài nguyên không được quản lý được sử dụng bởi UnitOfWork và tùy chọn giải phóng các tài nguyên được quản lý.
+    /// (EN) Releases the unmanaged resources used by the UnitOfWork and optionally releases the managed resources.<br/>
+    /// (VI) Giải phóng các tài nguyên không được quản lý được sử dụng bởi UnitOfWork và tùy chọn giải phóng các tài nguyên được quản lý.
     /// </summary>
     /// <param name="disposing">True to release both managed and unmanaged resources; false to release only unmanaged resources. (EN)<br/>True để giải phóng cả tài nguyên được quản lý và không được quản lý; false chỉ để giải phóng tài nguyên không được quản lý. (VI)</param>
     protected virtual void Dispose(
@@ -159,7 +165,8 @@ public class UnitOfWork<TContext>(
     }
 
     /// <summary>
-    /// Builds the file path for a DAO query template.<br/>(EN) Builds the file path for a DAO query template.<br/>(VI) Xây dựng đường dẫn tệp cho một mẫu truy vấn DAO.
+    /// (EN) Builds the file path for a DAO query template.<br/>
+    /// (VI) Xây dựng đường dẫn tệp cho một mẫu truy vấn DAO.
     /// </summary>
     /// <param name="directory">The directory containing the query file. (EN)<br/>Thư mục chứa tệp truy vấn. (VI)</param>
     /// <param name="methodName">The name of the method, used to determine the query file name. (EN)<br/>Tên của phương thức, được sử dụng để xác định tên tệp truy vấn. (VI)</param>
@@ -185,7 +192,8 @@ public class UnitOfWork<TContext>(
     }
 
     /// <summary>
-    /// Builds an array of NpgsqlParameter objects from the properties of an input object decorated with SqlParameterAttribute.<br/>(EN) Builds an array of NpgsqlParameter objects from the properties of an input object decorated with SqlParameterAttribute.<br/>(VI) Xây dựng một mảng các đối tượng NpgsqlParameter từ các thuộc tính của đối tượng đầu vào được trang trí bằng SqlParameterAttribute.
+    /// (EN) Builds an array of NpgsqlParameter objects from the properties of an input object decorated with SqlParameterAttribute.<br/>
+    /// (VI) Xây dựng một mảng các đối tượng NpgsqlParameter từ các thuộc tính của đối tượng đầu vào được trang trí bằng SqlParameterAttribute.
     /// </summary>
     /// <typeparam name="T">The type of the input object. (EN)<br/>Kiểu của đối tượng đầu vào. (VI)</typeparam>
     /// <param name="input">The input object. (EN)<br/>Đối tượng đầu vào. (VI)</param>
@@ -205,7 +213,8 @@ public class UnitOfWork<TContext>(
     }
 
     /// <summary>
-    /// Gets the NpgsqlParameter value for a property if it is decorated with SqlParameterAttribute.<br/>(EN) Gets the NpgsqlParameter value for a property if it is decorated with SqlParameterAttribute.<br/>(VI) Lấy giá trị NpgsqlParameter cho một thuộc tính nếu nó được trang trí bằng SqlParameterAttribute.
+    /// (EN) Gets the NpgsqlParameter value for a property if it is decorated with SqlParameterAttribute.<br/>
+    /// (VI) Lấy giá trị NpgsqlParameter cho một thuộc tính nếu nó được trang trí bằng SqlParameterAttribute.
     /// </summary>
     /// <typeparam name="T">The type of the input object. (EN)<br/>Kiểu của đối tượng đầu vào. (VI)</typeparam>
     /// <param name="input">The input object. (EN)<br/>Đối tượng đầu vào. (VI)</param>

@@ -1,3 +1,4 @@
+using CoreFinance.Api.Infrastructures.Middlewares;
 using CoreFinance.Api.Infrastructures.Modules;
 using CoreFinance.Api.Infrastructures.ServicesExtensions;
 using CoreFinance.Contracts.ConfigurationOptions;
@@ -58,6 +59,9 @@ builder.Host.UseSerilog((hostingContext, loggerConfiguration) =>
 
 var app = builder.Build();
 
+// Add the performance logging middleware early in the pipeline
+app.UseMiddleware<PerformanceLoggingMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -75,7 +79,7 @@ app.UseHttpsRedirection();
 app.UseCors(policyName);
 
 //app.UseAuthorization();
-
+app.UseRouting();
 app.MapControllers();
 
 await CreateDbIfNotExistsAsync(app);

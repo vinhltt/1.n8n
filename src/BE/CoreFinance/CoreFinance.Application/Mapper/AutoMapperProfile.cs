@@ -9,12 +9,14 @@ using CoreFinance.Domain.Enums;
 namespace CoreFinance.Application.Mapper;
 
 /// <summary>
-/// AutoMapper profile for mapping between domain entities and DTOs.<br/>(EN) AutoMapper profile for mapping between domain entities and DTOs.<br/>(VI) Cấu hình AutoMapper để ánh xạ giữa các entity miền (domain) và DTO.
+    /// (EN) AutoMapper profile for mapping between domain entities and DTOs.<br/>
+    /// (VI) Cấu hình AutoMapper để ánh xạ giữa các entity miền (domain) và DTO.
 /// </summary>
 public class AutoMapperProfile : Profile
 {
     /// <summary>
-/// Initializes a new instance of the <see cref="AutoMapperProfile"/> class.<br/>(EN) Initializes a new instance of the <see cref="AutoMapperProfile"/> class.<br/>(VI) Khởi tạo một phiên bản mới của lớp <see cref="AutoMapperProfile"/>.
+    /// (EN) Initializes a new instance of the <see cref="AutoMapperProfile"/> class.<br/>
+    /// (VI) Khởi tạo một phiên bản mới của lớp <see cref="AutoMapperProfile"/>.
 /// </summary>
     public AutoMapperProfile()
     {

@@ -14,7 +14,8 @@ namespace CoreFinance.Application.Tests.ExpectedTransactionServiceTests;
 public partial class ExpectedTransactionServiceTests
 {
     /// <summary>
-    /// Verifies that GetCategoryForecastAsync returns the correct category breakdown with aggregated amounts.<br/>(EN) Verifies that GetCategoryForecastAsync returns the correct category breakdown with aggregated amounts.<br/>(VI) Xác minh rằng GetCategoryForecastAsync trả về phân tích danh mục chính xác với tổng số tiền.
+    /// (EN) Verifies that GetCategoryForecastAsync returns the correct category breakdown with aggregated amounts.<br/>
+    /// (VI) Xác minh rằng GetCategoryForecastAsync trả về phân tích danh mục chính xác với tổng số tiền.
     /// </summary>
     [Fact]
     public async Task GetCategoryForecastAsync_ShouldReturnCorrectCategoryBreakdown()
@@ -92,7 +93,8 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetCategoryForecastAsync ignores transactions with null or empty category.<br/>(EN) Verifies that GetCategoryForecastAsync ignores transactions with null or empty category.<br/>(VI) Xác minh rằng GetCategoryForecastAsync bỏ qua các giao dịch có danh mục null hoặc rỗng.
+    /// (EN) Verifies that GetCategoryForecastAsync ignores transactions with null or empty category.<br/>
+    /// (VI) Xác minh rằng GetCategoryForecastAsync bỏ qua các giao dịch có danh mục null hoặc rỗng.
     /// </summary>
     [Fact]
     public async Task GetCategoryForecastAsync_ShouldIgnoreTransactionsWithNullOrEmptyCategory()
@@ -169,7 +171,8 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetCategoryForecastAsync ignores non-pending transactions.<br/>(EN) Verifies that GetCategoryForecastAsync ignores non-pending transactions.<br/>(VI) Xác minh rằng GetCategoryForecastAsync bỏ qua các giao dịch không ở trạng thái chờ xử lý.
+    /// (EN) Verifies that GetCategoryForecastAsync ignores non-pending transactions.<br/>
+    /// (VI) Xác minh rằng GetCategoryForecastAsync bỏ qua các giao dịch không ở trạng thái chờ xử lý.
     /// </summary>
     [Fact]
     public async Task GetCategoryForecastAsync_ShouldIgnoreNonPendingTransactions()
@@ -235,7 +238,8 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetCategoryForecastAsync filters transactions by User ID.<br/>(EN) Verifies that GetCategoryForecastAsync filters transactions by User ID.<br/>(VI) Xác minh rằng GetCategoryForecastAsync lọc các giao dịch theo ID người dùng.
+    /// (EN) Verifies that GetCategoryForecastAsync filters transactions by User ID.<br/>
+    /// (VI) Xác minh rằng GetCategoryForecastAsync lọc các giao dịch theo ID người dùng.
     /// </summary>
     [Fact]
     public async Task GetCategoryForecastAsync_ShouldFilterByUserId()

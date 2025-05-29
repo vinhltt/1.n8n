@@ -1,172 +1,206 @@
 ﻿namespace CoreFinance.Contracts.BaseEfModels;
 
 /// <summary>
-/// Provides predefined Type objects and helper methods for common data types.<br/>(EN) Provides predefined Type objects and helper methods for common data types.<br/>(VI) Cung cấp các đối tượng Type được định nghĩa trước và các phương thức hỗ trợ cho các kiểu dữ liệu thông dụng.
+    /// (EN) Provides predefined Type objects and helper methods for common data types.<br/>
+    /// (VI) Cung cấp các đối tượng Type được định nghĩa trước và các phương thức hỗ trợ cho các kiểu dữ liệu thông dụng.
 /// </summary>
 public static class TypeList
 {
     /// <summary>
-    /// The type of character.<br/>(EN) The type of character.<br/>(VI) Kiểu ký tự.
+    /// (EN) The type of character.<br/>
+    /// (VI) Kiểu ký tự.
     /// </summary>
     public static readonly Type TypeOfChar = typeof(char);
 
     /// <summary>
-    /// The type of nullable character.<br/>(EN) The type of nullable character.<br/>(VI) Kiểu ký tự có thể null.
+    /// (EN) The type of nullable character.<br/>
+    /// (VI) Kiểu ký tự có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableChar = typeof(char?);
 
     /// <summary>
-    /// The type of string.<br/>(EN) The type of string.<br/>(VI) Kiểu chuỗi ký tự.
+    /// (EN) The type of string.<br/>
+    /// (VI) Kiểu chuỗi ký tự.
     /// </summary>
     public static readonly Type TypeOfString = typeof(string);
 
     /// <summary>
-    /// The type of boolean.<br/>(EN) The type of boolean.<br/>(VI) Kiểu boolean.
+    /// (EN) The type of boolean.<br/>
+    /// (VI) Kiểu boolean.
     /// </summary>
     public static readonly Type TypeOfBoolean = typeof(bool);
 
     /// <summary>
-    /// The type of nullable boolean.<br/>(EN) The type of nullable boolean.<br/>(VI) Kiểu boolean có thể null.
+    /// (EN) The type of nullable boolean.<br/>
+    /// (VI) Kiểu boolean có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableBoolean = typeof(bool?);
 
     /// <summary>
-    /// The type of byte.<br/>(EN) The type of byte.<br/>(VI) Kiểu byte.
+    /// (EN) The type of byte.<br/>
+    /// (VI) Kiểu byte.
     /// </summary>
     public static readonly Type TypeOfByte = typeof(byte);
 
     /// <summary>
-    /// The type of nullable byte.<br/>(EN) The type of nullable byte.<br/>(VI) Kiểu byte có thể null.
+    /// (EN) The type of nullable byte.<br/>
+    /// (VI) Kiểu byte có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableByte = typeof(byte?);
 
     /// <summary>
-    /// The type of short (Int16).<br/>(EN) The type of short (Int16).<br/>(VI) Kiểu short (Int16).
+    /// (EN) The type of short (Int16).<br/>
+    /// (VI) Kiểu short (Int16).
     /// </summary>
     public static readonly Type TypeOfShort = typeof(short);
 
     /// <summary>
-    /// The type of nullable short (Int16).<br/>(EN) The type of nullable short (Int16).<br/>(VI) Kiểu short (Int16) có thể null.
+    /// (EN) The type of nullable short (Int16).<br/>
+    /// (VI) Kiểu short (Int16) có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableShort = typeof(short?);
 
     /// <summary>
-    /// The type of unsigned short (UInt16).<br/>(EN) The type of unsigned short (UInt16).<br/>(VI) Kiểu unsigned short (UInt16).
+    /// (EN) The type of unsigned short (UInt16).<br/>
+    /// (VI) Kiểu unsigned short (UInt16).
     /// </summary>
     public static readonly Type TypeOfUnsignedShort = typeof(ushort);
 
     /// <summary>
-    /// The type of nullable unsigned short (UInt16).<br/>(EN) The type of nullable unsigned short (UInt16).<br/>(VI) Kiểu unsigned short (UInt16) có thể null.
+    /// (EN) The type of nullable unsigned short (UInt16).<br/>
+    /// (VI) Kiểu unsigned short (UInt16) có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableUnsignedShort = typeof(ushort?);
 
     /// <summary>
-    /// The type of int (Int32).<br/>(EN) The type of int (Int32).<br/>(VI) Kiểu int (Int32).
+    /// (EN) The type of int (Int32).<br/>
+    /// (VI) Kiểu int (Int32).
     /// </summary>
     public static readonly Type TypeOfInt = typeof(int);
 
     /// <summary>
-    /// The type of nullable int (Int32).<br/>(EN) The type of nullable int (Int32).<br/>(VI) Kiểu int (Int32) có thể null.
+    /// (EN) The type of nullable int (Int32).<br/>
+    /// (VI) Kiểu int (Int32) có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableInt = typeof(int?);
 
     /// <summary>
-    /// The type of unsigned int (UInt32).<br/>(EN) The type of unsigned int (UInt32).<br/>(VI) Kiểu unsigned int (UInt32).
+    /// (EN) The type of unsigned int (UInt32).<br/>
+    /// (VI) Kiểu unsigned int (UInt32).
     /// </summary>
     public static readonly Type TypeOfUnsignedInt = typeof(uint);
 
     /// <summary>
-    /// The type of nullable unsigned int (UInt32).<br/>(EN) The type of nullable unsigned int (UInt32).<br/>(VI) Kiểu unsigned int (UInt32) có thể null.
+    /// (EN) The type of nullable unsigned int (UInt32).<br/>
+    /// (VI) Kiểu unsigned int (UInt32) có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableUnsignedInt = typeof(uint?);
 
     /// <summary>
-    /// The type of long (Int64).<br/>(EN) The type of long (Int64).<br/>(VI) Kiểu long (Int64).
+    /// (EN) The type of long (Int64).<br/>
+    /// (VI) Kiểu long (Int64).
     /// </summary>
     public static readonly Type TypeOfLong = typeof(long);
 
     /// <summary>
-    /// The type of nullable long (Int64).<br/>(EN) The type of nullable long (Int64).<br/>(VI) Kiểu long (Int64) có thể null.
+    /// (EN) The type of nullable long (Int64).<br/>
+    /// (VI) Kiểu long (Int64) có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableLong = typeof(long?);
 
     /// <summary>
-    /// The type of unsigned long (UInt64).<br/>(EN) The type of unsigned long (UInt64).<br/>(VI) Kiểu unsigned long (UInt64).
+    /// (EN) The type of unsigned long (UInt64).<br/>
+    /// (VI) Kiểu unsigned long (UInt64).
     /// </summary>
     public static readonly Type TypeOfUnsignedLong = typeof(ulong);
 
     /// <summary>
-    /// The type of nullable unsigned long (UInt64).<br/>(EN) The type of nullable unsigned long (UInt64).<br/>(VI) Kiểu unsigned long (UInt64) có thể null.
+    /// (EN) The type of nullable unsigned long (UInt64).<br/>
+    /// (VI) Kiểu unsigned long (UInt64) có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableUnsignedLong = typeof(ulong?);
 
     /// <summary>
-    /// The type of float (Single).<br/>(EN) The type of float (Single).<br/>(VI) Kiểu float (Single).
+    /// (EN) The type of float (Single).<br/>
+    /// (VI) Kiểu float (Single).
     /// </summary>
     public static readonly Type TypeOfFloat = typeof(float);
 
     /// <summary>
-    /// The type of nullable float (Single).<br/>(EN) The type of nullable float (Single).<br/>(VI) Kiểu float (Single) có thể null.
+    /// (EN) The type of nullable float (Single).<br/>
+    /// (VI) Kiểu float (Single) có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableFloat = typeof(float?);
 
     /// <summary>
-    /// The type of double.<br/>(EN) The type of double.<br/>(VI) Kiểu double.
+    /// (EN) The type of double.<br/>
+    /// (VI) Kiểu double.
     /// </summary>
     public static readonly Type TypeOfDouble = typeof(double);
 
     /// <summary>
-    /// The type of nullable double.<br/>(EN) The type of nullable double.<br/>(VI) Kiểu double có thể null.
+    /// (EN) The type of nullable double.<br/>
+    /// (VI) Kiểu double có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableDouble = typeof(double?);
 
     /// <summary>
-    /// The type of decimal.<br/>(EN) The type of decimal.<br/>(VI) Kiểu decimal.
+    /// (EN) The type of decimal.<br/>
+    /// (VI) Kiểu decimal.
     /// </summary>
     public static readonly Type TypeOfDecimal = typeof(decimal);
 
     /// <summary>
-    /// The type of nullable decimal.<br/>(EN) The type of nullable decimal.<br/>(VI) Kiểu decimal có thể null.
+    /// (EN) The type of nullable decimal.<br/>
+    /// (VI) Kiểu decimal có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableDecimal = typeof(decimal?);
 
     /// <summary>
-    /// The type of TimeSpan.<br/>(EN) The type of TimeSpan.<br/>(VI) Kiểu TimeSpan.
+    /// (EN) The type of TimeSpan.<br/>
+    /// (VI) Kiểu TimeSpan.
     /// </summary>
     public static readonly Type TypeOfTimeSpan = typeof(TimeSpan);
 
     /// <summary>
-    /// The type of nullable TimeSpan.<br/>(EN) The type of nullable TimeSpan.<br/>(VI) Kiểu TimeSpan có thể null.
+    /// (EN) The type of nullable TimeSpan.<br/>
+    /// (VI) Kiểu TimeSpan có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableTimeSpan = typeof(TimeSpan?);
 
     /// <summary>
-    /// The type of DateTime.<br/>(EN) The type of DateTime.<br/>(VI) Kiểu DateTime.
+    /// (EN) The type of DateTime.<br/>
+    /// (VI) Kiểu DateTime.
     /// </summary>
     public static readonly Type TypeOfDateTime = typeof(DateTime);
 
     /// <summary>
-    /// The type of nullable DateTime.<br/>(EN) The type of nullable DateTime.<br/>(VI) Kiểu DateTime có thể null.
+    /// (EN) The type of nullable DateTime.<br/>
+    /// (VI) Kiểu DateTime có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableDateTime = typeof(DateTime?);
 
     /// <summary>
-    /// The type of DateOnly.<br/>(EN) The type of DateOnly.<br/>(VI) Kiểu DateOnly.
+    /// (EN) The type of DateOnly.<br/>
+    /// (VI) Kiểu DateOnly.
     /// </summary>
     public static readonly Type TypeOfDateOnly = typeof(DateOnly);
 
     /// <summary>
-    /// The type of nullable DateOnly.<br/>(EN) The type of nullable DateOnly.<br/>(VI) Kiểu DateOnly có thể null.
+    /// (EN) The type of nullable DateOnly.<br/>
+    /// (VI) Kiểu DateOnly có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableDateOnly = typeof(DateOnly?);
 
     /// <summary>
-    /// The type of TimeOnly.<br/>(EN) The type of TimeOnly.<br/>(VI) Kiểu TimeOnly.
+    /// (EN) The type of TimeOnly.<br/>
+    /// (VI) Kiểu TimeOnly.
     /// </summary>
     public static readonly Type TypeOfTimeOnly = typeof(TimeOnly);
 
     /// <summary>
-    /// The type of nullable TimeOnly.<br/>(EN) The type of nullable TimeOnly.<br/>(VI) Kiểu TimeOnly có thể null.
+    /// (EN) The type of nullable TimeOnly.<br/>
+    /// (VI) Kiểu TimeOnly có thể null.
     /// </summary>
     public static readonly Type TypeOfNullableTimeOnly = typeof(TimeOnly?);
 
@@ -199,7 +233,8 @@ public static class TypeList
     public static readonly Type TypeOfNullableGuid = typeof(Guid?);
 
     /// <summary>
-    /// An array of all simple types.<br/>(EN) An array of all simple types.<br/>(VI) Mảng chứa tất cả các kiểu dữ liệu đơn giản.
+    /// (EN) An array of all simple types.<br/>
+    /// (VI) Mảng chứa tất cả các kiểu dữ liệu đơn giản.
     /// </summary>
     public static readonly Type[] TypeSimpleTypes =
     [

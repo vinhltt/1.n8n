@@ -21,7 +21,8 @@ namespace CoreFinance.Application.Tests.TransactionServiceTests;
 public partial class TransactionServiceTests
 {
     /// <summary>
-    /// Verifies that GetPagingAsync returns a paged result correctly.<br/>(EN) Verifies that GetPagingAsync returns a paged result correctly.<br/>(VI) Xác minh rằng GetPagingAsync trả về kết quả phân trang một cách chính xác.
+    /// (EN) Verifies that GetPagingAsync returns a paged result correctly.<br/>
+    /// (VI) Xác minh rằng GetPagingAsync trả về kết quả phân trang một cách chính xác.
     /// </summary>
     [Fact]
     public async Task GetPagingAsync_ShouldReturnPagedResult()

@@ -53,9 +53,9 @@ public class TransactionCreateRequest : BaseCreateRequest
     public string? Description { get; set; }
 
     /// <summary>
-    /// The balance of the account after the transaction. (EN)
+    /// The balance of the account after the transaction (optional, can be calculated automatically). (EN)
     /// <br/>
-    /// Số dư tài khoản sau giao dịch. (VI)
+    /// Số dư tài khoản sau giao dịch (tùy chọn, có thể được tính tự động). (VI)
     /// </summary>
     public decimal Balance { get; set; }
 
