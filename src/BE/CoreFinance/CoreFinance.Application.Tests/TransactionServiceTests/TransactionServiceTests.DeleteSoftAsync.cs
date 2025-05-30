@@ -9,15 +9,13 @@ using Moq;
 namespace CoreFinance.Application.Tests.TransactionServiceTests;
 
 /// <summary>
-/// Contains test cases for the soft deletion methods of TransactionService. (EN)
-/// <br/>
+/// Contains test cases for the soft deletion methods of TransactionService. (EN)<br/>
 /// Chứa các trường hợp kiểm thử cho các phương thức xóa mềm của TransactionService. (VI)
 /// </summary>
 public partial class TransactionServiceTests
 {
     /// <summary>
-    /// Verifies that DeleteSoftAsync returns one when a transaction is successfully soft deleted. (EN)
-    /// <br/>
+    /// Verifies that DeleteSoftAsync returns one when a transaction is successfully soft deleted. (EN)<br/>
     /// Xác minh rằng DeleteSoftAsync trả về một khi một giao dịch được xóa mềm thành công. (VI)
     /// </summary>
     [Fact]
@@ -40,8 +38,7 @@ public partial class TransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that DeleteSoftAsync returns the correct affected count when soft deletion is successful. (EN)
-    /// <br/>
+    /// Verifies that DeleteSoftAsync returns the correct affected count when soft deletion is successful. (EN)<br/>
     /// Xác minh rằng DeleteSoftAsync trả về số bản ghi bị ảnh hưởng chính xác khi xóa mềm thành công. (VI)
     /// </summary>
     [Fact]
@@ -67,8 +64,7 @@ public partial class TransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that DeleteSoftAsync returns zero when the entity to soft delete does not exist. (EN)
-    /// <br/>
+    /// Verifies that DeleteSoftAsync returns zero when the entity to soft delete does not exist. (EN)<br/>
     /// Xác minh rằng DeleteSoftAsync trả về không khi thực thể cần xóa mềm không tồn tại. (VI)
     /// </summary>
     [Fact]
@@ -94,8 +90,7 @@ public partial class TransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that DeleteSoftAsync throws an exception when the repository's soft delete operation throws an exception. (EN)
-    /// <br/>
+    /// Verifies that DeleteSoftAsync throws an exception when the repository's soft delete operation throws an exception. (EN)<br/>
     /// Xác minh rằng DeleteSoftAsync ném ra một ngoại lệ khi thao tác xóa mềm của repository ném ra một ngoại lệ. (VI)
     /// </summary>
     [Fact]
@@ -121,8 +116,7 @@ public partial class TransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that DeleteSoftAsync handles different affected counts returned by the repository. (EN)
-    /// <br/>
+    /// Verifies that DeleteSoftAsync handles different affected counts returned by the repository. (EN)<br/>
     /// Xác minh rằng DeleteSoftAsync xử lý các số lượng bản ghi bị ảnh hưởng khác nhau được trả về bởi repository. (VI)
     /// </summary>
     [Theory]

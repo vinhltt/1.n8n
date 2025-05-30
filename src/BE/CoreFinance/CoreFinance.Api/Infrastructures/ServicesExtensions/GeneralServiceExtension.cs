@@ -9,30 +9,25 @@ using CoreFinance.Api.Infrastructures.Swagger.SchemaFilters;
 namespace CoreFinance.Api.Infrastructures.ServicesExtensions;
 
 /// <summary>
-/// Provides extension methods for configuring general services and middleware in the API. (EN)
-/// <br/>
+/// Provides extension methods for configuring general services and middleware in the API. (EN)<br/>
 /// Cung cấp các extension methods để cấu hình các dịch vụ và middleware chung trong API. (VI)
 /// </summary>
 public static class GeneralServiceExtension
 {
     /// <summary>
-    /// Adds general service configurations, including DbContext, OpenAPI, AutoMapper, JSON options, SwaggerGen, and CORS. (EN)
-    /// <br/>
+    /// Adds general service configurations, including DbContext, OpenAPI, AutoMapper, JSON options, SwaggerGen, and CORS. (EN)<br/>
     /// Bổ sung các cấu hình dịch vụ chung, bao gồm DbContext, OpenAPI, AutoMapper, tùy chọn JSON, SwaggerGen và CORS. (VI)
     /// </summary>
     /// <param name="builder">
-    /// The WebApplicationBuilder instance. (EN)
-    /// <br/>
+    /// The WebApplicationBuilder instance. (EN)<br/>
     /// Instance của WebApplicationBuilder. (VI)
     /// </param>
     /// <param name="policyName">
-    /// The name of the CORS policy to add. (EN)
-    /// <br/>
+    /// The name of the CORS policy to add. (EN)<br/>
     /// Tên của chính sách CORS cần thêm. (VI)
     /// </param>
     /// <param name="corsOption">
-    /// The CORS options configuration. (EN)
-    /// <br/>
+    /// The CORS options configuration. (EN)<br/>
     /// Cấu hình tùy chọn CORS. (VI)
     /// </param>
     public static void AddGeneralConfigurations(
@@ -131,18 +126,15 @@ public static class GeneralServiceExtension
     }
 
     /// <summary>
-    /// Checks if the provided collection of strings indicates that all values are allowed (contains "*"). (EN)
-    /// <br/>
+    /// Checks if the provided collection of strings indicates that all values are allowed (contains "*"). (EN)<br/>
     /// Kiểm tra xem tập hợp chuỗi được cung cấp có cho biết tất cả các giá trị đều được phép hay không (chứa "*"). (VI)
     /// </summary>
     /// <param name="values">
-    /// The collection of strings to check. (EN)
-    /// <br/>
+    /// The collection of strings to check. (EN)<br/>
     /// Tập hợp chuỗi cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// True if the collection is null, empty, or contains "*"; otherwise, false. (EN)
-    /// <br/>
+    /// True if the collection is null, empty, or contains "*"; otherwise, false. (EN)<br/>
     /// True nếu tập hợp là null, rỗng hoặc chứa "*"; ngược lại là false. (VI)
     /// </returns>
     private static bool IsAllowedAll(this IReadOnlyCollection<string>? values)

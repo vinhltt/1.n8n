@@ -205,29 +205,25 @@ public static class TypeList
     public static readonly Type TypeOfNullableTimeOnly = typeof(TimeOnly?);
 
     /// <summary>
-    /// The type of date time offset (EN)
-    /// <br/>
+    /// The type of date time offset (EN)<br/>
     /// Kiểu date time offset (VI)
     /// </summary>
     public static readonly Type TypeOfDateTimeOffset = typeof(DateTimeOffset);
 
     /// <summary>
-    /// The type of nullable date time offset (EN)
-    /// <br/>
+    /// The type of nullable date time offset (EN)<br/>
     /// Kiểu date time offset có thể null (VI)
     /// </summary>
     public static readonly Type TypeOfNullableDateTimeOffset = typeof(DateTimeOffset?);
 
     /// <summary>
-    /// The type of unique identifier (EN)
-    /// <br/>
+    /// The type of unique identifier (EN)<br/>
     /// Kiểu định danh duy nhất (VI)
     /// </summary>
     public static readonly Type TypeOfGuid = typeof(Guid);
 
     /// <summary>
-    /// The type of nullable unique identifier (EN)
-    /// <br/>
+    /// The type of nullable unique identifier (EN)<br/>
     /// Kiểu định danh duy nhất có thể null (VI)
     /// </summary>
     public static readonly Type TypeOfNullableGuid = typeof(Guid?);
@@ -278,18 +274,15 @@ public static class TypeList
     ];
 
     /// <summary>
-    /// Determines whether the specified type is a simple type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is a simple type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu dữ liệu đơn giản hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is a simple type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is a simple type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu đơn giản; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsSimpleType(Type type)
@@ -304,18 +297,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is a boolean type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is a boolean type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu boolean hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is a boolean type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is a boolean type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu boolean; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsBoolean(this Type type)
@@ -324,18 +314,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is a DateTime type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is a DateTime type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu DateTime hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is a DateTime type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is a DateTime type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu DateTime; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsDateTime(this Type type)
@@ -344,18 +331,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is an integer type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is an integer type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu số nguyên hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is an integer type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is an integer type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu số nguyên; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsInt(this Type type)
@@ -364,18 +348,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is a byte type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is a byte type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu byte hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is a byte type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is a byte type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu byte; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsByte(this Type type)
@@ -384,18 +365,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is a long type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is a long type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu long hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is a long type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is a long type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu long; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsLong(this Type type)
@@ -404,18 +382,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is a short type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is a short type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu short hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is a short type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is a short type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu short; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsShort(this Type type)
@@ -424,18 +399,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is a Guid type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is a Guid type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu Guid hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is a Guid type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is a Guid type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu Guid; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsGuid(this Type type)
@@ -444,18 +416,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is an unsigned short type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is an unsigned short type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu unsigned short hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is an unsigned short type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is an unsigned short type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu unsigned short; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsUnsignedShort(this Type type)
@@ -464,18 +433,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is an unsigned integer type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is an unsigned integer type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu số nguyên không dấu hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is an unsigned integer type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is an unsigned integer type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu số nguyên không dấu; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsUnsignedInt(this Type type)
@@ -484,18 +450,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is an unsigned long type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is an unsigned long type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu unsigned long hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is an unsigned long type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is an unsigned long type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu unsigned long; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsUnsignedLong(this Type type)
@@ -504,18 +467,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is a float type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is a float type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu float hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is a float type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is a float type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu float; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsFloat(this Type type)
@@ -524,18 +484,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is a double type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is a double type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu double hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is a double type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is a double type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu double; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsDouble(this Type type)
@@ -544,18 +501,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is a decimal type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is a decimal type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu decimal hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is a decimal type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is a decimal type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu decimal; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsDecimal(this Type type)
@@ -564,18 +518,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is a TimeSpan type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is a TimeSpan type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu TimeSpan hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is a TimeSpan type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is a TimeSpan type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu TimeSpan; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsTimeSpan(this Type type)
@@ -584,18 +535,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is a DateTimeOffset type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is a DateTimeOffset type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu DateTimeOffset hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is a DateTimeOffset type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is a DateTimeOffset type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu DateTimeOffset; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsDateTimeOffset(this Type type)
@@ -604,18 +552,15 @@ public static class TypeList
     }
 
     /// <summary>
-    /// Determines whether the specified type is a string type. (EN)
-    /// <br/>
+    /// Determines whether the specified type is a string type. (EN)<br/>
     /// Xác định xem kiểu được chỉ định có phải là kiểu chuỗi hay không. (VI)
     /// </summary>
     /// <param name="type">
-    /// The type to check. (EN)
-    /// <br/>
+    /// The type to check. (EN)<br/>
     /// Kiểu cần kiểm tra. (VI)
     /// </param>
     /// <returns>
-    /// <c>true</c> if the specified type is a string type; otherwise, <c>false</c>. (EN)
-    /// <br/>
+    /// <c>true</c> if the specified type is a string type; otherwise, <c>false</c>. (EN)<br/>
     /// <c>true</c> nếu kiểu được chỉ định là kiểu chuỗi; ngược lại là <c>false</c>. (VI)
     /// </returns>
     public static bool IsString(this Type type)

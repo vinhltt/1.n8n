@@ -199,8 +199,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the given expression represents a null value. (EN)
-    /// <br/>
+    /// Determines whether the given expression represents a null value. (EN)<br/>
     /// Xác định xem biểu thức đã cho có biểu thị giá trị null hay không. (VI)
     /// </summary>
     /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
@@ -211,8 +210,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the given expression represents a non-null value. (EN)
-    /// <br/>
+    /// Determines whether the given expression represents a non-null value. (EN)<br/>
     /// Xác định xem biểu thức đã cho có biểu thị giá trị khác null hay không. (VI)
     /// </summary>
     /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
@@ -223,8 +221,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the given expression represents an empty string. (EN)
-    /// <br/>
+    /// Determines whether the given expression represents an empty string. (EN)<br/>
     /// Xác định xem biểu thức đã cho có biểu thị chuỗi rỗng hay không. (VI)
     /// </summary>
     /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
@@ -235,8 +232,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the given expression represents a non-empty string. (EN)
-    /// <br/>
+    /// Determines whether the given expression represents a non-empty string. (EN)<br/>
     /// Xác định xem biểu thức đã cho có biểu thị chuỗi không rỗng hay không. (VI)
     /// </summary>
     /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
@@ -247,8 +243,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the given expression represents a null or empty string. (EN)
-    /// <br/>
+    /// Determines whether the given expression represents a null or empty string. (EN)<br/>
     /// Xác định xem biểu thức đã cho có biểu thị chuỗi null hoặc rỗng hay không. (VI)
     /// </summary>
     /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
@@ -259,8 +254,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the given expression represents a non-null and non-empty string. (EN)
-    /// <br/>
+    /// Determines whether the given expression represents a non-null and non-empty string. (EN)<br/>
     /// Xác định xem biểu thức đã cho có biểu thị chuỗi không null và không rỗng hay không. (VI)
     /// </summary>
     /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
@@ -271,8 +265,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the given expression represents a null or white space string. (EN)
-    /// <br/>
+    /// Determines whether the given expression represents a null or white space string. (EN)<br/>
     /// Xác định xem biểu thức đã cho có biểu thị chuỗi null hoặc chỉ chứa khoảng trắng hay không. (VI)
     /// </summary>
     /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
@@ -284,8 +277,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the given expression represents a non-null and non-white space string. (EN)
-    /// <br/>
+    /// Determines whether the given expression represents a non-null and non-white space string. (EN)<br/>
     /// Xác định xem biểu thức đã cho có biểu thị chuỗi không null và không chứa khoảng trắng hay không. (VI)
     /// </summary>
     /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>
@@ -297,8 +289,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression equals to right expression. (EN)
-    /// <br/>
+    /// Determines whether the left expression equals to right expression. (EN)<br/>
     /// Xác định xem biểu thức bên trái có bằng biểu thức bên phải hay không. (VI)
     /// </summary>
     /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
@@ -315,8 +306,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression is not equals to right expression. (EN)
-    /// <br/>
+    /// Determines whether the left expression is not equals to right expression. (EN)<br/>
     /// Xác định xem biểu thức bên trái có khác biểu thức bên phải hay không. (VI)
     /// </summary>
     /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
@@ -333,8 +323,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression starts with the right expression. (EN)
-    /// <br/>
+    /// Determines whether the left expression starts with the right expression. (EN)<br/>
     /// Xác định xem biểu thức bên trái có bắt đầu bằng biểu thức bên phải hay không. (VI)
     /// </summary>
     /// <param name="left">The left expression (string). (EN)<br/>Biểu thức bên trái (chuỗi). (VI)</param>
@@ -346,8 +335,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression ends with the right expression. (EN)
-    /// <br/>
+    /// Determines whether the left expression ends with the right expression. (EN)<br/>
     /// Xác định xem biểu thức bên trái có kết thúc bằng biểu thức bên phải hay không. (VI)
     /// </summary>
     /// <param name="left">The left expression (string). (EN)<br/>Biểu thức bên trái (chuỗi). (VI)</param>
@@ -359,8 +347,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression is greater than the right expression. (EN)
-    /// <br/>
+    /// Determines whether the left expression is greater than the right expression. (EN)<br/>
     /// Xác định xem biểu thức bên trái có lớn hơn biểu thức bên phải hay không. (VI)
     /// </summary>
     /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
@@ -383,8 +370,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression is greater than or equals to right expression. (EN)
-    /// <br/>
+    /// Determines whether the left expression is greater than or equals to right expression. (EN)<br/>
     /// Xác định xem biểu thức bên trái có lớn hơn hoặc bằng biểu thức bên phải hay không. (VI)
     /// </summary>
     /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
@@ -407,8 +393,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression is less than right expression. (EN)
-    /// <br/>
+    /// Determines whether the left expression is less than right expression. (EN)<br/>
     /// Xác định xem biểu thức bên trái có nhỏ hơn biểu thức bên phải hay không. (VI)
     /// </summary>
     /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
@@ -431,8 +416,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression is less than or equals to right expression. (EN)
-    /// <br/>
+    /// Determines whether the left expression is less than or equals to right expression. (EN)<br/>
     /// Xác định xem biểu thức bên trái có nhỏ hơn hoặc bằng biểu thức bên phải hay không. (VI)
     /// </summary>
     /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
@@ -455,8 +439,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression contains the right expression. (EN)
-    /// <br/>
+    /// Determines whether the left expression contains the right expression. (EN)<br/>
     /// Xác định xem biểu thức bên trái có chứa biểu thức bên phải hay không (không phân biệt chữ hoa/thường đối với chuỗi). (VI)
     /// </summary>
     /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
@@ -470,8 +453,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression does not contain the right expression (case-insensitive for strings). (EN)
-    /// <br/>
+    /// Determines whether the left expression does not contain the right expression (case-insensitive for strings). (EN)<br/>
     /// Xác định xem biểu thức bên trái có không chứa biểu thức bên phải hay không (không phân biệt chữ hoa/thường đối với chuỗi). (VI)
     /// </summary>
     /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
@@ -506,8 +488,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression is not contained in the right expression. (EN)
-    /// <br/>
+    /// Determines whether the left expression is not contained in the right expression. (EN)<br/>
     /// Xác định xem biểu thức bên trái có không nằm trong biểu thức bên phải hay không. (VI)
     /// </summary>
     /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
@@ -520,8 +501,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression is in the right expression. (EN)
-    /// <br/>
+    /// Determines whether the left expression is in the right expression. (EN)<br/>
     /// Xác định xem biểu thức bên trái có nằm trong biểu thức bên phải hay không. (VI)
     /// </summary>
     /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
@@ -542,8 +522,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the left expression is not in the right expression. (EN)
-    /// <br/>
+    /// Determines whether the left expression is not in the right expression. (EN)<br/>
     /// Xác định xem biểu thức bên trái có không nằm trong biểu thức bên phải hay không. (VI)
     /// </summary>
     /// <param name="left">The left expression. (EN)<br/>Biểu thức bên trái. (VI)</param>
@@ -565,8 +544,7 @@ public static class ExpressionUtils
     }
 
     /// <summary>
-    /// Determines whether the expression's value is between value1 and value2 (inclusive). (EN)
-    /// <br/>
+    /// Determines whether the expression's value is between value1 and value2 (inclusive). (EN)<br/>
     /// Xác định xem giá trị của biểu thức có nằm giữa value1 và value2 hay không (bao gồm cả hai đầu). (VI)
     /// </summary>
     /// <param name="expression">The expression to check. (EN)<br/>Biểu thức cần kiểm tra. (VI)</param>

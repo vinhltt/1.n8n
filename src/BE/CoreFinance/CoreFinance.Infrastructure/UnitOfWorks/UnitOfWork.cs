@@ -14,13 +14,11 @@ using Npgsql;
 namespace CoreFinance.Infrastructure.UnitOfWorks;
 
 /// <summary>
-///     (EN) Represents a Unit of Work implementation using Entity Framework Core.
-///     <br/>
+///     (EN) Represents a Unit of Work implementation using Entity Framework Core.<br/>
 ///     (VI) Biểu thị một triển khai Unit of Work sử dụng Entity Framework Core.
 /// </summary>
 /// <typeparam name="TContext">
-///     The type of the DbContext. (EN)
-///     <br/>
+///     The type of the DbContext. (EN)<br/>
 ///     Kiểu của DbContext. (VI)
 /// </typeparam>
 public class UnitOfWork<TContext>(
@@ -57,26 +55,22 @@ public class UnitOfWork<TContext>(
     }
 
     /// <summary>
-    ///     (EN) Gets the content of a template query file asynchronously.
-    ///     <br/>
+    ///     (EN) Gets the content of a template query file asynchronously.<br/>
     ///     (VI) Lấy nội dung của tệp truy vấn mẫu một cách bất đồng bộ.
     /// </summary>
     /// <param name="methodName">
-    ///     The name of the calling method. (EN)
-    ///     <br/>
+    ///     The name of the calling method. (EN)<br/>
     ///     Tên của phương thức gọi. (VI)
     /// </param>
     /// <param name="path">
-    ///     The file path of the calling member. (EN)
-    ///     <br/>
+    ///     The file path of the calling member. (EN)<br/>
     ///     Đường dẫn tệp của thành viên gọi. (VI)
     /// </param>
     /// <returns>
     ///     A task representing the asynchronous operation, containing the content of the query file.
     /// </returns>
     /// <exception cref="FileNotFoundException">
-    ///     Thrown if the query file is not found. (EN)
-    ///     <br/>
+    ///     Thrown if the query file is not found. (EN)<br/>
     ///     Ném ngoại lệ nếu tệp truy vấn không được tìm thấy. (VI)
     /// </exception>
     public async Task<string> GetTemplateQueryAsync(
@@ -91,24 +85,20 @@ public class UnitOfWork<TContext>(
     }
 
     /// <summary>
-    /// (EN) Gets a repository for the specified entity type.
-    ///     <br/>
+    /// (EN) Gets a repository for the specified entity type.<br/>
     /// (VI) Lấy một repository cho kiểu thực thể được chỉ định.
     /// </summary>
     /// <typeparam name="TEntity">
-    ///     The type of the entity. (EN)
-    ///     <br/>
+    ///     The type of the entity. (EN)<br/>
     ///     Kiểu của thực thể. (VI)
     /// </typeparam>
     /// <typeparam name="TKey">
-    ///     The type of the entity's key. (EN)
-    ///     <br/>
+    ///     The type of the entity's key. (EN)<br/>
     ///     Kiểu của khóa thực thể. (VI)
     /// </typeparam>
     /// <returns>An instance of the base repository for the specified entity type.</returns>
     /// <exception cref="InvalidOperationException">
-    ///     Thrown if the repository service is not registered. (EN)
-    ///     <br/>
+    ///     Thrown if the repository service is not registered. (EN)<br/>
     ///     Ném ngoại lệ nếu dịch vụ repository chưa được đăng ký. (VI)
     /// </exception>
     public IBaseRepository<TEntity, TKey> Repository<TEntity, TKey>()

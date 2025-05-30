@@ -14,15 +14,13 @@ using Moq;
 namespace CoreFinance.Application.Tests.AccountServiceTests;
 
 /// <summary>
-/// Contains test cases for the UpdateAsync method of AccountService. (EN)
-/// <br/>
+/// Contains test cases for the UpdateAsync method of AccountService. (EN)<br/>
 /// Chứa các trường hợp kiểm thử cho phương thức UpdateAsync của AccountService. (VI)
 /// </summary>
 public partial class AccountServiceTests
 {
     /// <summary>
-    /// Verifies that UpdateAsync returns the updated ViewModel when the update is successful with a valid request. (EN)
-    /// <br/>
+    /// Verifies that UpdateAsync returns the updated ViewModel when the update is successful with a valid request. (EN)<br/>
     /// Xác minh rằng UpdateAsync trả về ViewModel đã cập nhật khi việc cập nhật thành công với yêu cầu hợp lệ. (VI)
     /// </summary>
     [Fact]
@@ -84,8 +82,7 @@ public partial class AccountServiceTests
     }
 
     /// <summary>
-    /// Verifies that UpdateAsync throws a KeyNotFoundException when the provided ID in the request mismatches the entity ID. (EN)
-    /// <br/>
+    /// Verifies that UpdateAsync throws a KeyNotFoundException when the provided ID in the request mismatches the entity ID. (EN)<br/>
     /// Xác minh rằng UpdateAsync ném ra KeyNotFoundException khi ID được cung cấp trong yêu cầu không khớp với ID thực thể. (VI)
     /// </summary>
     [Fact]
@@ -122,8 +119,7 @@ public partial class AccountServiceTests
     }
 
     /// <summary>
-    /// Verifies that UpdateAsync throws a NullReferenceException when the entity to update is not found in the repository. (EN)
-    /// <br/>
+    /// Verifies that UpdateAsync throws a NullReferenceException when the entity to update is not found in the repository. (EN)<br/>
     /// Xác minh rằng UpdateAsync ném ra NullReferenceException khi không tìm thấy thực thể cần cập nhật trong repository. (VI)
     /// </summary>
     [Fact]
@@ -155,8 +151,7 @@ public partial class AccountServiceTests
     }
 
     /// <summary>
-    /// Verifies that UpdateAsync throws an UpdateFailedException when the repository's update operation returns a zero affected count. (EN)
-    /// <br/>
+    /// Verifies that UpdateAsync throws an UpdateFailedException when the repository's update operation returns a zero affected count. (EN)<br/>
     /// Xác minh rằng UpdateAsync ném ra UpdateFailedException khi thao tác cập nhật của repository trả về số bản ghi bị ảnh hưởng bằng không. (VI)
     /// </summary>
     [Fact]

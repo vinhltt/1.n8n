@@ -9,15 +9,13 @@ using Moq;
 namespace CoreFinance.Application.Tests.AccountServiceTests;
 
 /// <summary>
-/// Contains test cases for the hard deletion methods of AccountService. (EN)
-/// <br/>
+/// Contains test cases for the hard deletion methods of AccountService. (EN)<br/>
 /// Chứa các trường hợp kiểm thử cho các phương thức xóa cứng của AccountService. (VI)
 /// </summary>
 public partial class AccountServiceTests
 {
     /// <summary>
-    /// Verifies that DeleteHardAsync returns the correct affected count when hard deletion is successful. (EN)
-    /// <br/>
+    /// Verifies that DeleteHardAsync returns the correct affected count when hard deletion is successful. (EN)<br/>
     /// Xác minh rằng DeleteHardAsync trả về số bản ghi bị ảnh hưởng chính xác khi xóa cứng thành công. (VI)
     /// </summary>
     [Fact]
@@ -47,8 +45,7 @@ public partial class AccountServiceTests
     }
 
     /// <summary>
-    /// Verifies that DeleteHardAsync returns zero when the entity to hard delete does not exist. (EN)
-    /// <br/>
+    /// Verifies that DeleteHardAsync returns zero when the entity to hard delete does not exist. (EN)<br/>
     /// Xác minh rằng DeleteHardAsync trả về không khi thực thể cần xóa cứng không tồn tại. (VI)
     /// </summary>
     [Fact]
@@ -79,8 +76,7 @@ public partial class AccountServiceTests
     }
 
     /// <summary>
-    /// Verifies that DeleteHardAsync throws an exception when the repository's hard delete operation throws an exception. (EN)
-    /// <br/>
+    /// Verifies that DeleteHardAsync throws an exception when the repository's hard delete operation throws an exception. (EN)<br/>
     /// Xác minh rằng DeleteHardAsync ném ra một ngoại lệ khi thao tác xóa cứng của repository ném ra một ngoại lệ. (VI)
     /// </summary>
     [Fact]
@@ -111,8 +107,7 @@ public partial class AccountServiceTests
     }
 
     /// <summary>
-    /// Verifies that DeleteHardAsync throws an exception when the SaveChanges operation throws an exception after hard deletion. (EN)
-    /// <br/>
+    /// Verifies that DeleteHardAsync throws an exception when the SaveChanges operation throws an exception after hard deletion. (EN)<br/>
     /// Xác minh rằng DeleteHardAsync ném ra một ngoại lệ khi thao tác SaveChanges ném ra một ngoại lệ sau khi xóa cứng. (VI)
     /// </summary>
     [Fact]

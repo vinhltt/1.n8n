@@ -14,8 +14,7 @@ using Microsoft.Extensions.Logging;
 namespace CoreFinance.Application.Services;
 
 /// <summary>
-/// (EN) Service for managing expected transactions.
-/// <br/>
+/// (EN) Service for managing expected transactions.<br/>
 /// (VI) Dịch vụ quản lý các giao dịch dự kiến.
 /// </summary>
 public class ExpectedTransactionService(
@@ -27,8 +26,7 @@ public class ExpectedTransactionService(
         IExpectedTransactionService
 {
     /// <summary>
-    /// (EN) Gets a paginated list of expected transactions based on a filter request.
-    /// <br/>
+    /// (EN) Gets a paginated list of expected transactions based on a filter request.<br/>
     /// (VI) Lấy danh sách giao dịch dự kiến có phân trang dựa trên yêu cầu lọc.
     /// </summary>
     /// <param name="request">The filter request body.</param>
@@ -51,8 +49,7 @@ public class ExpectedTransactionService(
     }
 
     /// <summary>
-    /// (EN) Gets a list of pending expected transactions for a user.
-    /// <br/>
+    /// (EN) Gets a list of pending expected transactions for a user.<br/>
     /// (VI) Lấy danh sách các giao dịch dự kiến đang chờ xử lý cho người dùng.
     /// </summary>
     /// <param name="userId">The user ID.</param>

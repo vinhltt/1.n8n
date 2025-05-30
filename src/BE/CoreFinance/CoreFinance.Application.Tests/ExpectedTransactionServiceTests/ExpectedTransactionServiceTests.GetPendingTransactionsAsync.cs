@@ -12,15 +12,13 @@ using FluentAssertions;
 namespace CoreFinance.Application.Tests.ExpectedTransactionServiceTests;
 
 /// <summary>
-/// Contains test cases for the GetPendingTransactionsAsync method of ExpectedTransactionService. (EN)
-/// <br/>
+/// Contains test cases for the GetPendingTransactionsAsync method of ExpectedTransactionService. (EN)<br/>
 /// Chứa các trường hợp kiểm thử cho phương thức GetPendingTransactionsAsync của ExpectedTransactionService. (VI)
 /// </summary>
 public partial class ExpectedTransactionServiceTests
 {
     /// <summary>
-    /// Verifies that GetPendingTransactionsAsync returns only pending transactions for a specific user. (EN)
-    /// <br/>
+    /// Verifies that GetPendingTransactionsAsync returns only pending transactions for a specific user. (EN)<br/>
     /// Xác minh rằng GetPendingTransactionsAsync chỉ trả về các giao dịch đang chờ xử lý cho một người dùng cụ thể. (VI)
     /// </summary>
     [Fact]
@@ -96,8 +94,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetPendingTransactionsAsync returns an empty list when no pending transactions exist for the user. (EN)
-    /// <br/>
+    /// Verifies that GetPendingTransactionsAsync returns an empty list when no pending transactions exist for the user. (EN)<br/>
     /// Xác minh rằng GetPendingTransactionsAsync trả về danh sách rỗng khi không có giao dịch đang chờ xử lý nào tồn tại cho người dùng. (VI)
     /// </summary>
     [Fact]
@@ -150,8 +147,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetPendingTransactionsAsync returns an empty list when the user has no transactions at all. (EN)
-    /// <br/>
+    /// Verifies that GetPendingTransactionsAsync returns an empty list when the user has no transactions at all. (EN)<br/>
     /// Xác minh rằng GetPendingTransactionsAsync trả về danh sách rỗng khi người dùng không có bất kỳ giao dịch nào. (VI)
     /// </summary>
     [Fact]
@@ -196,8 +192,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetPendingTransactionsAsync returns an empty list when no transactions exist in the repository globally. (EN)
-    /// <br/>
+    /// Verifies that GetPendingTransactionsAsync returns an empty list when no transactions exist in the repository globally. (EN)<br/>
     /// Xác minh rằng GetPendingTransactionsAsync trả về danh sách rỗng khi không có giao dịch nào tồn tại trong toàn bộ repository. (VI)
     /// </summary>
     [Fact]
@@ -227,8 +222,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetPendingTransactionsAsync returns the correct transaction properties in the ViewModel. (EN)
-    /// <br/>
+    /// Verifies that GetPendingTransactionsAsync returns the correct transaction properties in the ViewModel. (EN)<br/>
     /// Xác minh rằng GetPendingTransactionsAsync trả về đúng các thuộc tính giao dịch trong ViewModel. (VI)
     /// </summary>
     [Fact]

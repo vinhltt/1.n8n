@@ -4,15 +4,13 @@ using CoreFinance.Application.DTOs.ExpectedTransaction;
 namespace CoreFinance.Application.Validators;
 
 /// <summary>
-/// Validates the <see cref="CancelTransactionRequest"/>. (EN)
-/// <br/>
+/// Validates the <see cref="CancelTransactionRequest"/>. (EN)<br/>
 /// Thực hiện xác thực cho <see cref="CancelTransactionRequest"/>. (VI)
 /// </summary>
 public class CancelTransactionRequestValidator : AbstractValidator<CancelTransactionRequest>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="CancelTransactionRequestValidator"/> class. (EN)
-    /// <br/>
+    /// Initializes a new instance of the <see cref="CancelTransactionRequestValidator"/> class. (EN)<br/>
     /// Khởi tạo một phiên bản mới của lớp <see cref="CancelTransactionRequestValidator"/>. (VI)
     /// </summary>
     public CancelTransactionRequestValidator()

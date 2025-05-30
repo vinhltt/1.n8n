@@ -296,8 +296,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetCategoryForecastAsync returns an empty dictionary when there are no valid transactions (within date range, with category, pending). (EN)
-    /// <br/>
+    /// Verifies that GetCategoryForecastAsync returns an empty dictionary when there are no valid transactions (within date range, with category, pending). (EN)<br/>
     /// Xác minh rằng GetCategoryForecastAsync trả về một dictionary rỗng khi không có giao dịch hợp lệ nào (trong phạm vi ngày, có danh mục, đang chờ xử lý). (VI)
     /// </summary>
     [Fact]
@@ -353,8 +352,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetCategoryForecastAsync correctly handles mixed income and expense transactions within the same category. (EN)
-    /// <br/>
+    /// Verifies that GetCategoryForecastAsync correctly handles mixed income and expense transactions within the same category. (EN)<br/>
     /// Xác minh rằng GetCategoryForecastAsync xử lý đúng các giao dịch thu nhập và chi phí hỗn hợp trong cùng một danh mục. (VI)
     /// </summary>
     [Fact]

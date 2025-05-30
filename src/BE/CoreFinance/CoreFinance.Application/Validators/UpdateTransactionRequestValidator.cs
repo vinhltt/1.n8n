@@ -4,15 +4,13 @@ using FluentValidation;
 namespace CoreFinance.Application.Validators;
 
 /// <summary>
-/// Validates the <see cref="TransactionUpdateRequest"/>. (EN)
-/// <br/>
+/// Validates the <see cref="TransactionUpdateRequest"/>. (EN)<br/>
 /// Thực hiện xác thực cho <see cref="TransactionUpdateRequest"/>. (VI)
 /// </summary>
 public class UpdateTransactionRequestValidator : AbstractValidator<TransactionUpdateRequest>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="UpdateTransactionRequestValidator"/> class. (EN)
-    /// <br/>
+    /// Initializes a new instance of the <see cref="UpdateTransactionRequestValidator"/> class. (EN)<br/>
     /// Khởi tạo một phiên bản mới của lớp <see cref="UpdateTransactionRequestValidator"/>. (VI)
     /// </summary>
     public UpdateTransactionRequestValidator()

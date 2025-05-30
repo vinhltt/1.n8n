@@ -9,8 +9,7 @@ using CoreFinance.Domain.Entities;
 namespace CoreFinance.Api.Controllers;
 
 /// <summary>
-/// Controller for managing transactions. (EN)
-/// <br/>
+/// Controller for managing transactions. (EN)<br/>
 /// Controller để quản lý các giao dịch. (VI)
 /// </summary>
 [ApiController]

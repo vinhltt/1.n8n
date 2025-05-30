@@ -4,15 +4,13 @@ using CoreFinance.Application.DTOs.ExpectedTransaction;
 namespace CoreFinance.Application.Validators;
 
 /// <summary>
-/// Validates the <see cref="ExpectedTransactionCreateRequest"/>. (EN)
-/// <br/>
+/// Validates the <see cref="ExpectedTransactionCreateRequest"/>. (EN)<br/>
 /// Thực hiện xác thực cho <see cref="ExpectedTransactionCreateRequest"/>. (VI)
 /// </summary>
 public class ExpectedTransactionCreateRequestValidator : AbstractValidator<ExpectedTransactionCreateRequest>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ExpectedTransactionCreateRequestValidator"/> class. (EN)
-    /// <br/>
+    /// Initializes a new instance of the <see cref="ExpectedTransactionCreateRequestValidator"/> class. (EN)<br/>
     /// Khởi tạo một phiên bản mới của lớp <see cref="ExpectedTransactionCreateRequestValidator"/>. (VI)
     /// </summary>
     public ExpectedTransactionCreateRequestValidator()

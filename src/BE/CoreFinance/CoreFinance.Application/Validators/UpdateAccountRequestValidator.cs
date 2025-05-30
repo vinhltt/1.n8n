@@ -4,15 +4,13 @@ using CoreFinance.Application.DTOs.Account;
 namespace CoreFinance.Application.Validators;
 
 /// <summary>
-/// Validates the <see cref="AccountUpdateRequest"/>. (EN)
-/// <br/>
+/// Validates the <see cref="AccountUpdateRequest"/>. (EN)<br/>
 /// Thực hiện xác thực cho <see cref="AccountUpdateRequest"/>. (VI)
 /// </summary>
 public class UpdateAccountRequestValidator : AbstractValidator<AccountUpdateRequest>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="UpdateAccountRequestValidator"/> class. (EN)
-    /// <br/>
+    /// Initializes a new instance of the <see cref="UpdateAccountRequestValidator"/> class. (EN)<br/>
     /// Khởi tạo một phiên bản mới của lớp <see cref="UpdateAccountRequestValidator"/>. (VI)
     /// </summary>
     public UpdateAccountRequestValidator()

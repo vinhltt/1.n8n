@@ -1,22 +1,19 @@
 ﻿namespace CoreFinance.Contracts.Enums;
 
 /// <summary>
-/// Defines the sorting direction. (EN)
-/// <br/>
+/// Defines the sorting direction. (EN)<br/>
 /// Định nghĩa hướng sắp xếp. (VI)
 /// </summary>
 public enum SortDirection
 {
     /// <summary>
-    /// Ascending order. (EN)
-    /// <br/>
+    /// Ascending order. (EN)<br/>
     /// Thứ tự tăng dần. (VI)
     /// </summary>
     Asc = 0,
 
     /// <summary>
-    /// Descending order. (EN)
-    /// <br/>
+    /// Descending order. (EN)<br/>
     /// Thứ tự giảm dần. (VI)
     /// </summary>
     Desc = 1,

@@ -9,8 +9,7 @@ using CoreFinance.Domain.Entities;
 namespace CoreFinance.Api.Controllers;
 
 /// <summary>
-/// Controller for managing accounts. (EN)
-/// <br/>
+/// Controller for managing accounts. (EN)<br/>
 /// Controller để quản lý các tài khoản. (VI)
 /// </summary>
 [ApiController]
@@ -23,8 +22,7 @@ public class AccountController(
         accountService)
 {
     /// <summary>
-    ///     Gets a paginated list of accounts based on a filter request. (EN)
-    ///     <br/>
+    ///     Gets a paginated list of accounts based on a filter request. (EN)<br/>
     ///     
     /// </summary>
     /// <param name="request"></param>
@@ -37,8 +35,7 @@ public class AccountController(
     }
 
     /// <summary>
-    /// (EN) Gets a list of account selections for UI components.
-    /// <br/>
+    /// (EN) Gets a list of account selections for UI components.<br/>
     /// (VI) Lấy danh sách lựa chọn tài khoản cho các thành phần giao diện người dùng.
     /// </summary>
     /// <returns></returns>

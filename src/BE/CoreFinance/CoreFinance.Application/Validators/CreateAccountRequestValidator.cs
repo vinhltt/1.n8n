@@ -4,15 +4,13 @@ using CoreFinance.Application.DTOs.Account;
 namespace CoreFinance.Application.Validators;
 
 /// <summary>
-/// Validates the <see cref="AccountCreateRequest"/>. (EN)
-/// <br/>
+/// Validates the <see cref="AccountCreateRequest"/>. (EN)<br/>
 /// Thực hiện xác thực cho <see cref="AccountCreateRequest"/>. (VI)
 /// </summary>
 public class CreateAccountRequestValidator : AbstractValidator<AccountCreateRequest>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="CreateAccountRequestValidator"/> class. (EN)
-    /// <br/>
+    /// Initializes a new instance of the <see cref="CreateAccountRequestValidator"/> class. (EN)<br/>
     /// Khởi tạo một phiên bản mới của lớp <see cref="CreateAccountRequestValidator"/>. (VI)
     /// </summary>
     public CreateAccountRequestValidator()

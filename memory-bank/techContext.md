@@ -82,13 +82,11 @@
 - Ví dụ:
   ```csharp
   /// <summary>
-  /// English summary here (EN)
-  /// <br/>
+  /// English summary here (EN)<br/>
   /// Tóm tắt tiếng Việt ở đây (VI)
   /// </summary>
   /// <param name="paramName">
-  /// English description for parameter (EN)
-  /// <br/>
+  /// English description for parameter (EN)<br/>
   /// Mô tả tiếng Việt cho tham số (VI)
   /// </param>
   // ... rest of the code

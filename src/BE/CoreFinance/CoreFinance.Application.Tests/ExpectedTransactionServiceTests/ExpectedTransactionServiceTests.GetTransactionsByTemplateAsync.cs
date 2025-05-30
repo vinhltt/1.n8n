@@ -11,15 +11,13 @@ using FluentAssertions;
 namespace CoreFinance.Application.Tests.ExpectedTransactionServiceTests;
 
 /// <summary>
-/// Contains test cases for the GetTransactionsByTemplateAsync method of ExpectedTransactionService. (EN)
-/// <br/>
+/// Contains test cases for the GetTransactionsByTemplateAsync method of ExpectedTransactionService. (EN)<br/>
 /// Chứa các trường hợp kiểm thử cho phương thức GetTransactionsByTemplateAsync của ExpectedTransactionService. (VI)
 /// </summary>
 public partial class ExpectedTransactionServiceTests
 {
     /// <summary>
-    /// Verifies that GetTransactionsByTemplateAsync returns transactions for a specific template. (EN)
-    /// <br/>
+    /// Verifies that GetTransactionsByTemplateAsync returns transactions for a specific template. (EN)<br/>
     /// Xác minh rằng GetTransactionsByTemplateAsync trả về các giao dịch cho một mẫu cụ thể. (VI)
     /// </summary>
     [Fact]
@@ -106,8 +104,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetTransactionsByTemplateAsync returns an empty list when the template has no transactions. (EN)
-    /// <br/>
+    /// Verifies that GetTransactionsByTemplateAsync returns an empty list when the template has no transactions. (EN)<br/>
     /// Xác minh rằng GetTransactionsByTemplateAsync trả về danh sách rỗng khi mẫu không có giao dịch nào. (VI)
     /// </summary>
     [Fact]
@@ -154,8 +151,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetTransactionsByTemplateAsync returns an empty list when no transactions exist in the repository. (EN)
-    /// <br/>
+    /// Verifies that GetTransactionsByTemplateAsync returns an empty list when no transactions exist in the repository. (EN)<br/>
     /// Xác minh rằng GetTransactionsByTemplateAsync trả về danh sách rỗng khi không có giao dịch nào tồn tại trong repository. (VI)
     /// </summary>
     [Fact]
@@ -185,8 +181,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetTransactionsByTemplateAsync returns transactions ordered by ExpectedDate. (EN)
-    /// <br/>
+    /// Verifies that GetTransactionsByTemplateAsync returns transactions ordered by ExpectedDate. (EN)<br/>
     /// Xác minh rằng GetTransactionsByTemplateAsync trả về các giao dịch được sắp xếp theo ExpectedDate. (VI)
     /// </summary>
     [Fact]
@@ -262,8 +257,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetTransactionsByTemplateAsync returns transactions of all status types. (EN)
-    /// <br/>
+    /// Verifies that GetTransactionsByTemplateAsync returns transactions of all status types. (EN)<br/>
     /// Xác minh rằng GetTransactionsByTemplateAsync trả về các giao dịch của tất cả các loại trạng thái. (VI)
     /// </summary>
     [Fact]
@@ -332,8 +326,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetTransactionsByTemplateAsync returns the correct transaction properties in the ViewModel. (EN)
-    /// <br/>
+    /// Verifies that GetTransactionsByTemplateAsync returns the correct transaction properties in the ViewModel. (EN)<br/>
     /// Xác minh rằng GetTransactionsByTemplateAsync trả về đúng các thuộc tính giao dịch trong ViewModel. (VI)
     /// </summary>
     [Fact]
@@ -396,8 +389,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetTransactionsByTemplateAsync handles past and future transactions correctly, returning them all. (EN)
-    /// <br/>
+    /// Verifies that GetTransactionsByTemplateAsync handles past and future transactions correctly, returning them all. (EN)<br/>
     /// Xác minh rằng GetTransactionsByTemplateAsync xử lý đúng các giao dịch quá khứ và tương lai, trả về tất cả chúng. (VI)
     /// </summary>
     [Fact]

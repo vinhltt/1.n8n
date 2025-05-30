@@ -1,8 +1,7 @@
 namespace CoreFinance.Domain.Exceptions;
 
 /// <summary>
-/// Exception thrown when a create operation fails. (EN)
-/// <br/>
+/// Exception thrown when a create operation fails. (EN)<br/>
 /// Ngoại lệ được ném ra khi thao tác tạo mới thất bại. (VI)
 /// </summary>
 [Serializable]

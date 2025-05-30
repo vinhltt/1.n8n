@@ -11,15 +11,13 @@ using FluentAssertions;
 namespace CoreFinance.Application.Tests.ExpectedTransactionServiceTests;
 
 /// <summary>
-/// Contains test cases for the GetUpcomingTransactionsAsync method of ExpectedTransactionService. (EN)
-/// <br/>
+/// Contains test cases for the GetUpcomingTransactionsAsync method of ExpectedTransactionService. (EN)<br/>
 /// Chứa các trường hợp kiểm thử cho phương thức GetUpcomingTransactionsAsync của ExpectedTransactionService. (VI)
 /// </summary>
 public partial class ExpectedTransactionServiceTests
 {
     /// <summary>
-    /// Verifies that GetUpcomingTransactionsAsync returns upcoming pending transactions within the default number of days (30). (EN)
-    /// <br/>
+    /// Verifies that GetUpcomingTransactionsAsync returns upcoming pending transactions within the default number of days (30). (EN)<br/>
     /// Xác minh rằng GetUpcomingTransactionsAsync trả về các giao dịch sắp tới đang chờ xử lý trong số ngày mặc định (30). (VI)
     /// </summary>
     [Fact]
@@ -113,8 +111,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetUpcomingTransactionsAsync returns upcoming pending transactions within a custom number of days. (EN)
-    /// <br/>
+    /// Verifies that GetUpcomingTransactionsAsync returns upcoming pending transactions within a custom number of days. (EN)<br/>
     /// Xác minh rằng GetUpcomingTransactionsAsync trả về các giao dịch sắp tới đang chờ xử lý trong số ngày tùy chỉnh. (VI)
     /// </summary>
     [Fact]
@@ -182,8 +179,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetUpcomingTransactionsAsync ignores non-pending transactions. (EN)
-    /// <br/>
+    /// Verifies that GetUpcomingTransactionsAsync ignores non-pending transactions. (EN)<br/>
     /// Xác minh rằng GetUpcomingTransactionsAsync bỏ qua các giao dịch không ở trạng thái đang chờ xử lý. (VI)
     /// </summary>
     [Fact]
@@ -248,8 +244,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetUpcomingTransactionsAsync filters transactions by User ID. (EN)
-    /// <br/>
+    /// Verifies that GetUpcomingTransactionsAsync filters transactions by User ID. (EN)<br/>
     /// Xác minh rằng GetUpcomingTransactionsAsync lọc các giao dịch theo ID người dùng. (VI)
     /// </summary>
     [Fact]
@@ -306,8 +301,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetUpcomingTransactionsAsync returns an empty list when there are no upcoming transactions within the specified date range. (EN)
-    /// <br/>
+    /// Verifies that GetUpcomingTransactionsAsync returns an empty list when there are no upcoming transactions within the specified date range. (EN)<br/>
     /// Xác minh rằng GetUpcomingTransactionsAsync trả về danh sách rỗng khi không có giao dịch sắp tới nào trong phạm vi ngày được chỉ định. (VI)
     /// </summary>
     [Fact]
@@ -361,8 +355,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetUpcomingTransactionsAsync returns an empty list when no transactions exist in the repository. (EN)
-    /// <br/>
+    /// Verifies that GetUpcomingTransactionsAsync returns an empty list when no transactions exist in the repository. (EN)<br/>
     /// Xác minh rằng GetUpcomingTransactionsAsync trả về danh sách rỗng khi không có giao dịch nào tồn tại trong repository. (VI)
     /// </summary>
     [Fact]
@@ -392,8 +385,7 @@ public partial class ExpectedTransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetUpcomingTransactionsAsync returns transactions ordered by ExpectedDate. (EN)
-    /// <br/>
+    /// Verifies that GetUpcomingTransactionsAsync returns transactions ordered by ExpectedDate. (EN)<br/>
     /// Xác minh rằng GetUpcomingTransactionsAsync trả về các giao dịch được sắp xếp theo ExpectedDate. (VI)
     /// </summary>
     [Fact]

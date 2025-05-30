@@ -9,15 +9,13 @@ using Moq;
 namespace CoreFinance.Application.Tests.TransactionServiceTests;
 
 /// <summary>
-/// Contains test cases for the GetByIdAsync method of TransactionService. (EN)
-/// <br/>
+/// Contains test cases for the GetByIdAsync method of TransactionService. (EN)<br/>
 /// Chứa các trường hợp kiểm thử cho phương thức GetByIdAsync của TransactionService. (VI)
 /// </summary>
 public partial class TransactionServiceTests
 {
     /// <summary>
-    /// Verifies that GetByIdAsync returns the correct transaction ViewModel when the transaction exists. (EN)
-    /// <br/>
+    /// Verifies that GetByIdAsync returns the correct transaction ViewModel when the transaction exists. (EN)<br/>
     /// Xác minh rằng GetByIdAsync trả về đúng ViewModel của giao dịch khi giao dịch tồn tại. (VI)
     /// </summary>
     [Fact]
@@ -47,8 +45,7 @@ public partial class TransactionServiceTests
     }
 
     /// <summary>
-    /// Verifies that GetByIdAsync returns null when the transaction does not exist in the repository. (EN)
-    /// <br/>
+    /// Verifies that GetByIdAsync returns null when the transaction does not exist in the repository. (EN)<br/>
     /// Xác minh rằng GetByIdAsync trả về null khi giao dịch không tồn tại trong repository. (VI)
     /// </summary>
     [Fact]
