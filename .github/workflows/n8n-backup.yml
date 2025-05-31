@@ -76,40 +76,28 @@ jobs:
           EOF
         shell: bash
 
-      - name: Gửi thông báo lỗi backup lên Telegram
+      - name: Set backup error timestamp
         if: failure()
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          MESSAGE="❌ Backup n8n thất bại trên branch $GITHUB_REF_NAME lúc $(date '+%Y-%m-%d %H:%M:%S')"
-          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-            -d chat_id="${TELEGRAM_CHAT_ID}" \
-            -d text="$MESSAGE"
+          echo "TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
 
-      - name: Send Telegram timeout notification for backup
+      - name: Send Discord error notification for backup
+        if: failure()
+        uses: appleboy/discord-action@v1.2.0
+        with:
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          message: |
+            ❌ Backup n8n thất bại trên branch **${{ github.ref_name }}** lúc **${{ env.TIMESTAMP }}**
+            Nhánh: **${{ github.ref_name }}**
+            [Xem Chi Tiết Job](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+      - name: Send Discord timeout notification for backup
         if: cancelled()
-        run: |
-          if [[ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" && ! -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]]; then
-            ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            STATUS_EMOJI="⏱️"
-            STATUS_TEXT="Backup n8n (Production) ĐÃ BỊ HỦY do quá thời gian (timeout > 30 phút)!"
-            
-            JSON_PAYLOAD=$(printf '{
-              "chat_id": "%s",
-              "text": "%s *%s*\nNhánh: %s\n[Xem Chi Tiết Job](%s)",
-              "parse_mode": "Markdown"
-            }' \
-            "${{ secrets.TELEGRAM_CHAT_ID }}" \
-            "$STATUS_EMOJI" \
-            "$STATUS_TEXT" \
-            "${{ github.ref_name }}" \
-            "$ACTION_URL")
-            curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
-              -H "Content-Type: application/json" \
-              -d "$JSON_PAYLOAD"
-            echo "ℹ️ Thông báo Telegram (timeout backup) đã được gửi."
-          else
-            echo "⚠️ Biến Telegram (BOT_TOKEN hoặc CHAT_ID) chưa được đặt. Bỏ qua thông báo timeout backup."
-          fi
-        shell: bash 
+        uses: appleboy/discord-action@v1.2.0
+        with:
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          message: |
+            ⏱️ Backup n8n (Production) **ĐÃ BỊ HỦY** do quá thời gian (timeout > 30 phút)!
+            Nhánh: **${{ github.ref_name }}**
+            [Xem Chi Tiết Job](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
