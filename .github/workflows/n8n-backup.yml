@@ -76,44 +76,28 @@ jobs:
           EOF
         shell: bash
 
+      - name: Set backup error timestamp
+        if: failure()
+        run: |
+          echo "TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+
       - name: Send Discord error notification for backup
         if: failure()
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: |
-          if [[ -n "${DISCORD_WEBHOOK_URL}" ]]; then
-            TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-            MESSAGE="❌ Backup n8n thất bại trên branch $GITHUB_REF_NAME lúc $TIMESTAMP"
-            JSON_PAYLOAD=$(printf '{"content":"%s"}' "$MESSAGE")
-            curl -s -X POST \
-              -H "Content-Type: application/json" \
-              -d "$JSON_PAYLOAD" \
-              "${DISCORD_WEBHOOK_URL}"
-            echo "ℹ️ Thông báo Discord (lỗi backup) đã được gửi."
-          else
-            echo "⚠️ Biến Discord (DISCORD_WEBHOOK_URL) chưa được đặt. Bỏ qua thông báo lỗi backup."
-          fi
-        shell: bash
+        uses: appleboy/discord-action@v1.2.0
+        with:
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          message: |
+            ❌ Backup n8n thất bại trên branch **${{ github.ref_name }}** lúc **${{ env.TIMESTAMP }}**
+            Nhánh: **${{ github.ref_name }}**
+            [Xem Chi Tiết Job](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
       - name: Send Discord timeout notification for backup
         if: cancelled()
-        run: |
-          if [[ -n "${{ secrets.DISCORD_WEBHOOK_URL }}" ]]; then
-            ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            STATUS_EMOJI="⏱️"
-            STATUS_TEXT="Backup n8n (Production) ĐÃ BỊ HỦY do quá thời gian (timeout > 30 phút)!"
-            
-            JSON_PAYLOAD=$(printf '{"content":"%s **%s**\nNhánh: %s\n[Xem Chi Tiết Job](%s)"}' \
-              "$STATUS_EMOJI" \
-              "$STATUS_TEXT" \
-              "${{ github.ref_name }}" \
-              "$ACTION_URL")
-            curl -s -X POST \
-              -H "Content-Type: application/json" \
-              -d "$JSON_PAYLOAD" \
-              "${{ secrets.DISCORD_WEBHOOK_URL }}"
-            echo "ℹ️ Thông báo Discord (timeout backup) đã được gửi."
-          else
-            echo "⚠️ Biến Discord (DISCORD_WEBHOOK_URL) chưa được đặt. Bỏ qua thông báo timeout backup."
-          fi
-        shell: bash
+        uses: appleboy/discord-action@v1.2.0
+        with:
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          message: |
+            ⏱️ Backup n8n (Production) **ĐÃ BỊ HỦY** do quá thời gian (timeout > 30 phút)!
+            Nhánh: **${{ github.ref_name }}**
+            [Xem Chi Tiết Job](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+

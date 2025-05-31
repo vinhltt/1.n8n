@@ -221,73 +221,24 @@ jobs:
           fi
           echo "✅ TRIỂN KHAI N8N HOÀN TẤT THÀNH CÔNG"
         shell: bash
-
+        
       - name: Send Discord success/failure notification
         if: success() || failure()
-        run: |
-          if [[ -n "${{ secrets.DISCORD_WEBHOOK_URL }}" ]]; then
-            # Xây dựng URL tới trang Actions
-            ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            JOB_STATUS="${{ job.status }}"
-            
-            if [ "$JOB_STATUS" == "success" ]; then
-              STATUS_EMOJI="✅"
-              STATUS_TEXT="Triển khai n8n lên TrueNAS (qua Cloudflared) THÀNH CÔNG!"
-            else
-              if [ "$JOB_STATUS" != "cancelled" ]; then
-                STATUS_EMOJI="❌"
-                STATUS_TEXT="Triển khai n8n lên TrueNAS (qua Cloudflared) THẤT BẠI!"
-              else
-                echo "Job was cancelled, likely due to timeout. Notification will be handled by the timeout step."
-                exit 0
-              fi
-            fi
-            
-            # Tạo payload JSON cho Discord (dùng \\n để gửi lên là chuỗi "\n" trong JSON)
-            JSON_PAYLOAD=$(printf '{"content":"%s **%s**\\nNhánh: %s\\n[Xem Chi Tiết Triển Khai](%s)"}' \
-              "$STATUS_EMOJI" \
-              "$STATUS_TEXT" \
-              "${{ github.ref_name }}" \
-              "$ACTION_URL")
-            
-            # Gửi request tới Discord Webhook
-            curl -s -X POST \
-              -H "Content-Type: application/json" \
-              -d "$JSON_PAYLOAD" \
-              "${{ secrets.DISCORD_WEBHOOK_URL }}"
-            
-            echo "ℹ️ Thông báo Discord (thành công/thất bại) đã được gửi."
-          else
-            echo "⚠️ Biến Discord (DISCORD_WEBHOOK_URL) chưa được đặt. Bỏ qua thông báo."
-          fi
-        shell: bash
-      
+        uses: appleboy/discord-action@v1.2.0
+        with:
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          message: |
+            ${{ job.status == 'success' && '✅ **Triển khai n8n lên TrueNAS (qua Cloudflared) THÀNH CÔNG!**' || '❌ **Triển khai n8n lên TrueNAS (qua Cloudflared) THẤT BẠI!**' }}
+            Nhánh: ${{ github.ref_name }}
+            [Xem Chi Tiết Triển Khai](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
       - name: Send Discord timeout notification
         if: cancelled()
-        run: |
-          if [[ -n "${{ secrets.DISCORD_WEBHOOK_URL }}" ]]; then
-            # Xây dựng URL tới trang Actions
-            ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            STATUS_EMOJI="⏱️"
-            STATUS_TEXT="Triển khai n8n lên TrueNAS (qua Cloudflared) ĐÃ BỊ HỦY do quá thời gian (timeout > 30 phút)!"
-            
-            # Tạo payload JSON cho Discord (sử dụng \n để xuống dòng trong nội dung)
-            JSON_PAYLOAD=$(printf '{"content":"%s **%s**\\nNhánh: %s\\n[Xem Chi Tiết Triển Khai](%s)"}' \
-              "$STATUS_EMOJI" \
-              "$STATUS_TEXT" \
-              "${{ github.ref_name }}" \
-              "$ACTION_URL")
-            
-            # Gửi request tới Discord Webhook
-            curl -s -X POST \
-              -H "Content-Type: application/json" \
-              -d "$JSON_PAYLOAD" \
-              "${{ secrets.DISCORD_WEBHOOK_URL }}"
-            
-            echo "ℹ️ Thông báo Discord (timeout) đã được gửi."
-          else
-            echo "⚠️ Biến Discord (DISCORD_WEBHOOK_URL) chưa được đặt. Bỏ qua thông báo timeout."
-          fi
-        shell: bash
+        uses: appleboy/discord-action@v1.2.0
+        with:
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          message: |
+            ⏱️ **Triển khai n8n lên TrueNAS (qua Cloudflared) ĐÃ BỊ HỦY do quá thời gian (timeout > 30 phút)!**
+            Nhánh: ${{ github.ref_name }}
+            [Xem Chi Tiết Triển Khai](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
