@@ -243,8 +243,8 @@ jobs:
               fi
             fi
             
-            # Tạo payload JSON cho Discord (sử dụng \n để xuống dòng)
-            JSON_PAYLOAD=$(printf '{"content":"%s **%s**\nNhánh: %s\n[Xem Chi Tiết Triển Khai](%s)"}' \
+            # Tạo payload JSON cho Discord (dùng \\n để gửi lên là chuỗi "\n" trong JSON)
+            JSON_PAYLOAD=$(printf '{"content":"%s **%s**\\nNhánh: %s\\n[Xem Chi Tiết Triển Khai](%s)"}' \
               "$STATUS_EMOJI" \
               "$STATUS_TEXT" \
               "${{ github.ref_name }}" \
@@ -261,6 +261,7 @@ jobs:
             echo "⚠️ Biến Discord (DISCORD_WEBHOOK_URL) chưa được đặt. Bỏ qua thông báo."
           fi
         shell: bash
+      
 
       - name: Send Discord timeout notification
         if: cancelled()
