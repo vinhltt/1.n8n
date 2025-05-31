@@ -31,11 +31,11 @@ public class UnitOfWork<TContext>(
     private Dictionary<Type, object?>? _repositories;
 
     /// <summary>
-    /// (EN) Saves all changes made in this context to the database asynchronously.<br/>
-    /// (VI) Lưu tất cả các thay đổi được thực hiện trong ngữ cảnh này vào cơ sở dữ liệu một cách bất đồng bộ.
+    ///     (EN) Saves all changes made in this context to the database asynchronously.<br/>
+    ///     (VI) Lưu tất cả các thay đổi được thực hiện trong ngữ cảnh này vào cơ sở dữ liệu một cách bất đồng bộ.
     /// </summary>
     /// <returns>
-    /// A task that represents the asynchronous save operation. The task result contains the number of state entries written to the database.
+    ///     A task that represents the asynchronous save operation. The task result contains the number of state entries written to the database.
     /// </returns>
     public Task<int> SaveChangesAsync()
     {
@@ -43,8 +43,8 @@ public class UnitOfWork<TContext>(
     }
 
     /// <summary>
-    /// (EN) Begins a new database transaction asynchronously.<br/>
-    /// (VI) Bắt đầu một giao dịch cơ sở dữ liệu mới một cách bất đồng bộ.
+    ///     (EN) Begins a new database transaction asynchronously.<br/>
+    ///     (VI) Bắt đầu một giao dịch cơ sở dữ liệu mới một cách bất đồng bộ.
     /// </summary>
     /// <returns>
     ///     A task that represents the asynchronous operation. The task result contains the newly created transaction.
@@ -85,8 +85,8 @@ public class UnitOfWork<TContext>(
     }
 
     /// <summary>
-    /// (EN) Gets a repository for the specified entity type.<br/>
-    /// (VI) Lấy một repository cho kiểu thực thể được chỉ định.
+    ///     (EN) Gets a repository for the specified entity type.<br/>
+    ///     (VI) Lấy một repository cho kiểu thực thể được chỉ định.
     /// </summary>
     /// <typeparam name="TEntity">
     ///     The type of the entity. (EN)<br/>

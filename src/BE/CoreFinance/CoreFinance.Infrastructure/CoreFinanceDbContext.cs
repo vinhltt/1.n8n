@@ -32,8 +32,14 @@ public class CoreFinanceDbContext : DbContext
     /// (EN) Initializes a new instance of the <see cref="CoreFinanceDbContext"/> class with specified options and configuration.<br/>
     /// (VI) Khởi tạo một phiên bản mới của lớp <see cref="CoreFinanceDbContext"/> với các tùy chọn và cấu hình được chỉ định.
     /// </summary>
-    /// <param name="options">The DbContext options. (EN)<br/>Các tùy chọn DbContext. (VI)</param>
-    /// <param name="configuration">The application configuration. (EN)<br/>Cấu hình ứng dụng. (VI)</param>
+    /// <param name="options">
+    /// The DbContext options. (EN)<br/>
+    /// Các tùy chọn DbContext. (VI)
+    /// </param>
+    /// <param name="configuration">
+    /// The application configuration. (EN)<br/>
+    /// Cấu hình ứng dụng. (VI)
+    /// </param>
     public CoreFinanceDbContext(DbContextOptions<CoreFinanceDbContext> options,
         IConfiguration configuration) : base(options)
     {
@@ -65,8 +71,15 @@ public class CoreFinanceDbContext : DbContext
     /// (EN) Configures the database context.<br/>
     /// (VI) Cấu hình ngữ cảnh cơ sở dữ liệu.
     /// </summary>
-    /// <param name="optionsBuilder">The options builder. (EN)<br/>Bộ xây dựng tùy chọn. (VI)</param>
+    /// <param name="optionsBuilder">
+    /// The options builder. (EN)<br/>
+    /// Bộ xây dựng tùy chọn. (VI)
+    /// </param>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        if (optionsBuilder.IsConfigured)
+            return;
+        var connectionString = _configuration.GetConnectionString(DEFAULT_CONNECTION_STRING);
+        optionsBuilder.UseNpgsql(connectionString);
     }
 }

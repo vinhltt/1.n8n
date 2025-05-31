@@ -78,6 +78,7 @@ app.UseHttpsRedirection();
 
 app.UseCors(policyName);
 
+// Add the authorization middleware
 //app.UseAuthorization();
 app.UseRouting();
 app.MapControllers();
@@ -91,5 +92,5 @@ try
 }
 finally
 {
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
 }
