@@ -1,6 +1,7 @@
-using Microsoft.EntityFrameworkCore;
 using CoreFinance.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using CoreFinance.Contracts.Extensions;
 
 #pragma warning disable CS8618, CS9264
 
@@ -81,5 +82,12 @@ public class CoreFinanceDbContext : DbContext
             return;
         var connectionString = _configuration.GetConnectionString(DEFAULT_CONNECTION_STRING);
         optionsBuilder.UseNpgsql(connectionString);
+    }
+
+    protected override void OnModelCreating(
+        ModelBuilder modelBuilder
+    )
+    {
+        modelBuilder.UseQueryFilter();
     }
 }

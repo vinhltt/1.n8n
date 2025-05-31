@@ -18,9 +18,9 @@ namespace CoreFinance.Application.Services;
 /// </summary>
 public class AccountService(
     IMapper mapper,
-    IUnitOfWork unitOffWork,
+    IUnitOfWork unitOfWork,
     ILogger<AccountService> logger)
-    : BaseService<Account, AccountCreateRequest, AccountUpdateRequest, AccountViewModel, Guid>(mapper, unitOffWork,
+    : BaseService<Account, AccountCreateRequest, AccountUpdateRequest, AccountViewModel, Guid>(mapper, unitOfWork,
             logger),
         IAccountService
 {
@@ -33,7 +33,7 @@ public class AccountService(
     public async Task<IBasePaging<AccountViewModel>?> GetPagingAsync(IFilterBodyRequest request)
     {
         var query =
-            Mapper.ProjectTo<AccountViewModel>(UnitOffWork.Repository<Account, Guid>()
+            Mapper.ProjectTo<AccountViewModel>(unitOfWork.Repository<Account, Guid>()
                 .GetNoTrackingEntities());
 
         if (!string.IsNullOrEmpty(request.SearchValue))
@@ -45,7 +45,7 @@ public class AccountService(
     public async Task<List<AccountSelectionViewModel>?> GetAccountSelectionAsync()
     {
         var query =
-            Mapper.ProjectTo<AccountSelectionViewModel>(UnitOffWork.Repository<Account, Guid>()
+            Mapper.ProjectTo<AccountSelectionViewModel>(unitOfWork.Repository<Account, Guid>()
                 .GetNoTrackingEntities());
 
         return await query.ToListAsync();

@@ -8,7 +8,7 @@ namespace CoreFinance.Contracts.BaseEfModels;
 /// Lớp thực thể cơ sở cung cấp các thuộc tính chung cho các thực thể cơ sở dữ liệu. (VI)
 /// </summary>
 [Microsoft.EntityFrameworkCore.Index(nameof(Id))]
-public abstract class BaseEntity<TKey> //: ICloneable
+public abstract class BaseEntity<TKey> : BaseEntity
 {
     /// <summary>
     /// Sets default values for creation properties. (EN)<br/>
@@ -44,7 +44,10 @@ public abstract class BaseEntity<TKey> //: ICloneable
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Required]
     public virtual TKey? Id { get; set; }
+}
 
+public class BaseEntity
+{
     /// <summary>
     /// Gets or sets the creation timestamp of the entity. (EN)<br/>
     /// Lấy hoặc đặt dấu thời gian tạo của thực thể. (VI)
@@ -74,6 +77,4 @@ public abstract class BaseEntity<TKey> //: ICloneable
     /// Lấy hoặc đặt cờ cho biết thực thể đã bị xóa mềm hay chưa (tùy chọn). (VI)
     /// </summary>
     public string? Deleted { get; set; }
-
-    //public abstract object Clone();
 }

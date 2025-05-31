@@ -29,7 +29,6 @@ public interface IBaseService<TEntity, TCreateRequest, in TUpdateRequest, TViewM
     Task<TViewModel?> GetByIdAsync(TKey id);
 
     /// <summary>
-    /// Deletes an entity permanently by its identifier asynchronously.<br/>
     /// (EN) Deletes an entity permanently by its identifier asynchronously.<br/>
     /// (VI) Xóa vĩnh viễn một entity theo định danh của nó một cách bất đồng bộ.
     /// </summary>

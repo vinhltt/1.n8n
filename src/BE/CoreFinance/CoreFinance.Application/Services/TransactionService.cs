@@ -24,8 +24,6 @@ public class TransactionService(
             unitOfWork, logger),
         ITransactionService
 {
-    private readonly ILogger<TransactionService> _logger = logger;
-
     /// <summary>
     /// (EN) Gets a paginated list of transactions based on a filter request.<br/>
     /// (VI) Lấy danh sách giao dịch có phân trang dựa trên yêu cầu lọc.
@@ -35,7 +33,7 @@ public class TransactionService(
     public async Task<IBasePaging<TransactionViewModel>?> GetPagingAsync(IFilterBodyRequest request)
     {
         var query =
-            Mapper.ProjectTo<TransactionViewModel>(UnitOffWork.Repository<Transaction, Guid>()
+            Mapper.ProjectTo<TransactionViewModel>(unitOfWork.Repository<Transaction, Guid>()
                 .GetNoTrackingEntities());
 
         // Example: filter by Description or other fields if needed
@@ -64,8 +62,8 @@ public class TransactionService(
 
         var entity = Mapper.Map<Transaction>(request);
 
-        await UnitOffWork.Repository<Transaction, Guid>().CreateAsync(entity);
-        await UnitOffWork.SaveChangesAsync();
+        await unitOfWork.Repository<Transaction, Guid>().CreateAsync(entity);
+        await unitOfWork.SaveChangesAsync();
 
         // Recalculate subsequent transactions if balance was provided
         await RecalculateSubsequentBalancesAsync(request.AccountId, request.TransactionDate);
@@ -91,7 +89,7 @@ public class TransactionService(
         try
         {
             // Find the most recent transaction before the current transaction date for the same account
-            var previousTransaction = await UnitOffWork.Repository<Transaction, Guid>()
+            var previousTransaction = await unitOfWork.Repository<Transaction, Guid>()
                 .GetNoTrackingEntities()
                 .Where(t => t.AccountId == accountId && t.TransactionDate < transactionDate)
                 .OrderByDescending(t => t.TransactionDate)
@@ -99,19 +97,20 @@ public class TransactionService(
 
             if (previousTransaction == null)
             {
-                _logger.LogWarning("No previous transaction with balance found for account {AccountId}", accountId);
+                logger.LogWarning("No previous transaction with balance found for account {AccountId}", accountId);
                 return 0;
             }
 
             // Calculate new balance: previous balance + revenue - spent
             var calculatedBalance = previousTransaction.Balance + revenueAmount - spentAmount;
 
-            _logger.LogInformation("Balance calculated for account {AccountId}: {Balance}", accountId, calculatedBalance);
+            logger.LogInformation("Balance calculated for account {AccountId}: {Balance}", accountId,
+                calculatedBalance);
             return calculatedBalance;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error calculating balance for account {AccountId}", accountId);
+            logger.LogError(ex, "Error calculating balance for account {AccountId}", accountId);
             return 0;
         }
     }
@@ -124,7 +123,7 @@ public class TransactionService(
     /// <param name="fromDate">The date from which to recalculate.</param>
     private async Task RecalculateSubsequentBalancesAsync(Guid accountId, DateTime fromDate)
     {
-        var subsequentTransactions = await UnitOffWork.Repository<Transaction, Guid>()
+        var subsequentTransactions = await unitOfWork.Repository<Transaction, Guid>()
             .GetNoTrackingEntities()
             .Where(t => t.AccountId == accountId && t.TransactionDate > fromDate)
             .OrderBy(t => t.TransactionDate)
@@ -138,13 +137,13 @@ public class TransactionService(
                 transaction.RevenueAmount, 
                 transaction.SpentAmount);
             // Update the transaction entity directly
-            var entityToUpdate = await UnitOffWork.Repository<Transaction, Guid>().GetByIdAsync(transaction.Id);
+            var entityToUpdate = await unitOfWork.Repository<Transaction, Guid>().GetByIdAsync(transaction.Id);
             if (entityToUpdate == null)
                 continue;
             entityToUpdate.Balance = calculatedBalance;
-            await UnitOffWork.Repository<Transaction, Guid>().UpdateAsync(entityToUpdate);
+            await unitOfWork.Repository<Transaction, Guid>().UpdateAsync(entityToUpdate);
         }
 
-        await UnitOffWork.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync();
     }
 }
