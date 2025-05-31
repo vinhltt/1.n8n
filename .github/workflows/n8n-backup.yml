@@ -76,40 +76,44 @@ jobs:
           EOF
         shell: bash
 
-      - name: Gửi thông báo lỗi backup lên Telegram
+      - name: Send Discord error notification for backup
         if: failure()
         env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          MESSAGE="❌ Backup n8n thất bại trên branch $GITHUB_REF_NAME lúc $(date '+%Y-%m-%d %H:%M:%S')"
-          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-            -d chat_id="${TELEGRAM_CHAT_ID}" \
-            -d text="$MESSAGE"
+          if [[ -n "${DISCORD_WEBHOOK_URL}" ]]; then
+            TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+            MESSAGE="❌ Backup n8n thất bại trên branch $GITHUB_REF_NAME lúc $TIMESTAMP"
+            JSON_PAYLOAD=$(printf '{"content":"%s"}' "$MESSAGE")
+            curl -s -X POST \
+              -H "Content-Type: application/json" \
+              -d "$JSON_PAYLOAD" \
+              "${DISCORD_WEBHOOK_URL}"
+            echo "ℹ️ Thông báo Discord (lỗi backup) đã được gửi."
+          else
+            echo "⚠️ Biến Discord (DISCORD_WEBHOOK_URL) chưa được đặt. Bỏ qua thông báo lỗi backup."
+          fi
+        shell: bash
 
-      - name: Send Telegram timeout notification for backup
+      - name: Send Discord timeout notification for backup
         if: cancelled()
         run: |
-          if [[ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" && ! -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]]; then
+          if [[ -n "${{ secrets.DISCORD_WEBHOOK_URL }}" ]]; then
             ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             STATUS_EMOJI="⏱️"
             STATUS_TEXT="Backup n8n (Production) ĐÃ BỊ HỦY do quá thời gian (timeout > 30 phút)!"
             
-            JSON_PAYLOAD=$(printf '{
-              "chat_id": "%s",
-              "text": "%s *%s*\nNhánh: %s\n[Xem Chi Tiết Job](%s)",
-              "parse_mode": "Markdown"
-            }' \
-            "${{ secrets.TELEGRAM_CHAT_ID }}" \
-            "$STATUS_EMOJI" \
-            "$STATUS_TEXT" \
-            "${{ github.ref_name }}" \
-            "$ACTION_URL")
-            curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+            JSON_PAYLOAD=$(printf '{"content":"%s **%s**\nNhánh: %s\n[Xem Chi Tiết Job](%s)"}' \
+              "$STATUS_EMOJI" \
+              "$STATUS_TEXT" \
+              "${{ github.ref_name }}" \
+              "$ACTION_URL")
+            curl -s -X POST \
               -H "Content-Type: application/json" \
-              -d "$JSON_PAYLOAD"
-            echo "ℹ️ Thông báo Telegram (timeout backup) đã được gửi."
+              -d "$JSON_PAYLOAD" \
+              "${{ secrets.DISCORD_WEBHOOK_URL }}"
+            echo "ℹ️ Thông báo Discord (timeout backup) đã được gửi."
           else
-            echo "⚠️ Biến Telegram (BOT_TOKEN hoặc CHAT_ID) chưa được đặt. Bỏ qua thông báo timeout backup."
+            echo "⚠️ Biến Discord (DISCORD_WEBHOOK_URL) chưa được đặt. Bỏ qua thông báo timeout backup."
           fi
-        shell: bash 
+        shell: bash
