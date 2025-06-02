@@ -120,6 +120,14 @@ jobs:
           # Excel API
           EXCEL_API_HTTP_PORT=${{ vars.EXCEL_API_HTTP_PORT || '8080' }}
           EXCEL_API_HTTPS_PORT=${{ vars.EXCEL_API_HTTPS_PORT || '8443' }}
+          # Discord Bot Configuration
+          DISCORD_TOKEN='${{ secrets.DISCORD_TOKEN }}'
+          DISCORD_N8N_WEBHOOK_URL=${{ vars.DISCORD_N8N_WEBHOOK_URL || 'http://n8n:5678/webhook/discord-event' }}
+          DISCORD_BOT_PREFIX=${{ vars.DISCORD_BOT_PREFIX || '!' }}
+          DISCORD_ENABLE_MESSAGE_LOGGING=${{ vars.DISCORD_ENABLE_MESSAGE_LOGGING || 'true' }}
+          DISCORD_ENABLE_MEMBER_JOIN_LOGGING=${{ vars.DISCORD_ENABLE_MEMBER_JOIN_LOGGING || 'true' }}
+          DISCORD_LOG_LEVEL=${{ vars.DISCORD_LOG_LEVEL || 'info' }}
+          DISCORD_GUILD_ID=${{ vars.DISCORD_GUILD_ID || '' }}
           # Timezone & other settings
           GENERIC_TIMEZONE=${{ secrets.GENERIC_TIMEZONE || 'Asia/Ho_Chi_Minh' }}
           TZ=${{ secrets.TZ || 'Asia/Ho_Chi_Minh' }}
@@ -210,16 +218,60 @@ jobs:
           EOF
         shell: bash
 
-      - name: Display n8n URL
+      - name: Verify Discord Bot deployment
         run: |
-          echo "🌐 n8n đã được triển khai thành công trên TrueNAS."
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
+            set -e 
+            cd ${{ env.TRUENAS_DEPLOY_DIR }}
+            echo "🤖 Kiểm tra trạng thái Discord Bot..."
+            
+            # Kiểm tra container Discord bot có chạy không
+            if docker compose ps discord-bot | grep -q "Up"; then
+              echo "✅ Discord Bot container đang chạy"
+              
+              # Kiểm tra logs để xem bot có kết nối thành công không
+              echo "📋 Logs Discord Bot (10 dòng cuối):"
+              docker compose logs --tail=10 discord-bot
+              
+              # Kiểm tra xem có lỗi kết nối không
+              if docker compose logs discord-bot | grep -q "Bot đã online"; then
+                echo "✅ Discord Bot đã kết nối thành công"
+              else
+                echo "⚠️ Discord Bot chưa kết nối hoặc có lỗi - kiểm tra DISCORD_TOKEN"
+              fi
+            else
+              echo "❌ Discord Bot container không chạy"
+              echo "📋 Logs Discord Bot để debug:"
+              docker compose logs discord-bot
+              exit 1
+            fi
+            
+            echo "🔍 Tổng quan trạng thái tất cả services:"
+            docker compose ps
+          EOF
+        shell: bash
+
+      - name: Display deployment information
+        run: |
+          echo "🌐 n8n và Discord Bot đã được triển khai thành công trên TrueNAS."
+          echo ""
+          echo "📊 Thông tin triển khai:"
+          echo "  🔹 n8n:"
           if [ ! -z "${{ vars.WEBHOOK_URL }}" ]; then
-            echo "   Truy cập tại: ${{ vars.WEBHOOK_URL }}"
+            echo "     Truy cập tại: ${{ vars.WEBHOOK_URL }}"
           else
-            echo "   Có thể truy cập tại địa chỉ IP/hostname của TrueNAS và cổng ${{ vars.N8N_EXTERNAL_PORT || '5678' }}"
-            echo "   Ví dụ: http://<IP_TRUENAS_CỦA_BẠN>:${{ vars.N8N_EXTERNAL_PORT || '5678' }}"
+            echo "     Có thể truy cập tại: http://<IP_TRUENAS>:${{ vars.N8N_EXTERNAL_PORT || '5678' }}"
           fi
-          echo "✅ TRIỂN KHAI N8N HOÀN TẤT THÀNH CÔNG"
+          echo "  🔹 Discord Bot:"
+          echo "     Webhook endpoint: ${{ vars.DISCORD_N8N_WEBHOOK_URL || 'http://n8n:5678/webhook/discord-event' }}"
+          echo "     Log level: ${{ vars.DISCORD_LOG_LEVEL || 'info' }}"
+          if [ ! -z "${{ vars.DISCORD_GUILD_ID }}" ]; then
+            echo "     Giới hạn server: ${{ vars.DISCORD_GUILD_ID }}"
+          else
+            echo "     Hoạt động trên: Tất cả servers"
+          fi
+          echo ""
+          echo "✅ TRIỂN KHAI HOÀN TẤT THÀNH CÔNG"
         shell: bash
         
       - name: Send Discord success/failure notification
@@ -228,9 +280,15 @@ jobs:
         with:
           webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
           message: |
-            ${{ job.status == 'success' && '✅ **Triển khai n8n lên TrueNAS (qua Cloudflared) THÀNH CÔNG!**' || '❌ **Triển khai n8n lên TrueNAS (qua Cloudflared) THẤT BẠI!**' }}
-            Nhánh: ${{ github.ref_name }}
-            [Xem Chi Tiết Triển Khai](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            ${{ job.status == 'success' && '✅ **Triển khai n8n + Discord Bot lên TrueNAS THÀNH CÔNG!**' || '❌ **Triển khai n8n + Discord Bot lên TrueNAS THẤT BẠI!**' }}
+            
+            📊 **Thông tin triển khai:**
+            • **Nhánh:** `${{ github.ref_name }}`
+            • **n8n:** ${{ vars.WEBHOOK_URL || 'http://<IP_TRUENAS>:5678' }}
+            • **Discord Bot:** ${{ job.status == 'success' && 'Đã khởi động và kết nối' || 'Lỗi khởi động' }}
+            • **Webhook:** `${{ vars.DISCORD_N8N_WEBHOOK_URL || 'http://n8n:5678/webhook/discord-event' }}`
+            
+            [📋 Xem Chi Tiết Deploy](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
       - name: Send Discord timeout notification
         if: cancelled()
@@ -238,7 +296,11 @@ jobs:
         with:
           webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
           message: |
-            ⏱️ **Triển khai n8n lên TrueNAS (qua Cloudflared) ĐÃ BỊ HỦY do quá thời gian (timeout > 30 phút)!**
-            Nhánh: ${{ github.ref_name }}
-            [Xem Chi Tiết Triển Khai](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            ⏱️ **Triển khai n8n + Discord Bot ĐÃ BỊ HỦY do timeout (> 30 phút)!**
+            
+            📊 **Thông tin:**
+            • **Nhánh:** `${{ github.ref_name }}`
+            • **Thời gian:** Vượt quá 30 phút
+            
+            [📋 Xem Chi Tiết Deploy](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
