@@ -6,6 +6,7 @@
 # - pfm_excel_api: ${IP_PREFIX}.2
 # - postgresdb: ${IP_PREFIX}.3
 # - n8n: ${IP_PREFIX}.4
+# - discord-bot: ${IP_PREFIX}.5
 # =============================
 services:
   postgresdb:
@@ -82,6 +83,33 @@ services:
     networks:
       custom_network:
         ipv4_address: ${IP_PREFIX}.2
+
+  discord-bot:
+    # Static IP: ${IP_PREFIX}.5
+    build:
+      context: ./discord-bot
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - TZ=${TZ:-Asia/Ho_Chi_Minh}
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - N8N_WEBHOOK_URL=${DISCORD_N8N_WEBHOOK_URL:-http://n8n:5678/webhook/discord-event}
+      - BOT_PREFIX=${DISCORD_BOT_PREFIX:-!}
+      - ENABLE_MESSAGE_LOGGING=${DISCORD_ENABLE_MESSAGE_LOGGING:-true}
+      - ENABLE_MEMBER_JOIN_LOGGING=${DISCORD_ENABLE_MEMBER_JOIN_LOGGING:-true}
+      - LOG_LEVEL=${DISCORD_LOG_LEVEL:-info}
+      - GUILD_ID=${DISCORD_GUILD_ID:-}
+    depends_on:
+      - n8n
+    networks:
+      custom_network:
+        ipv4_address: ${IP_PREFIX}.5
+    healthcheck:
+      test: ["CMD", "node", "-e", "console.log('Bot is running')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 # Custom bridge network with static IPs
 # Last edited: 2024-05-18
