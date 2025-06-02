@@ -206,21 +206,91 @@ Bot sẽ gửi các loại dữ liệu sau đến n8n:
 3. Kiểm tra n8n workflow có được trigger không
 4. Thêm/xóa thành viên để test member events
 
-## 🔍 Troubleshooting
+## 🔧 Troubleshooting
 
-### Bot không online
-- Kiểm tra `DISCORD_TOKEN` có đúng không
-- Kiểm tra bot có được mời vào server với đúng permissions không
+### Lỗi đăng nhập Discord Bot
 
-### Webhook không hoạt động
-- Kiểm tra `N8N_WEBHOOK_URL` có đúng không
-- Kiểm tra n8n workflow có được kích hoạt không
-- Kiểm tra network connectivity giữa bot và n8n
+#### 1. "TokenInvalid" hoặc "Không thể đăng nhập Discord bot"
 
-### Không nhận được events
-- Kiểm tra bot có đúng permissions trong Discord server không
-- Kiểm tra `GUILD_ID` nếu được cấu hình
-- Kiểm tra các biến `ENABLE_*_LOGGING`
+**Nguyên nhân:**
+- Discord Token không hợp lệ hoặc đã hết hạn
+- Token không được cấu hình đúng trong biến môi trường
+
+**Cách khắc phục:**
+1. Kiểm tra Discord Token tại [Discord Developer Portal](https://discord.com/developers/applications)
+2. Đảm bảo bot đã được tạo và token được copy chính xác
+3. Kiểm tra biến môi trường `DISCORD_TOKEN` trong file `.env` hoặc GitHub Secrets
+
+```bash
+# Kiểm tra token trong container
+docker compose exec discord-bot printenv DISCORD_TOKEN
+```
+
+#### 2. Bot restart liên tục
+
+**Nguyên nhân:**
+- Token không hợp lệ khiến bot exit và Docker restart
+- Lỗi kết nối mạng
+
+**Cách khắc phục:**
+1. Kiểm tra logs: `docker compose logs discord-bot`
+2. Kiểm tra restart policy trong `docker-compose.yml` (đã được set thành `on-failure:3`)
+3. Xác minh token Discord hợp lệ
+
+#### 3. Bot không gửi webhook đến n8n
+
+**Nguyên nhân:**
+- `N8N_WEBHOOK_URL` không được cấu hình
+- n8n service chưa sẵn sàng
+- Network connectivity issues
+
+**Cách khắc phục:**
+1. Kiểm tra biến `N8N_WEBHOOK_URL` trong `.env`
+2. Đảm bảo n8n đang chạy: `docker compose ps n8n`
+3. Test webhook endpoint từ container:
+
+```bash
+docker compose exec discord-bot curl -X POST http://n8n:5678/webhook/discord-event \
+  -H "Content-Type: application/json" \
+  -d '{"test": "message"}'
+```
+
+### Debug Commands
+
+```bash
+# Xem logs realtime
+docker compose logs -f discord-bot
+
+# Kiểm tra biến môi trường
+docker compose exec discord-bot printenv | grep DISCORD
+
+# Restart chỉ Discord bot
+docker compose restart discord-bot
+
+# Kiểm tra network connectivity
+docker compose exec discord-bot ping n8n
+```
+
+### GitHub Actions Deployment Issues
+
+#### 1. Secrets không được cấu hình
+
+Đảm bảo các secrets sau được cấu hình tại `https://github.com/YOUR_REPO/settings/secrets/actions`:
+
+- `DISCORD_TOKEN`: Token của Discord Bot
+- `POSTGRES_PASSWORD`: Mật khẩu PostgreSQL  
+- `N8N_ENCRYPTION_KEY`: Khóa mã hóa n8n
+
+#### 2. Deployment thành công nhưng bot không hoạt động
+
+1. Kiểm tra logs trong GitHub Actions
+2. SSH vào server và kiểm tra:
+
+```bash
+cd /path/to/deploy/directory
+docker compose logs discord-bot
+docker compose ps
+```
 
 ## 📝 Logs
 

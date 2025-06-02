@@ -22,6 +22,43 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Validate Required Secrets and Variables
+        run: |
+          echo "🔍 Kiểm tra các secrets và variables cần thiết..."
+          
+          # Kiểm tra các secrets quan trọng
+          MISSING_SECRETS=()
+          
+          if [ -z "${{ secrets.DISCORD_TOKEN }}" ]; then
+            MISSING_SECRETS+=("DISCORD_TOKEN")
+          else
+            echo "✅ DISCORD_TOKEN: Có (độ dài: ${#DISCORD_TOKEN} ký tự)"
+          fi
+          
+          if [ -z "${{ secrets.POSTGRES_PASSWORD }}" ]; then
+            MISSING_SECRETS+=("POSTGRES_PASSWORD")
+          else
+            echo "✅ POSTGRES_PASSWORD: Có"
+          fi
+          
+          if [ -z "${{ secrets.N8N_ENCRYPTION_KEY }}" ]; then
+            MISSING_SECRETS+=("N8N_ENCRYPTION_KEY")
+          else
+            echo "✅ N8N_ENCRYPTION_KEY: Có"
+          fi
+          
+          if [ ${#MISSING_SECRETS[@]} -gt 0 ]; then
+            echo "❌ Thiếu các secrets sau:"
+            printf '%s\n' "${MISSING_SECRETS[@]}"
+            echo "🔧 Vui lòng cấu hình tại: https://github.com/${{ github.repository }}/settings/secrets/actions"
+            exit 1
+          fi
+          
+          echo "✅ Tất cả secrets cần thiết đã được cấu hình"
+        shell: bash
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+
       - name: Set TrueNAS Deploy Directory Environment Variable
         run: echo "TRUENAS_DEPLOY_DIR=${{ vars.DEPLOY_PATH_ON_TRUENAS }}/deploy_${GITHUB_REF_NAME}" >> $GITHUB_ENV
         shell: bash
@@ -121,7 +158,7 @@ jobs:
           EXCEL_API_HTTP_PORT=${{ vars.EXCEL_API_HTTP_PORT || '8080' }}
           EXCEL_API_HTTPS_PORT=${{ vars.EXCEL_API_HTTPS_PORT || '8443' }}
           # Discord Bot Configuration
-          DISCORD_TOKEN='${{ secrets.DISCORD_TOKEN }}'
+          DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}
           DISCORD_N8N_WEBHOOK_URL=${{ vars.DISCORD_N8N_WEBHOOK_URL || 'http://n8n:5678/webhook/discord-event' }}
           DISCORD_BOT_PREFIX=${{ vars.DISCORD_BOT_PREFIX || '!' }}
           DISCORD_ENABLE_MESSAGE_LOGGING=${{ vars.DISCORD_ENABLE_MESSAGE_LOGGING || 'true' }}
@@ -141,6 +178,35 @@ jobs:
           TRUENAS_DEPLOY_DIR=${{ vars.TRUENAS_DEPLOY_DIR }}
           EOF
           echo '✅ .env file created on TrueNAS at ${{ env.TRUENAS_DEPLOY_DIR }}/.env'"
+        shell: bash
+
+      - name: Debug Discord Token Configuration
+        run: |
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
+            cd ${{ env.TRUENAS_DEPLOY_DIR }}
+            echo "🔍 Kiểm tra cấu hình Discord Token..."
+            
+            # Kiểm tra DISCORD_TOKEN có tồn tại trong .env không
+            if grep -q "DISCORD_TOKEN=" .env; then
+              TOKEN_LINE=\$(grep "DISCORD_TOKEN=" .env)
+              if [[ "\$TOKEN_LINE" == "DISCORD_TOKEN=" ]]; then
+                echo "❌ DISCORD_TOKEN rỗng trong file .env"
+              else
+                TOKEN_VALUE=\$(echo "\$TOKEN_LINE" | cut -d'=' -f2)
+                if [[ "\$TOKEN_VALUE" == "" ]]; then
+                  echo "❌ DISCORD_TOKEN không có giá trị"
+                else
+                  echo "✅ DISCORD_TOKEN đã được cấu hình (độ dài: \${#TOKEN_VALUE} ký tự)"
+                  echo "🔑 Token preview: \${TOKEN_VALUE:0:10}..."
+                fi
+              fi
+            else
+              echo "❌ Không tìm thấy DISCORD_TOKEN trong file .env"
+            fi
+            
+            echo "📋 Các biến môi trường Discord trong .env:"
+            grep "DISCORD_" .env || echo "Không có biến DISCORD_ nào"
+          EOF
         shell: bash
 
       - name: Prepare n8n host mount directories on TrueNAS
@@ -225,25 +291,51 @@ jobs:
             cd ${{ env.TRUENAS_DEPLOY_DIR }}
             echo "🤖 Kiểm tra trạng thái Discord Bot..."
             
+            # Đợi Discord Bot khởi động (60 giây thay vì ngay lập tức)
+            echo "⏳ Đợi Discord Bot khởi động (60 giây)..."
+            sleep 60
+            
             # Kiểm tra container Discord bot có chạy không
+            echo "📊 Trạng thái tất cả containers:"
+            docker compose ps
+            
             if docker compose ps discord-bot | grep -q "Up"; then
               echo "✅ Discord Bot container đang chạy"
               
               # Kiểm tra logs để xem bot có kết nối thành công không
-              echo "📋 Logs Discord Bot (10 dòng cuối):"
-              docker compose logs --tail=10 discord-bot
+              echo "📋 Logs Discord Bot (20 dòng cuối):"
+              docker compose logs --tail=20 discord-bot
               
               # Kiểm tra xem có lỗi kết nối không
-              if docker compose logs discord-bot | grep -q "Bot đã online"; then
+              if docker compose logs discord-bot | grep -q "✅ Đăng nhập Discord bot thành công"; then
                 echo "✅ Discord Bot đã kết nối thành công"
+              elif docker compose logs discord-bot | grep -q "Bot đã online"; then
+                echo "✅ Discord Bot đã kết nối thành công (legacy check)"
               else
-                echo "⚠️ Discord Bot chưa kết nối hoặc có lỗi - kiểm tra DISCORD_TOKEN"
+                echo "⚠️ Discord Bot chưa kết nối hoặc có lỗi"
+                echo "🔍 Kiểm tra chi tiết logs:"
+                docker compose logs discord-bot
+                
+                # Kiểm tra lỗi token
+                if docker compose logs discord-bot | grep -q "TokenInvalid\|DISCORD_TOKEN"; then
+                  echo "❌ Lỗi DISCORD_TOKEN - vui lòng kiểm tra GitHub Secrets"
+                fi
               fi
             else
               echo "❌ Discord Bot container không chạy"
               echo "📋 Logs Discord Bot để debug:"
               docker compose logs discord-bot
-              exit 1
+              
+              # Kiểm tra exit code
+              EXIT_CODE=\$(docker compose ps discord-bot --format "table {{.State}}" | tail -n +2)
+              echo "🔍 Trạng thái container: \$EXIT_CODE"
+              
+              # Không exit với lỗi nếu chỉ là vấn đề Discord token
+              if docker compose logs discord-bot | grep -q "TokenInvalid\|DISCORD_TOKEN"; then
+                echo "⚠️ Lỗi Discord Token - deployment vẫn tiếp tục cho các service khác"
+              else
+                exit 1
+              fi
             fi
             
             echo "🔍 Tổng quan trạng thái tất cả services:"

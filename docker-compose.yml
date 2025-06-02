@@ -89,7 +89,7 @@ services:
     build:
       context: ./discord-bot
       dockerfile: Dockerfile
-    restart: always
+    restart: on-failure:3
     environment:
       - TZ=${TZ:-Asia/Ho_Chi_Minh}
       - DISCORD_TOKEN=${DISCORD_TOKEN}
