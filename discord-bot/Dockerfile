@@ -12,8 +12,8 @@ RUN apk add --no-cache \
 # Copy package.json và package-lock.json (nếu có)
 COPY package*.json ./
 
-# Cài đặt dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Cài đặt dependencies (sử dụng --omit=dev thay vì --only=production)
+RUN npm ci --omit=dev && npm cache clean --force
 
 # Copy source code
 COPY . .
