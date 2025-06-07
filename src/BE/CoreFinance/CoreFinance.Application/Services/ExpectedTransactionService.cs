@@ -25,6 +25,8 @@ public class ExpectedTransactionService(
             ExpectedTransactionUpdateRequest, ExpectedTransactionViewModel, Guid>(mapper, unitOfWork, logger),
         IExpectedTransactionService
 {
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
     /// <summary>
     /// (EN) Gets a paginated list of expected transactions based on a filter request.<br/>
     /// (VI) Lấy danh sách giao dịch dự kiến có phân trang dựa trên yêu cầu lọc.
@@ -34,7 +36,7 @@ public class ExpectedTransactionService(
     public async Task<IBasePaging<ExpectedTransactionViewModel>?> GetPagingAsync(IFilterBodyRequest request)
     {
         var query = Mapper.ProjectTo<ExpectedTransactionViewModel>(
-            unitOfWork.Repository<ExpectedTransaction, Guid>()
+            _unitOfWork.Repository<ExpectedTransaction, Guid>()
                 .GetNoTrackingEntities());
 
         if (!string.IsNullOrEmpty(request.SearchValue))
@@ -56,7 +58,7 @@ public class ExpectedTransactionService(
     /// <returns>A list of pending expected transactions.</returns>
     public async Task<IEnumerable<ExpectedTransactionViewModel>> GetPendingTransactionsAsync(Guid userId)
     {
-        var query = unitOfWork.Repository<ExpectedTransaction, Guid>()
+        var query = _unitOfWork.Repository<ExpectedTransaction, Guid>()
             .GetNoTrackingEntities()
             .Where(t => t.UserId == userId && t.Status == ExpectedTransactionStatus.Pending);
 
@@ -74,7 +76,7 @@ public class ExpectedTransactionService(
         int days = 30)
     {
         var endDate = DateTime.UtcNow.AddDays(days);
-        var query = unitOfWork.Repository<ExpectedTransaction, Guid>()
+        var query = _unitOfWork.Repository<ExpectedTransaction, Guid>()
             .GetNoTrackingEntities()
             .Where(t => t.UserId == userId &&
                         t.Status == ExpectedTransactionStatus.Pending &&
@@ -93,7 +95,7 @@ public class ExpectedTransactionService(
     /// <returns>A list of expected transactions by template.</returns>
     public async Task<IEnumerable<ExpectedTransactionViewModel>> GetTransactionsByTemplateAsync(Guid templateId)
     {
-        var query = unitOfWork.Repository<ExpectedTransaction, Guid>()
+        var query = _unitOfWork.Repository<ExpectedTransaction, Guid>()
             .GetNoTrackingEntities()
             .Where(t => t.RecurringTransactionTemplateId == templateId)
             .OrderBy(t => t.ExpectedDate);
@@ -109,7 +111,7 @@ public class ExpectedTransactionService(
     /// <returns>A list of expected transactions by account.</returns>
     public async Task<IEnumerable<ExpectedTransactionViewModel>> GetTransactionsByAccountAsync(Guid accountId)
     {
-        var query = unitOfWork.Repository<ExpectedTransaction, Guid>()
+        var query = _unitOfWork.Repository<ExpectedTransaction, Guid>()
             .GetNoTrackingEntities()
             .Where(t => t.AccountId == accountId)
             .OrderBy(t => t.ExpectedDate);
@@ -128,7 +130,7 @@ public class ExpectedTransactionService(
     public async Task<IEnumerable<ExpectedTransactionViewModel>> GetTransactionsByDateRangeAsync(Guid userId,
         DateTime startDate, DateTime endDate)
     {
-        var query = unitOfWork.Repository<ExpectedTransaction, Guid>()
+        var query = _unitOfWork.Repository<ExpectedTransaction, Guid>()
             .GetNoTrackingEntities()
             .Where(t => t.UserId == userId &&
                         t.ExpectedDate >= startDate.Date &&
@@ -147,10 +149,10 @@ public class ExpectedTransactionService(
     /// <returns>True if the confirmation was successful, false otherwise.</returns>
     public async Task<bool> ConfirmExpectedTransactionAsync(Guid expectedTransactionId, Guid actualTransactionId)
     {
-        await using var trans = await unitOfWork.BeginTransactionAsync();
+        await using var trans = await _unitOfWork.BeginTransactionAsync();
         try
         {
-            var expectedTransaction = await unitOfWork.Repository<ExpectedTransaction, Guid>()
+            var expectedTransaction = await _unitOfWork.Repository<ExpectedTransaction, Guid>()
                 .GetByIdAsync(expectedTransactionId);
 
             if (expectedTransaction == null || expectedTransaction.Status != ExpectedTransactionStatus.Pending)
@@ -161,8 +163,8 @@ public class ExpectedTransactionService(
             expectedTransaction.ProcessedAt = DateTime.UtcNow;
             expectedTransaction.UpdatedAt = DateTime.UtcNow;
 
-            await unitOfWork.Repository<ExpectedTransaction, Guid>().UpdateAsync(expectedTransaction);
-            await unitOfWork.SaveChangesAsync();
+            await _unitOfWork.Repository<ExpectedTransaction, Guid>().UpdateAsync(expectedTransaction);
+            await _unitOfWork.SaveChangesAsync();
 
             await trans.CommitAsync();
             return true;
@@ -184,10 +186,10 @@ public class ExpectedTransactionService(
     /// <returns>True if the cancellation was successful, false otherwise.</returns>
     public async Task<bool> CancelExpectedTransactionAsync(Guid expectedTransactionId, string reason)
     {
-        await using var trans = await unitOfWork.BeginTransactionAsync();
+        await using var trans = await _unitOfWork.BeginTransactionAsync();
         try
         {
-            var expectedTransaction = await unitOfWork.Repository<ExpectedTransaction, Guid>()
+            var expectedTransaction = await _unitOfWork.Repository<ExpectedTransaction, Guid>()
                 .GetByIdAsync(expectedTransactionId);
 
             if (expectedTransaction == null || expectedTransaction.Status != ExpectedTransactionStatus.Pending)
@@ -198,8 +200,8 @@ public class ExpectedTransactionService(
             expectedTransaction.ProcessedAt = DateTime.UtcNow;
             expectedTransaction.UpdatedAt = DateTime.UtcNow;
 
-            await unitOfWork.Repository<ExpectedTransaction, Guid>().UpdateAsync(expectedTransaction);
-            await unitOfWork.SaveChangesAsync();
+            await _unitOfWork.Repository<ExpectedTransaction, Guid>().UpdateAsync(expectedTransaction);
+            await _unitOfWork.SaveChangesAsync();
 
             await trans.CommitAsync();
             return true;
@@ -222,10 +224,10 @@ public class ExpectedTransactionService(
     /// <returns>True if the adjustment was successful, false otherwise.</returns>
     public async Task<bool> AdjustExpectedTransactionAsync(Guid expectedTransactionId, decimal newAmount, string reason)
     {
-        await using var trans = await unitOfWork.BeginTransactionAsync();
+        await using var trans = await _unitOfWork.BeginTransactionAsync();
         try
         {
-            var expectedTransaction = await unitOfWork.Repository<ExpectedTransaction, Guid>()
+            var expectedTransaction = await _unitOfWork.Repository<ExpectedTransaction, Guid>()
                 .GetByIdAsync(expectedTransactionId);
 
             if (expectedTransaction == null || expectedTransaction.Status != ExpectedTransactionStatus.Pending)
@@ -241,8 +243,8 @@ public class ExpectedTransactionService(
             expectedTransaction.AdjustmentReason = reason;
             expectedTransaction.UpdatedAt = DateTime.UtcNow;
 
-            await unitOfWork.Repository<ExpectedTransaction, Guid>().UpdateAsync(expectedTransaction);
-            await unitOfWork.SaveChangesAsync();
+            await _unitOfWork.Repository<ExpectedTransaction, Guid>().UpdateAsync(expectedTransaction);
+            await _unitOfWork.SaveChangesAsync();
 
             await trans.CommitAsync();
             return true;

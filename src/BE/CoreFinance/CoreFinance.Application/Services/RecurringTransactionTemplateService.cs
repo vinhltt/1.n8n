@@ -26,6 +26,8 @@ public class RecurringTransactionTemplateService(
             logger),
         IRecurringTransactionTemplateService
 {
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
     /// <summary>
     /// (EN) Gets a paginated list of recurring transaction templates based on a filter request.<br/>
     /// (VI) Lấy danh sách mẫu giao dịch định kỳ có phân trang dựa trên yêu cầu lọc.
@@ -35,7 +37,7 @@ public class RecurringTransactionTemplateService(
     public async Task<IBasePaging<RecurringTransactionTemplateViewModel>?> GetPagingAsync(IFilterBodyRequest request)
     {
         var query = Mapper.ProjectTo<RecurringTransactionTemplateViewModel>(
-            unitOfWork.Repository<RecurringTransactionTemplate, Guid>()
+            _unitOfWork.Repository<RecurringTransactionTemplate, Guid>()
                 .GetNoTrackingEntities());
 
         if (!string.IsNullOrEmpty(request.SearchValue))
@@ -58,7 +60,7 @@ public class RecurringTransactionTemplateService(
     /// <returns>A list of active recurring transaction templates.</returns>
     public async Task<IEnumerable<RecurringTransactionTemplateViewModel>> GetActiveTemplatesAsync(Guid userId)
     {
-        var query = unitOfWork.Repository<RecurringTransactionTemplate, Guid>()
+        var query = _unitOfWork.Repository<RecurringTransactionTemplate, Guid>()
             .GetNoTrackingEntities()
             .Where(t => t.UserId == userId && t.IsActive);
 
@@ -73,7 +75,7 @@ public class RecurringTransactionTemplateService(
     /// <returns>A list of recurring transaction templates by account.</returns>
     public async Task<IEnumerable<RecurringTransactionTemplateViewModel>> GetTemplatesByAccountAsync(Guid accountId)
     {
-        var query = unitOfWork.Repository<RecurringTransactionTemplate, Guid>()
+        var query = _unitOfWork.Repository<RecurringTransactionTemplate, Guid>()
             .GetNoTrackingEntities()
             .Where(t => t.AccountId == accountId);
 
@@ -89,10 +91,10 @@ public class RecurringTransactionTemplateService(
     /// <returns>True if the status was successfully toggled, false otherwise.</returns>
     public async Task<bool> ToggleActiveStatusAsync(Guid templateId, bool isActive)
     {
-        await using var trans = await unitOfWork.BeginTransactionAsync();
+        await using var trans = await _unitOfWork.BeginTransactionAsync();
         try
         {
-            var template = await unitOfWork.Repository<RecurringTransactionTemplate, Guid>()
+            var template = await _unitOfWork.Repository<RecurringTransactionTemplate, Guid>()
                 .GetByIdAsync(templateId);
 
             if (template == null)
@@ -101,8 +103,8 @@ public class RecurringTransactionTemplateService(
             template.IsActive = isActive;
             template.UpdatedAt = DateTime.UtcNow;
 
-            await unitOfWork.Repository<RecurringTransactionTemplate, Guid>().UpdateAsync(template);
-            await unitOfWork.SaveChangesAsync();
+            await _unitOfWork.Repository<RecurringTransactionTemplate, Guid>().UpdateAsync(template);
+            await _unitOfWork.SaveChangesAsync();
 
             await trans.CommitAsync();
             return true;
@@ -123,7 +125,7 @@ public class RecurringTransactionTemplateService(
     /// <returns>The next execution date.</returns>
     public async Task<DateTime> CalculateNextExecutionDateAsync(Guid templateId)
     {
-        var template = await unitOfWork.Repository<RecurringTransactionTemplate, Guid>()
+        var template = await _unitOfWork.Repository<RecurringTransactionTemplate, Guid>()
             .GetByIdAsync(templateId);
 
         if (template == null)
@@ -141,7 +143,7 @@ public class RecurringTransactionTemplateService(
     /// <returns>A task representing the asynchronous operation.</returns>
     public async Task GenerateExpectedTransactionsAsync(Guid templateId, int daysInAdvance)
     {
-        await using var trans = await unitOfWork.BeginTransactionAsync();
+        await using var trans = await _unitOfWork.BeginTransactionAsync();
         try
         {
             await GenerateExpectedTransactionsInternalAsync(templateId, daysInAdvance);
@@ -164,7 +166,7 @@ public class RecurringTransactionTemplateService(
     /// <returns>A task representing the asynchronous operation.</returns>
     private async Task GenerateExpectedTransactionsInternalAsync(Guid templateId, int daysInAdvance)
     {
-        var template = await unitOfWork.Repository<RecurringTransactionTemplate, Guid>()
+        var template = await _unitOfWork.Repository<RecurringTransactionTemplate, Guid>()
             .GetByIdAsync(templateId);
 
         if (template == null || !template.IsActive || !template.AutoGenerate)
@@ -177,7 +179,7 @@ public class RecurringTransactionTemplateService(
         if (template.EndDate.HasValue && currentDate > template.EndDate.Value)
             return;
 
-        var expectedTransactionRepo = unitOfWork.Repository<ExpectedTransaction, Guid>();
+        var expectedTransactionRepo = _unitOfWork.Repository<ExpectedTransaction, Guid>();
 
         while (currentDate <= endDate)
         {
@@ -186,10 +188,10 @@ public class RecurringTransactionTemplateService(
                 break;
 
             // Check if expected transaction already exists for this date
-            var existingTransaction = expectedTransactionRepo
+            var existingTransaction = await expectedTransactionRepo
                 .GetNoTrackingEntities()
-                .FirstOrDefault(et => et.RecurringTransactionTemplateId == templateId &&
-                                      et.ExpectedDate.Date == currentDate.Date);
+                .FirstOrDefaultAsync(et => et.RecurringTransactionTemplateId == templateId &&
+                                           et.ExpectedDate.Date == currentDate.Date);
 
             if (existingTransaction == null)
             {
@@ -220,9 +222,9 @@ public class RecurringTransactionTemplateService(
         // Update template's next execution date
         template.NextExecutionDate = currentDate;
         template.UpdatedAt = DateTime.UtcNow;
-        await unitOfWork.Repository<RecurringTransactionTemplate, Guid>().UpdateAsync(template);
+        await _unitOfWork.Repository<RecurringTransactionTemplate, Guid>().UpdateAsync(template);
 
-        await unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
     }
 
     /// <summary>
@@ -232,13 +234,13 @@ public class RecurringTransactionTemplateService(
     /// <returns>A task representing the asynchronous operation.</returns>
     public async Task GenerateExpectedTransactionsForAllActiveTemplatesAsync()
     {
-        await using var trans = await unitOfWork.BeginTransactionAsync();
+        await using var trans = await _unitOfWork.BeginTransactionAsync();
         try
         {
-            var activeTemplates = unitOfWork.Repository<RecurringTransactionTemplate, Guid>()
+            var activeTemplates = await _unitOfWork.Repository<RecurringTransactionTemplate, Guid>()
                 .GetNoTrackingEntities()
                 .Where(t => t.IsActive && t.AutoGenerate)
-                .ToList();
+                .ToListAsync();
 
             foreach (var template in activeTemplates)
             {

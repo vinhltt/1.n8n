@@ -11,8 +11,7 @@ public abstract class CrudController<TEntity, TCreateRequest, TUpdateRequest,
     ILogger logger,
     IBaseService<TEntity, TCreateRequest, TUpdateRequest, TViewModel, TKey>
         baseService
-)
-    : BaseController(logger)
+) : BaseController(logger)
     where TEntity : BaseEntity<TKey>, new()
     where TCreateRequest : BaseCreateRequest, new()
     where TUpdateRequest : BaseUpdateRequest<TKey>, new()

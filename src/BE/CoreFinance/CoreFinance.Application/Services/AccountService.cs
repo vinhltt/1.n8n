@@ -13,8 +13,8 @@ using Microsoft.Extensions.Logging;
 namespace CoreFinance.Application.Services;
 
 /// <summary>
-/// (EN) Service for managing accounts.<br/>
-/// (VI) Dịch vụ quản lý tài khoản.
+///     (EN) Service for managing accounts.<br />
+///     (VI) Dịch vụ quản lý tài khoản.
 /// </summary>
 public class AccountService(
     IMapper mapper,
@@ -24,16 +24,18 @@ public class AccountService(
             logger),
         IAccountService
 {
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
     /// <summary>
-    /// (EN) Gets a paginated list of accounts based on a filter request.<br/>
-    /// (VI) Lấy danh sách tài khoản có phân trang dựa trên yêu cầu lọc.
+    ///     (EN) Gets a paginated list of accounts based on a filter request.<br />
+    ///     (VI) Lấy danh sách tài khoản có phân trang dựa trên yêu cầu lọc.
     /// </summary>
     /// <param name="request">The filter request body.</param>
     /// <returns>A paginated list of account view models.</returns>
     public async Task<IBasePaging<AccountViewModel>?> GetPagingAsync(IFilterBodyRequest request)
     {
         var query =
-            Mapper.ProjectTo<AccountViewModel>(unitOfWork.Repository<Account, Guid>()
+            Mapper.ProjectTo<AccountViewModel>(_unitOfWork.Repository<Account, Guid>()
                 .GetNoTrackingEntities());
 
         if (!string.IsNullOrEmpty(request.SearchValue))
@@ -45,7 +47,7 @@ public class AccountService(
     public async Task<List<AccountSelectionViewModel>?> GetAccountSelectionAsync()
     {
         var query =
-            Mapper.ProjectTo<AccountSelectionViewModel>(unitOfWork.Repository<Account, Guid>()
+            Mapper.ProjectTo<AccountSelectionViewModel>(_unitOfWork.Repository<Account, Guid>()
                 .GetNoTrackingEntities());
 
         return await query.ToListAsync();

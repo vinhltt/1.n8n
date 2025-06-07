@@ -24,6 +24,8 @@ public class TransactionService(
             unitOfWork, logger),
         ITransactionService
 {
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
     /// <summary>
     /// (EN) Gets a paginated list of transactions based on a filter request.<br/>
     /// (VI) Lấy danh sách giao dịch có phân trang dựa trên yêu cầu lọc.
@@ -33,7 +35,7 @@ public class TransactionService(
     public async Task<IBasePaging<TransactionViewModel>?> GetPagingAsync(IFilterBodyRequest request)
     {
         var query =
-            Mapper.ProjectTo<TransactionViewModel>(unitOfWork.Repository<Transaction, Guid>()
+            Mapper.ProjectTo<TransactionViewModel>(_unitOfWork.Repository<Transaction, Guid>()
                 .GetNoTrackingEntities());
 
         // Example: filter by Description or other fields if needed
@@ -62,8 +64,8 @@ public class TransactionService(
 
         var entity = Mapper.Map<Transaction>(request);
 
-        await unitOfWork.Repository<Transaction, Guid>().CreateAsync(entity);
-        await unitOfWork.SaveChangesAsync();
+        await _unitOfWork.Repository<Transaction, Guid>().CreateAsync(entity);
+        await _unitOfWork.SaveChangesAsync();
 
         // Recalculate subsequent transactions if balance was provided
         await RecalculateSubsequentBalancesAsync(request.AccountId, request.TransactionDate);
@@ -89,7 +91,7 @@ public class TransactionService(
         try
         {
             // Find the most recent transaction before the current transaction date for the same account
-            var previousTransaction = await unitOfWork.Repository<Transaction, Guid>()
+            var previousTransaction = await _unitOfWork.Repository<Transaction, Guid>()
                 .GetNoTrackingEntities()
                 .Where(t => t.AccountId == accountId && t.TransactionDate < transactionDate)
                 .OrderByDescending(t => t.TransactionDate)
@@ -123,7 +125,7 @@ public class TransactionService(
     /// <param name="fromDate">The date from which to recalculate.</param>
     private async Task RecalculateSubsequentBalancesAsync(Guid accountId, DateTime fromDate)
     {
-        var subsequentTransactions = await unitOfWork.Repository<Transaction, Guid>()
+        var subsequentTransactions = await _unitOfWork.Repository<Transaction, Guid>()
             .GetNoTrackingEntities()
             .Where(t => t.AccountId == accountId && t.TransactionDate > fromDate)
             .OrderBy(t => t.TransactionDate)
@@ -137,13 +139,13 @@ public class TransactionService(
                 transaction.RevenueAmount, 
                 transaction.SpentAmount);
             // Update the transaction entity directly
-            var entityToUpdate = await unitOfWork.Repository<Transaction, Guid>().GetByIdAsync(transaction.Id);
+            var entityToUpdate = await _unitOfWork.Repository<Transaction, Guid>().GetByIdAsync(transaction.Id);
             if (entityToUpdate == null)
                 continue;
             entityToUpdate.Balance = calculatedBalance;
-            await unitOfWork.Repository<Transaction, Guid>().UpdateAsync(entityToUpdate);
+            await _unitOfWork.Repository<Transaction, Guid>().UpdateAsync(entityToUpdate);
         }
 
-        await unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
     }
 }
