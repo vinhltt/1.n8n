@@ -794,7 +794,7 @@
                                 class="absolute top-0 z-[10] hidden min-w-[180px] rounded bg-white p-0 py-2 text-dark shadow ltr:left-[95%] rtl:right-[95%] dark:bg-[#1b2e4b] dark:text-white-dark"
                             >
                                 <li>
-                                    <NuxtLink to="/auth/cover-register" target="_blank">{{ $t('register_cover') }}</NuxtLink>
+                                    <NuxtLink to="/auth/cover-signup" target="_blank">{{ $t('register_cover') }}</NuxtLink>
                                 </li>
                                 <li>
                                     <NuxtLink to="/auth/boxed-signup" target="_blank">{{ $t('register_boxed') }}</NuxtLink>

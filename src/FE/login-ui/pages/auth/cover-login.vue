@@ -79,7 +79,7 @@
                         <div class="mb-10">
                             <h1 class="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Sign in</h1>
                             <p class="text-base font-bold leading-normal text-white-dark">Enter your email and password to login</p>
-                            
+
                             <!-- Success message after signup -->
                             <div v-if="showSignupSuccess" class="mt-4 p-3 text-sm bg-green-50 border border-green-200 rounded-md dark:bg-green-900/20 dark:border-green-800">
                                 <p class="text-green-700 dark:text-green-300">
@@ -87,7 +87,7 @@
                                     Your account has been created. Please log in with your credentials.
                                 </p>
                             </div>
-                            
+
                             <div class="mt-4 p-3 text-sm bg-blue-50 border border-blue-200 rounded-md dark:bg-blue-900/20 dark:border-blue-800">
                                 <p class="text-blue-700 dark:text-blue-300">
                                     <strong>Demo Account:</strong><br>

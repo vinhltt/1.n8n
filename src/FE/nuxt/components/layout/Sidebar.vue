@@ -48,6 +48,18 @@
                                     </div>
                                 </NuxtLink>
                             </li>
+
+                            <li class="nav-item">
+                                <NuxtLink to="/apps/recurring-transactions" class="group" @click="toggleMobileMenu">
+                                    <div class="flex items-center">
+                                        <icon-refresh class="shrink-0 group-hover:!text-primary" />
+
+                                        <span class="text-black ltr:pl-3 rtl:pr-3 dark:text-[#506690] dark:group-hover:text-white-dark">
+                                            Recurring Transactions
+                                        </span>
+                                    </div>
+                                </NuxtLink>
+                            </li>
                             <!-- <li class="menu nav-item">
                                 <button
                                     type="button"
@@ -692,7 +704,7 @@
                                             <NuxtLink to="/auth/cover-login" target="_blank">{{ $t('login_cover') }}</NuxtLink>
                                         </li>
                                         <li @click="toggleMobileMenu">
-                                            <NuxtLink to="/auth/cover-register" target="_blank">{{ $t('register_cover') }}</NuxtLink>
+                                            <NuxtLink to="/auth/cover-signup" target="_blank">{{ $t('register_cover') }}</NuxtLink>
                                         </li>
                                         <li @click="toggleMobileMenu">
                                             <NuxtLink to="/auth/cover-lockscreen" target="_blank">{{ $t('unlock_cover') }}</NuxtLink>

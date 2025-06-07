@@ -79,51 +79,98 @@
                         <div class="mb-10">
                             <h1 class="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Sign in</h1>
                             <p class="text-base font-bold leading-normal text-white-dark">Enter your email and password to login</p>
-                        </div>
-                        <form class="space-y-5 dark:text-white" @submit.prevent="router.push('/')">
+                        </div>                        <form class="space-y-5 dark:text-white" @submit.prevent="handleLogin">
                             <div>
                                 <label for="Email">Email</label>
                                 <div class="relative text-white-dark">
-                                    <input id="Email" type="email" placeholder="Enter Email" class="form-input ps-10 placeholder:text-white-dark" />
+                                    <input
+                                        id="Email"
+                                        v-model="loginForm.email"
+                                        type="email"
+                                        placeholder="Enter Email"
+                                        class="form-input ps-10 placeholder:text-white-dark"
+                                        :class="{ 'border-red-500': emailError }"
+                                        required
+                                    />
                                     <span class="absolute start-4 top-1/2 -translate-y-1/2">
                                         <icon-mail :fill="true" />
                                     </span>
                                 </div>
+                                <p v-if="emailError" class="mt-1 text-sm text-red-500">{{ emailError }}</p>
                             </div>
                             <div>
                                 <label for="Password">Password</label>
                                 <div class="relative text-white-dark">
-                                    <input id="Password" type="password" placeholder="Enter Password" class="form-input ps-10 placeholder:text-white-dark" />
+                                    <input
+                                        id="Password"
+                                        v-model="loginForm.password"
+                                        type="password"
+                                        placeholder="Enter Password"
+                                        class="form-input ps-10 placeholder:text-white-dark"
+                                        :class="{ 'border-red-500': passwordError }"
+                                        required
+                                    />
                                     <span class="absolute start-4 top-1/2 -translate-y-1/2">
                                         <icon-lock-dots :fill="true" />
                                     </span>
                                 </div>
+                                <p v-if="passwordError" class="mt-1 text-sm text-red-500">{{ passwordError }}</p>
                             </div>
                             <div>
                                 <label class="flex cursor-pointer items-center">
-                                    <input type="checkbox" class="form-checkbox bg-white dark:bg-black" />
-                                    <span class="text-white-dark">Subscribe to weekly newsletter</span>
+                                    <input
+                                        v-model="rememberMe"
+                                        type="checkbox"
+                                        class="form-checkbox bg-white dark:bg-black"
+                                    />
+                                    <span class="text-white-dark">Remember me</span>
                                 </label>
                             </div>
-                            <button type="submit" class="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
-                                Sign in
+
+                            <!-- Error Message -->
+                            <div v-if="error" class="rounded-md bg-red-50 p-4 dark:bg-red-900/10">
+                                <div class="flex">
+                                    <div class="ml-3">
+                                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+                                            Login Failed
+                                        </h3>
+                                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                                            <p>{{ error }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]"
+                                :disabled="isLoading"
+                            >
+                                <span v-if="isLoading" class="mr-2">
+                                    <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                </span>
+                                {{ isLoading ? 'Signing in...' : 'Sign in' }}
                             </button>
                         </form>
 
                         <div class="relative my-7 text-center md:mb-9">
                             <span class="absolute inset-x-0 top-1/2 h-px w-full -translate-y-1/2 bg-white-light dark:bg-white-dark"></span>
                             <span class="relative bg-white px-2 font-bold uppercase text-white-dark dark:bg-dark dark:text-white-light">or</span>
-                        </div>
-                        <div class="mb-10 md:mb-[60px]">
+                        </div>                        <div class="mb-10 md:mb-[60px]">
                             <ul class="flex justify-center gap-3.5">
                                 <li>
-                                    <a
-                                        href="javascript:"
-                                        class="inline-flex h-8 w-8 items-center justify-center rounded-full p-0 transition hover:scale-110"
+                                    <button
+                                        type="button"
+                                        @click="handleGoogleLogin"
+                                        :disabled="isLoading"
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-full p-0 transition hover:scale-110 disabled:opacity-50"
                                         style="background: linear-gradient(135deg, rgba(239, 18, 98, 1) 0%, rgba(67, 97, 238, 1) 100%)"
                                     >
-                                        <icon-instagram />
-                                    </a>
+                                        <icon-google />
+                                    </button>
                                 </li>
                                 <li>
                                     <a
@@ -149,14 +196,14 @@
                                         class="inline-flex h-8 w-8 items-center justify-center rounded-full p-0 transition hover:scale-110"
                                         style="background: linear-gradient(135deg, rgba(239, 18, 98, 1) 0%, rgba(67, 97, 238, 1) 100%)"
                                     >
-                                        <icon-google />
+                                        <icon-instagram />
                                     </a>
                                 </li>
                             </ul>
                         </div>
                         <div class="text-center dark:text-white">
                             Don't have an account ?
-                            <NuxtLink to="/auth/cover-register" class="uppercase text-primary underline transition hover:text-black dark:hover:text-white">
+                            <NuxtLink to="/auth/cover-signup" class="uppercase text-primary underline transition hover:text-black dark:hover:text-white">
                                 SIGN UP
                             </NuxtLink>
                         </div>
@@ -168,23 +215,114 @@
     </div>
 </template>
 <script lang="ts" setup>
-    import { computed } from 'vue';
-    import appSetting from '@/app-setting';
-    import { useAppStore } from '@/stores/index';
-    import { useRouter } from 'vue-router';
-    useHead({ title: 'Login Cover' });
-    const router = useRouter();
-    definePageMeta({
-        layout: 'auth-layout',
-    });
-    const store = useAppStore();
-    const { setLocale } = useI18n();
+import { computed, reactive, ref } from 'vue'
+import appSetting from '@/app-setting'
+import { useAppStore } from '@/stores/index'
+import { useAuth } from '@/composables/useAuth'
 
-    // multi language
-    const changeLanguage = (item: any) => {
-        appSetting.toggleLanguage(item, setLocale);
-    };
-    const currentFlag = computed(() => {
-        return `/assets/images/flags/${store.locale?.toUpperCase()}.svg`;
-    });
+useHead({ title: 'Login Cover' })
+
+definePageMeta({
+    layout: 'auth-layout',
+})
+
+const store = useAppStore()
+const { login, loginWithGoogle, isLoading, error, clearError } = useAuth()
+const { setLocale } = useI18n()
+
+// Form state
+const loginForm = reactive({
+    email: '',
+    password: '',
+})
+
+const rememberMe = ref(false)
+const emailError = ref('')
+const passwordError = ref('')
+
+// Form validation
+const validateForm = (): boolean => {
+    emailError.value = ''
+    passwordError.value = ''
+
+    let isValid = true
+
+    if (!loginForm.email) {
+        emailError.value = 'Email is required'
+        isValid = false
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginForm.email)) {
+        emailError.value = 'Please enter a valid email address'
+        isValid = false
+    }
+
+    if (!loginForm.password) {
+        passwordError.value = 'Password is required'
+        isValid = false
+    } else if (loginForm.password.length < 6) {
+        passwordError.value = 'Password must be at least 6 characters'
+        isValid = false
+    }
+
+    return isValid
+}
+
+// Handle form submission
+const handleLogin = async (): Promise<void> => {
+    clearError()
+
+    if (!validateForm()) {
+        return
+    }
+
+    try {
+        const success = await login({
+            email: loginForm.email,
+            password: loginForm.password,
+        })
+
+        if (success) {
+            // Login successful, redirect will be handled by useAuth composable
+            console.log('Login successful')
+        }
+    } catch (err) {
+        console.error('Login error:', err)
+    }
+}
+
+// Handle Google login
+const handleGoogleLogin = async (): Promise<void> => {
+    clearError()
+
+    try {
+        // In a real implementation, you would integrate with Google OAuth SDK
+        // For now, this is a placeholder
+        console.log('Google login clicked - implement Google OAuth integration')
+
+        // Example:
+        // const googleToken = await getGoogleToken()
+        // await loginWithGoogle(googleToken)
+    } catch (err) {
+        console.error('Google login error:', err)
+    }
+}
+
+// Multi language support
+const changeLanguage = (item: any) => {
+    appSetting.toggleLanguage(item, setLocale)
+}
+
+const currentFlag = computed(() => {
+    return `/assets/images/flags/${store.locale?.toUpperCase()}.svg`
+})
+
+// Clear errors when user starts typing
+watch(() => loginForm.email, () => {
+    if (emailError.value) emailError.value = ''
+    if (error.value) clearError()
+})
+
+watch(() => loginForm.password, () => {
+    if (passwordError.value) passwordError.value = ''
+    if (error.value) clearError()
+})
 </script>
