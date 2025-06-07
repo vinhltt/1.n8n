@@ -21,10 +21,58 @@
 - **✅ HOÀN THÀNH: Fix Account dropdown selection trong TransactionDetailPanel.**
 - **✅ HOÀN THÀNH: Fix Vue readonly ref warning và transaction detail data loading.**
 - **✅ HOÀN THÀNH: Fix TypeScript errors và Category selection trong TransactionDetailPanel.**
+- **✅ HOÀN THÀNH: Background Job Service cho Recurring Transactions - tự động sinh giao dịch dự kiến hàng ngày.**
+- **✅ HOÀN THÀNH: Frontend Recurring Transactions Management - trang quản lý mẫu giao dịch định kỳ với CRUD operations.**
+- **🚧 ĐANG TRIỂN KHAI: Money Management bounded context với BudgetService, JarService, SharedExpenseService.**
 
 ## Thay đổi gần đây
 
-### ✅ Transaction Display Bug Fixes (Mới hoàn thành)
+### 🚧 Money Management Implementation (Đang triển khai)
+- **✅ Đã tạo cấu trúc project MoneyManagement:**
+  - **Tạo solution MoneyManagement.sln** với 6 projects: Domain, Contracts, Application, Infrastructure, Api, Application.Tests
+  - **Cấu hình dependencies** tương tự CoreFinance với .NET 9.0, Entity Framework Core, AutoMapper, FluentValidation
+  - **Tạo cấu trúc thư mục** theo Clean Architecture pattern
+- **✅ Đã triển khai Domain Layer:**
+  - **Budget entity** với đầy đủ properties: BudgetAmount, SpentAmount, Period, Status, AlertThreshold, etc.
+  - **Jar entity** cho hệ thống 6 Jars method: Necessities, FinancialFreedom, LongTermSavings, Education, Play, Give
+  - **SharedExpense entity** cho quản lý chi tiêu nhóm với participants tracking
+  - **SharedExpenseParticipant entity** để theo dõi phần chia sẻ cá nhân
+  - **Enums:** BudgetStatus, BudgetPeriod, JarType, SharedExpenseStatus
+- **✅ Đã triển khai Base Infrastructure:**
+  - **BaseEntity<TKey>** với audit fields (CreateAt, UpdateAt, CreateBy, UpdateBy, Deleted)
+  - **IBaseRepository<TEntity, TKey>** với đầy đủ CRUD operations và soft delete
+  - **IUnitOfWork** interface cho transaction management
+- **✅ Đã triển khai BudgetService (hoàn chỉnh):**
+  - **IBudgetService interface** với 12 methods: CRUD, filtering, status management, alert tracking
+  - **BudgetService implementation** với AutoMapper, logging, error handling
+  - **DTOs:** BudgetViewModel, CreateBudgetRequest, UpdateBudgetRequest
+  - **AutoMapper profile** cho Budget entity mappings
+  - **FluentValidation validators** cho CreateBudgetRequest và UpdateBudgetRequest
+  - **Business logic:** Alert threshold checking, over-budget detection, spent amount tracking
+
+### ✅ Recurring Transactions Implementation (Mới hoàn thành)
+- **✅ Đã triển khai Background Job Service:**
+  - **Tạo RecurringTransactionBackgroundService** sử dụng IHostedService của .NET Core
+  - **Chạy hàng ngày vào lúc nửa đêm** để sinh giao dịch dự kiến từ các mẫu định kỳ active
+  - **Đăng ký service trong Program.cs** với AddHostedService<RecurringTransactionBackgroundService>()
+  - **Logging đầy đủ** cho việc theo dõi và debug
+  - **Error handling** với try-catch để đảm bảo service không crash
+- **✅ Đã triển khai Frontend Recurring Transactions:**
+  - **Trang quản lý /apps/recurring-transactions** với danh sách mẫu giao dịch định kỳ
+  - **CRUD operations đầy đủ:** Create, Read, Update, Delete, Toggle Active Status
+  - **Filtering system:** Theo tài khoản, trạng thái, tần suất lặp lại
+  - **Modal component RecurringTransactionModal** cho tạo/chỉnh sửa mẫu
+  - **Composable useRecurringTransactions** với API integration
+  - **Types đầy đủ** cho RecurringTransactionTemplate và ExpectedTransaction
+  - **Menu navigation** thêm "Recurring Transactions" vào sidebar
+- **✅ Đã cập nhật Types và API Integration:**
+  - **Tạo types/recurring-transaction.ts** với đầy đủ interfaces và enums
+  - **IBasePaging<T> interface** cho pagination response
+  - **RecurrenceFrequency, RecurringTransactionType, ExpectedTransactionStatus enums**
+  - **Request/Response models** cho tất cả API operations
+  - **Export types trong types/index.ts** để sử dụng toàn project
+
+### ✅ Transaction Display Bug Fixes (Đã hoàn thành trước đó)
 - **✅ Đã fix hiển thị Account name trong transaction detail:**
   - **Cập nhật useAccountsSimple.getAccountName()** trả về "Không xác định" thay vì "Unknown Account"
   - **Sử dụng getAccountName từ composable** thay vì định nghĩa lại trong component

@@ -17,13 +17,26 @@
   - **Viết comprehensive unit tests cho tất cả methods với coverage cao, áp dụng pattern partial class và tổ chức theo thư mục service.**
 - **Đã cấu hình Dependency Injection cho Unit of Work, RecurringTransactionTemplateService và ExpectedTransactionService.**
 - **Đã tạo các validator bằng FluentValidation cho các request DTOs liên quan đến RecurringTransactionTemplate và ExpectedTransaction, và đăng ký chúng tập trung.**
+- **Đã triển khai Background Job Service sử dụng IHostedService để tự động sinh giao dịch dự kiến từ các mẫu định kỳ active hàng ngày.**
+- **Đã triển khai đầy đủ Frontend Recurring Transactions Management với trang quản lý, modal CRUD, composable, types và menu navigation.**
+- **Đã bắt đầu triển khai Money Management bounded context:**
+  - **Tạo solution MoneyManagement với cấu trúc Clean Architecture đầy đủ (6 projects).**
+  - **Triển khai Domain Layer với Budget, Jar, SharedExpense, SharedExpenseParticipant entities.**
+  - **Triển khai Base Infrastructure: BaseEntity, IBaseRepository, IUnitOfWork.**
+  - **Hoàn thành BudgetService với đầy đủ business logic, DTOs, validators và AutoMapper profiles.**
 
 ## Còn lại
-- **Triển khai background job service để tự động sinh giao dịch dự kiến từ các mẫu định kỳ (sử dụng Quartz.NET hoặc Hangfire).**
-- **Triển khai API Controllers cho RecurringTransactionTemplate và ExpectedTransaction với đầy đủ endpoints.**
+- **Hoàn thiện Money Management bounded context:**
+  - **Triển khai Infrastructure Layer: BaseRepository implementation, UnitOfWork implementation, DbContext.**
+  - **Triển khai JarService với business logic cho hệ thống 6 Jars method.**
+  - **Triển khai SharedExpenseService với logic quản lý chi tiêu nhóm và participants.**
+  - **Tạo API Controllers cho Budget, Jar, SharedExpense.**
+  - **Viết unit tests cho tất cả services trong Money Management.**
+  - **Triển khai Frontend cho Money Management: Budget management, Jar management, Shared expense tracking.**
 - **Tích hợp với NotificationService để gửi thông báo về giao dịch định kỳ sắp đến hạn.**
 - **Cập nhật ReportingService để tạo báo cáo kế hoạch tiền mặt kết hợp giao dịch thực tế và dự kiến.**
-- **Thiết kế và triển khai giao diện người dùng cho việc quản lý mẫu giao dịch định kỳ.**
+- **Triển khai trang quản lý Expected Transactions để xem, xác nhận, hủy, điều chỉnh giao dịch dự kiến.**
+- **Tích hợp Expected Transactions vào Transaction page để hiển thị giao dịch dự kiến cùng với giao dịch thực tế.**
 - Bổ sung user stories, acceptance criteria chi tiết cho từng chức năng còn lại.
 - Hoàn thiện mockup, wireframe UI/UX.
 - Xác định giải pháp frontend cụ thể.
@@ -33,8 +46,11 @@
 ## Trạng thái hiện tại
 - Dự án đã có nền tảng tài liệu nghiệp vụ, kiến trúc, kỹ thuật vững chắc.
 - **Core Finance bounded context đã có đầy đủ chức năng cơ bản: Account, Transaction, RecurringTransactionTemplate, ExpectedTransaction.**
-- **Tính năng Recurring Transactions đã sẵn sàng cho việc tích hợp với các services khác và triển khai API layer, bao gồm cấu hình DI và validation.**
-- Sẵn sàng chuyển sang giai đoạn triển khai API Controllers và tích hợp với background job system.
+- **Tính năng Recurring Transactions đã hoàn thành đầy đủ: Backend services, API Controllers, Background Job, Frontend UI.**
+- **Background Job Service đang chạy tự động hàng ngày để sinh giao dịch dự kiến từ các mẫu định kỳ active.**
+- **Frontend có trang quản lý Recurring Transactions hoàn chỉnh với CRUD operations, filtering, và modal interface.**
+- **Money Management bounded context đã bắt đầu triển khai với BudgetService hoàn chỉnh, cần tiếp tục với JarService và SharedExpenseService.**
+- Sẵn sàng chuyển sang giai đoạn triển khai Expected Transactions management và tích hợp với Notification/Reporting services.
 - **Pattern tổ chức unit test đã được chuẩn hóa và áp dụng thành công, có thể replicate cho các services khác.**
 
 ## Vấn đề đã biết
@@ -44,10 +60,12 @@
 - **Cần triển khai background job để tự động sinh giao dịch dự kiến theo lịch trình.**
 - **Cần thiết kế cơ chế notification cho giao dịch định kỳ sắp đến hạn.**
 - **Cần tích hợp dữ liệu giao dịch dự kiến vào báo cáo tài chính.**
+- **Money Management cần hoàn thiện Infrastructure Layer và API Controllers.**
 
 ## Tiến hóa quyết định
 - Ưu tiên triển khai core service trước, import statement manual upload, test coverage >80%.
 - Mọi thay đổi lớn đều phải cập nhật vào Memory Bank và BA Design.
 - **Quyết định triển khai tính năng Recurring Transactions trong Core Finance thay vì Planning & Investment để tận dụng cơ sở hạ tầng sẵn có.**
 - **Áp dụng pattern partial class cho unit test organization đã chứng minh hiệu quả, sẽ tiếp tục sử dụng cho các services khác.**
-- **Thiết kế ExpectedTransaction với lifecycle management đầy đủ (Pending/Confirmed/Cancelled/Completed) để hỗ trợ các use case phức tạp.** 
+- **Thiết kế ExpectedTransaction với lifecycle management đầy đủ (Pending/Confirmed/Cancelled/Completed) để hỗ trợ các use case phức tạp.**
+- **Triển khai Money Management theo từng service một, bắt đầu với BudgetService để tạo foundation cho các services khác.** 

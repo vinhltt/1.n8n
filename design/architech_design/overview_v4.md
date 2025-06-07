@@ -15,7 +15,7 @@ Hệ thống PFM được thiết kế theo kiến trúc microservices, với c�
 ### 2.2 Core Finance
 - **AccountService**: Quản lý tài khoản
 - **TransactionService**: Xử lý giao dịch
-- **StatementService**: Quản lý sao kê và import dữ liệu
+- **StatementService**: Quản lý sao kê và import từ danh sách giao dịch
 - **Database**: db_finance (PostgreSQL)
 
 ### 2.3 Money Management
@@ -28,13 +28,13 @@ Hệ thống PFM được thiết kế theo kiến trúc microservices, với c�
 - **DebtService**: Quản lý khoản nợ
 - **GoalService**: Quản lý mục tiêu tài chính
 - **InvestmentService**: Quản lý đầu tư
-- **RecurringTransactionService**: Quản lý giao dịch định kỳ
 - **Database**: db_planning (PostgreSQL)
 
 ### 2.5 Reporting & Integration
 - **ReportingService**: Tạo báo cáo và phân tích
 - **NotificationService**: Gửi thông báo
 - **IntegrationService**: Kết nối với các dịch vụ bên ngoài
+- **StatementParserService**: Phân tích và trích xuất dữ liệu từ file sao kê
 - **Database**: db_reporting (PostgreSQL)
 
 ## 3. Kiến trúc giao tiếp
@@ -60,14 +60,15 @@ flowchart LR
 
 ## 4. Xử lý dữ liệu
 
-### 4.1 Import Statement Flow
+### 4.1 Import Statement Flow (Updated)
 ```mermaid
 flowchart LR
-    Client -->|Upload| StatementService
-    StatementService -->|Save File| MinIO
+    Client -->|Upload File| StatementParserService
+    StatementParserService -->|Save File| MinIO
+    StatementParserService -->|Parse & Extract| TransactionList
+    StatementParserService -->|Send List| StatementService
+    StatementService -->|Validate & Process| TransactionList
     StatementService -->|Publish| RabbitMQ
-    RabbitMQ -->|Process| StatementProcessor
-    StatementProcessor -->|Publish| RabbitMQ
     RabbitMQ -->|Save| TransactionService
 ```
 
@@ -143,6 +144,7 @@ flowchart LR
 - Advanced Reporting
 - External Integrations
 - AI/ML Features
+- Statement Parser
 
 ## 9. Best Practices
 
