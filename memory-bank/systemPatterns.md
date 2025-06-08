@@ -34,8 +34,15 @@
   - Money Management: BudgetService, JarService, SharedExpenseService
   - Planning & Investment: DebtService, GoalService, InvestmentService
   - Reporting & Integration: ReportingService, NotificationService, IntegrationService
+  - **ExcelApi: Excel processing services (đã di chuyển vào src/BE/ExcelApi)**
 - Mỗi service gắn với database riêng, không chia sẻ schema.
 - File storage (MinIO) dùng cho import/export statement.
+
+**Backend Organization:**
+- **Tất cả backend services** được tổ chức trong `src/BE/` folder
+- **ExcelApi** đã được di chuyển từ `src/ExcelApi/` vào `src/BE/ExcelApi/` để thống nhất cấu trúc
+- **PFM.sln** trong `src/BE/` quản lý tất cả backend projects
+- **Docker configuration** đã được cập nhật để phù hợp với cấu trúc mới
 
 **Core Finance Services:**
 - **RecurringTransactionTemplateService:**
