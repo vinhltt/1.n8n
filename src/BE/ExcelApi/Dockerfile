@@ -8,16 +8,16 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy project files first for better layer caching
-COPY ["ExcelApi/ExcelApi.csproj", "ExcelApi/"]
+COPY ["BE/ExcelApi/ExcelApi.csproj", "BE/ExcelApi/"]
 
 # Restore dependencies
-RUN dotnet restore "ExcelApi/ExcelApi.csproj"
+RUN dotnet restore "BE/ExcelApi/ExcelApi.csproj"
 
 # Copy all source files
 COPY . .
 
 # Build the application
-WORKDIR "/src/ExcelApi"
+WORKDIR "/src/BE/ExcelApi"
 RUN dotnet build "ExcelApi.csproj" -c Release -o /app/build
 
 # Publish stage
