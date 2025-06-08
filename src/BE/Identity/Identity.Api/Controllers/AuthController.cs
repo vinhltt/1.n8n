@@ -24,9 +24,6 @@ namespace Identity.Api.Controllers;
 [Route("api/[controller]")]
 public class AuthController(IAuthService authService, IUserService userService) : ControllerBase
 {
-    private readonly IAuthService _authService = authService;
-    private readonly IUserService _userService = userService;
-
     /// <summary>
     /// Traditional login with username/email and password
     /// </summary>
@@ -35,7 +32,7 @@ public class AuthController(IAuthService authService, IUserService userService) 
     {
         try
         {
-            var response = await _authService.LoginAsync(request);
+            var response = await authService.LoginAsync(request);
             return Ok(response);
         }
         catch (UnauthorizedAccessException ex)
@@ -55,7 +52,7 @@ public class AuthController(IAuthService authService, IUserService userService) 
     {
         try
         {
-            var user = await _userService.CreateAsync(request);
+            var user = await userService.CreateAsync(request);
             return Ok(new ApiResponse<UserResponse>
             {
                 Success = true,
@@ -89,7 +86,7 @@ public class AuthController(IAuthService authService, IUserService userService) 
     {
         try
         {
-            var response = await _authService.GoogleLoginAsync(request);
+            var response = await authService.GoogleLoginAsync(request);
             return Ok(response);
         }
         catch (UnauthorizedAccessException ex)
@@ -110,7 +107,7 @@ public class AuthController(IAuthService authService, IUserService userService) 
     {
         try
         {
-            var response = await _authService.RefreshTokenAsync(request);
+            var response = await authService.RefreshTokenAsync(request);
             return Ok(response);
         }
         catch (UnauthorizedAccessException ex)
@@ -132,7 +129,7 @@ public class AuthController(IAuthService authService, IUserService userService) 
     {
         try
         {
-            await _authService.LogoutAsync(request);
+            await authService.LogoutAsync(request);
             return Ok(new { message = "Logged out successfully" });
         }
         catch (Exception ex)
@@ -149,7 +146,7 @@ public class AuthController(IAuthService authService, IUserService userService) 
     {
         try
         {
-            var response = await _authService.VerifyApiKeyAsync(apiKey);
+            var response = await authService.VerifyApiKeyAsync(apiKey);
             return Ok(response);
         }
         catch (Exception ex)

@@ -28,28 +28,24 @@ public class ApiKeyService(
     IUserRepository userRepository,
     IApiKeyHasher apiKeyHasher) : IApiKeyService
 {
-    private readonly IApiKeyRepository _apiKeyRepository = apiKeyRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-    private readonly IApiKeyHasher _apiKeyHasher = apiKeyHasher;
-
     public async Task<ApiKeyResponse> CreateApiKeyAsync(Guid userId, CreateApiKeyRequest request, CancellationToken cancellationToken = default)
     {
         // Verify user exists
-        var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
+        var user = await userRepository.GetByIdAsync(userId, cancellationToken);
         if (user == null)
         {
             throw new KeyNotFoundException($"User with ID {userId} not found");
         }
 
         // Check user's API key limit
-        var userApiKeys = await _apiKeyRepository.GetByUserIdAsync(userId, cancellationToken);
+        var userApiKeys = await apiKeyRepository.GetByUserIdAsync(userId, cancellationToken);
         const int maxKeysPerUser = 10; // This should come from configuration
         if (userApiKeys.Count() >= maxKeysPerUser)
         {
             throw new InvalidOperationException($"User has reached the maximum limit of {maxKeysPerUser} API keys");
         }        // Generate new API key
         var rawApiKey = GenerateApiKey();
-        var hashedKey = _apiKeyHasher.HashApiKey(rawApiKey);
+        var hashedKey = apiKeyHasher.HashApiKey(rawApiKey);
         
         var apiKey = new ApiKey
         {
@@ -64,7 +60,7 @@ public class ApiKeyService(
             UpdatedAt = DateTime.UtcNow
         };
 
-        await _apiKeyRepository.AddAsync(apiKey, cancellationToken);
+        await apiKeyRepository.AddAsync(apiKey, cancellationToken);
 
         var response = MapToApiKeyResponse(apiKey);
         response.RawKey = rawApiKey; // Only return raw key during creation
@@ -73,7 +69,7 @@ public class ApiKeyService(
 
     public async Task<ApiKeyResponse> GetApiKeyByIdAsync(Guid apiKeyId, CancellationToken cancellationToken = default)
     {
-        var apiKey = await _apiKeyRepository.GetByIdAsync(apiKeyId, cancellationToken);
+        var apiKey = await apiKeyRepository.GetByIdAsync(apiKeyId, cancellationToken);
         if (apiKey == null)
         {
             throw new KeyNotFoundException($"API key with ID {apiKeyId} not found");
@@ -84,13 +80,13 @@ public class ApiKeyService(
 
     public async Task<IEnumerable<ApiKeyResponse>> GetUserApiKeysAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        var apiKeys = await _apiKeyRepository.GetByUserIdAsync(userId, cancellationToken);
+        var apiKeys = await apiKeyRepository.GetByUserIdAsync(userId, cancellationToken);
         return apiKeys.Select(MapToApiKeyResponse);
     }
 
     public async Task<ApiKeyResponse> UpdateApiKeyAsync(Guid apiKeyId, UpdateApiKeyRequest request, CancellationToken cancellationToken = default)
     {
-        var apiKey = await _apiKeyRepository.GetByIdAsync(apiKeyId, cancellationToken);
+        var apiKey = await apiKeyRepository.GetByIdAsync(apiKeyId, cancellationToken);
         if (apiKey == null)
         {
             throw new KeyNotFoundException($"API key with ID {apiKeyId} not found");
@@ -107,14 +103,14 @@ public class ApiKeyService(
             apiKey.ExpiresAt = request.ExpiresAt;
 
         apiKey.UpdatedAt = DateTime.UtcNow;
-        await _apiKeyRepository.UpdateAsync(apiKey, cancellationToken);
+        await apiKeyRepository.UpdateAsync(apiKey, cancellationToken);
 
         return MapToApiKeyResponse(apiKey);
     }
 
     public async Task RevokeApiKeyAsync(Guid apiKeyId, CancellationToken cancellationToken = default)
     {
-        var apiKey = await _apiKeyRepository.GetByIdAsync(apiKeyId, cancellationToken);
+        var apiKey = await apiKeyRepository.GetByIdAsync(apiKeyId, cancellationToken);
         if (apiKey == null)
         {
             throw new KeyNotFoundException($"API key with ID {apiKeyId} not found");
@@ -122,24 +118,24 @@ public class ApiKeyService(
 
         apiKey.Status = ApiKeyStatus.Revoked;
         apiKey.UpdatedAt = DateTime.UtcNow;
-        await _apiKeyRepository.UpdateAsync(apiKey, cancellationToken);
+        await apiKeyRepository.UpdateAsync(apiKey, cancellationToken);
     }
 
     public async Task DeleteApiKeyAsync(Guid apiKeyId, CancellationToken cancellationToken = default)
     {
-        var apiKey = await _apiKeyRepository.GetByIdAsync(apiKeyId, cancellationToken);
+        var apiKey = await apiKeyRepository.GetByIdAsync(apiKeyId, cancellationToken);
         if (apiKey == null)
         {
             throw new KeyNotFoundException($"API key with ID {apiKeyId} not found");
         }
 
-        await _apiKeyRepository.DeleteAsync(apiKeyId, cancellationToken);
+        await apiKeyRepository.DeleteAsync(apiKeyId, cancellationToken);
     }
 
     public async Task<VerifyApiKeyResponse> VerifyApiKeyAsync(string apiKey, CancellationToken cancellationToken = default)
     {
-        var hashedKey = _apiKeyHasher.HashApiKey(apiKey);
-        var apiKeyEntity = await _apiKeyRepository.GetActiveKeyByHashAsync(hashedKey, cancellationToken);
+        var hashedKey = apiKeyHasher.HashApiKey(apiKey);
+        var apiKeyEntity = await apiKeyRepository.GetActiveKeyByHashAsync(hashedKey, cancellationToken);
 
         if (apiKeyEntity == null)
         {
@@ -177,11 +173,11 @@ public class ApiKeyService(
         }
 
         // Update usage
-        await _apiKeyRepository.UpdateLastUsedAsync(apiKeyEntity.Id, DateTime.UtcNow, cancellationToken);
-        await _apiKeyRepository.IncrementUsageCountAsync(apiKeyEntity.Id, cancellationToken);
+        await apiKeyRepository.UpdateLastUsedAsync(apiKeyEntity.Id, DateTime.UtcNow, cancellationToken);
+        await apiKeyRepository.IncrementUsageCountAsync(apiKeyEntity.Id, cancellationToken);
 
         // Verify user is still active
-        var user = await _userRepository.GetByIdAsync(apiKeyEntity.UserId, cancellationToken);
+        var user = await userRepository.GetByIdAsync(apiKeyEntity.UserId, cancellationToken);
         if (user == null || !user.IsActive)
         {
             return new VerifyApiKeyResponse

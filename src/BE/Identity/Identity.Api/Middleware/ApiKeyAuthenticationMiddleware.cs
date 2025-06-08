@@ -3,15 +3,9 @@ using System.Security.Claims;
 
 namespace Identity.Api.Middleware;
 
-public class ApiKeyAuthenticationMiddleware
+public class ApiKeyAuthenticationMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate _next;
     private const string ApiKeyHeaderName = "X-API-Key";
-
-    public ApiKeyAuthenticationMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
 
     public async Task InvokeAsync(HttpContext context, IApiKeyService apiKeyService)
     {
@@ -42,6 +36,6 @@ public class ApiKeyAuthenticationMiddleware
             }
         }
 
-        await _next(context);
+        await next(context);
     }
 }

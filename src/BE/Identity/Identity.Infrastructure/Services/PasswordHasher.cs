@@ -4,12 +4,7 @@ namespace Identity.Infrastructure.Services;
 
 public class PasswordHasher : IPasswordHasher
 {
-    private readonly int _workFactor;
-
-    public PasswordHasher()
-    {
-        _workFactor = 12; // BCrypt work factor
-    }
+    private readonly int _workFactor = 12; // BCrypt work factor
 
     public string HashPassword(string password)
     {

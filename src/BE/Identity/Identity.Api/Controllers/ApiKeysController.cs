@@ -20,7 +20,6 @@ namespace Identity.Api.Controllers;
 [Authorize]
 public class ApiKeysController(IApiKeyService apiKeyService) : ControllerBase
 {
-    private readonly IApiKeyService _apiKeyService = apiKeyService;
     private const string AdminRole = "Admin";
     private const string ApiKeyNotFoundMessage = "API key not found";
 
@@ -31,7 +30,7 @@ public class ApiKeysController(IApiKeyService apiKeyService) : ControllerBase
     public async Task<ActionResult<ApiResponse<List<ApiKeyResponse>>>> GetMyApiKeys()
     {
         var userId = GetCurrentUserId();
-        var apiKeys = await _apiKeyService.GetUserApiKeysAsync(userId);
+        var apiKeys = await apiKeyService.GetUserApiKeysAsync(userId);
         
         return Ok(new ApiResponse<List<ApiKeyResponse>>
         {
@@ -48,7 +47,7 @@ public class ApiKeysController(IApiKeyService apiKeyService) : ControllerBase
     public async Task<ActionResult<ApiResponse<ApiKeyResponse>>> GetApiKey(Guid id)
     {
         var userId = GetCurrentUserId();
-        var apiKey = await _apiKeyService.GetApiKeyByIdAsync(id);
+        var apiKey = await apiKeyService.GetApiKeyByIdAsync(id);
         
         if (apiKey == null)
         {
@@ -79,7 +78,7 @@ public class ApiKeysController(IApiKeyService apiKeyService) : ControllerBase
         [FromBody] CreateApiKeyRequest request)
     {
         var userId = GetCurrentUserId();
-        var result = await _apiKeyService.CreateApiKeyAsync(userId, request);
+        var result = await apiKeyService.CreateApiKeyAsync(userId, request);
         
         return CreatedAtAction(
             nameof(GetApiKey),
@@ -102,7 +101,7 @@ public class ApiKeysController(IApiKeyService apiKeyService) : ControllerBase
     {        var userId = GetCurrentUserId();
         
         // Verify ownership
-        var existingApiKey = await _apiKeyService.GetApiKeyByIdAsync(id);
+        var existingApiKey = await apiKeyService.GetApiKeyByIdAsync(id);
         if (existingApiKey == null)
         {
             return NotFound(new ApiResponse<ApiKeyResponse>
@@ -117,7 +116,7 @@ public class ApiKeysController(IApiKeyService apiKeyService) : ControllerBase
             return Forbid();
         }
 
-        var apiKey = await _apiKeyService.UpdateApiKeyAsync(id, request);
+        var apiKey = await apiKeyService.UpdateApiKeyAsync(id, request);
         
         return Ok(new ApiResponse<ApiKeyResponse>
         {
@@ -134,7 +133,7 @@ public class ApiKeysController(IApiKeyService apiKeyService) : ControllerBase
         var userId = GetCurrentUserId();
         
         // Verify ownership
-        var existingApiKey = await _apiKeyService.GetApiKeyByIdAsync(id);
+        var existingApiKey = await apiKeyService.GetApiKeyByIdAsync(id);
         if (existingApiKey == null)
         {
             return NotFound(new ApiResponse<object>
@@ -149,7 +148,7 @@ public class ApiKeysController(IApiKeyService apiKeyService) : ControllerBase
             return Forbid();
         }
 
-        await _apiKeyService.RevokeApiKeyAsync(id);
+        await apiKeyService.RevokeApiKeyAsync(id);
         
         return Ok(new ApiResponse<object>
         {
@@ -165,7 +164,7 @@ public class ApiKeysController(IApiKeyService apiKeyService) : ControllerBase
         var userId = GetCurrentUserId();
         
         // Verify ownership
-        var existingApiKey = await _apiKeyService.GetApiKeyByIdAsync(id);
+        var existingApiKey = await apiKeyService.GetApiKeyByIdAsync(id);
         if (existingApiKey == null)
         {
             return NotFound(new ApiResponse<object>
@@ -180,7 +179,7 @@ public class ApiKeysController(IApiKeyService apiKeyService) : ControllerBase
             return Forbid();
         }
 
-        await _apiKeyService.DeleteApiKeyAsync(id);
+        await apiKeyService.DeleteApiKeyAsync(id);
         
         return Ok(new ApiResponse<object>
         {
@@ -200,7 +199,7 @@ public class ApiKeysController(IApiKeyService apiKeyService) : ControllerBase
         // For admin, we'd need a different service method that gets all users' API keys
         // For now, let's just return the current user's API keys
         var userId = GetCurrentUserId();
-        var apiKeys = await _apiKeyService.GetUserApiKeysAsync(userId);
+        var apiKeys = await apiKeyService.GetUserApiKeysAsync(userId);
         
         return Ok(new ApiResponse<IEnumerable<ApiKeyResponse>>
         {
@@ -217,7 +216,7 @@ public class ApiKeysController(IApiKeyService apiKeyService) : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<ApiResponse<VerifyApiKeyResponse>>> VerifyApiKey(string key)
     {
-        var result = await _apiKeyService.VerifyApiKeyAsync(key);
+        var result = await apiKeyService.VerifyApiKeyAsync(key);
         
         if (result == null)
         {

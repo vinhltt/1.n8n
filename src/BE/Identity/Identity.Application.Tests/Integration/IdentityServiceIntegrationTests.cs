@@ -3,7 +3,6 @@ using Identity.Contracts.Users;
 using Identity.Domain.Entities;
 using Identity.Domain.Repositories;
 using Identity.Application.Common.Interfaces;
-using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Identity.Application.Tests.Integration;
@@ -18,11 +17,13 @@ public class IdentityServiceIntegrationTests
         // Arrange
         var mockUserRepository = new Mock<IUserRepository>();
         var mockPasswordHasher = new Mock<IPasswordHasher>();
+        var mockRoleRepository = new Mock<IRoleRepository>();
 
         // Act & Assert - This should not throw any exceptions
         var userService = new UserService(
             mockUserRepository.Object,
-            mockPasswordHasher.Object);
+            mockPasswordHasher.Object,
+            mockRoleRepository.Object);
         
         Assert.NotNull(userService);
     }    [Fact]
@@ -31,6 +32,7 @@ public class IdentityServiceIntegrationTests
         // Arrange
         var mockUserRepository = new Mock<IUserRepository>();
         var mockPasswordHasher = new Mock<IPasswordHasher>();
+        var mockRoleRepository = new Mock<IRoleRepository>();
 
         var createRequest = new CreateUserRequest(
             Email: "test@example.com",
@@ -56,7 +58,8 @@ public class IdentityServiceIntegrationTests
 
         var userService = new UserService(
             mockUserRepository.Object,
-            mockPasswordHasher.Object);
+            mockPasswordHasher.Object,
+            mockRoleRepository.Object);
 
         // Act
         var result = await userService.CreateAsync(createRequest);
@@ -93,17 +96,19 @@ public class IdentityServiceIntegrationTests
         // Setup mock to return that email already exists
         mockUserRepository.Setup(x => x.IsEmailExistsAsync(createRequest.Email, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
+        var mockRoleRepository = new Mock<IRoleRepository>();
 
         var userService = new UserService(
             mockUserRepository.Object,
-            mockPasswordHasher.Object);
+            mockPasswordHasher.Object,
+            mockRoleRepository.Object);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => userService.CreateAsync(createRequest));
-        
+
         Assert.Equal("Email is already taken", exception.Message);
-        
+
         // Verify that AddAsync was never called since user already exists
         mockUserRepository.Verify(x => x.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
     }

@@ -20,8 +20,6 @@ namespace Identity.Api.Controllers;
 [Authorize]
 public class UsersController(IUserService userService) : ControllerBase
 {
-    private readonly IUserService _userService = userService;
-
     /// <summary>
     /// Get current user profile
     /// </summary>
@@ -29,7 +27,7 @@ public class UsersController(IUserService userService) : ControllerBase
     public async Task<ActionResult<ApiResponse<UserResponse>>> GetCurrentUser()
     {
         var userId = GetCurrentUserId();
-        var user = await _userService.GetByIdAsync(userId);
+        var user = await userService.GetByIdAsync(userId);
         
         if (user == null)
         {
@@ -56,7 +54,7 @@ public class UsersController(IUserService userService) : ControllerBase
         [FromBody] UpdateUserRequest request)
     {
         var userId = GetCurrentUserId();
-        var user = await _userService.UpdateAsync(userId, request);
+        var user = await userService.UpdateAsync(userId, request);
         
         return Ok(new ApiResponse<UserResponse>
         {
@@ -74,7 +72,7 @@ public class UsersController(IUserService userService) : ControllerBase
         [FromBody] ChangePasswordRequest request)
     {
         var userId = GetCurrentUserId();
-        await _userService.ChangePasswordAsync(userId, request);
+        await userService.ChangePasswordAsync(userId, request);
         
         return Ok(new ApiResponse<object>
         {
@@ -90,7 +88,7 @@ public class UsersController(IUserService userService) : ControllerBase
     public async Task<ActionResult<ApiResponse<object>>> DeleteCurrentUser()
     {
         var userId = GetCurrentUserId();
-        await _userService.DeleteAsync(userId);
+        await userService.DeleteAsync(userId);
         
         return Ok(new ApiResponse<object>
         {
@@ -109,7 +107,7 @@ public class UsersController(IUserService userService) : ControllerBase
         [FromQuery] int pageSize = 10,
         [FromQuery] string? search = null)
     {
-        var users = await _userService.GetPagedAsync(page, pageSize, search);
+        var users = await userService.GetPagedAsync(page, pageSize, search);
         
         return Ok(new ApiResponse<PagedResponse<UserResponse>>
         {
@@ -126,7 +124,7 @@ public class UsersController(IUserService userService) : ControllerBase
     [Authorize(Policy = "RequireAdmin")]
     public async Task<ActionResult<ApiResponse<UserResponse>>> GetUser(Guid id)
     {
-        var user = await _userService.GetByIdAsync(id);
+        var user = await userService.GetByIdAsync(id);
         
         if (user == null)
         {
@@ -154,7 +152,7 @@ public class UsersController(IUserService userService) : ControllerBase
         Guid id,
         [FromBody] UpdateUserRequest request)
     {
-        var user = await _userService.UpdateAsync(id, request);
+        var user = await userService.UpdateAsync(id, request);
         
         return Ok(new ApiResponse<UserResponse>
         {
@@ -171,7 +169,7 @@ public class UsersController(IUserService userService) : ControllerBase
     [Authorize(Policy = "RequireAdmin")]
     public async Task<ActionResult<ApiResponse<object>>> DeleteUser(Guid id)
     {
-        await _userService.DeleteAsync(id);
+        await userService.DeleteAsync(id);
         
         return Ok(new ApiResponse<object>
         {

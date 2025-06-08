@@ -9,26 +9,17 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Identity.Infrastructure.Services;
 
-public class JwtTokenService : IJwtTokenService
+public class JwtTokenService(IConfiguration configuration) : IJwtTokenService
 {
-    private readonly IConfiguration _configuration;
-    private readonly string _secretKey;
-    private readonly string _issuer;
-    private readonly string _audience;
-
-    public JwtTokenService(IConfiguration configuration)
-    {
-        _configuration = configuration;
-        _secretKey = configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT secret key not configured");
-        _issuer = configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT issuer not configured");
-        _audience = configuration["Jwt:Audience"] ?? throw new InvalidOperationException("JWT audience not configured");
-    }
+    private readonly string _secretKey = configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT secret key not configured");
+    private readonly string _issuer = configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT issuer not configured");
+    private readonly string _audience = configuration["Jwt:Audience"] ?? throw new InvalidOperationException("JWT audience not configured");
 
     public TimeSpan AccessTokenLifetime => 
-        TimeSpan.FromMinutes(_configuration.GetValue<int>("Jwt:AccessTokenExpirationMinutes", 30));
+        TimeSpan.FromMinutes(configuration.GetValue<int>("Jwt:AccessTokenExpirationMinutes", 30));
 
     public TimeSpan RefreshTokenLifetime => 
-        TimeSpan.FromDays(_configuration.GetValue<int>("Jwt:RefreshTokenExpirationDays", 7));
+        TimeSpan.FromDays(configuration.GetValue<int>("Jwt:RefreshTokenExpirationDays", 7));
 
     public string GenerateAccessToken(UserProfile user)
     {

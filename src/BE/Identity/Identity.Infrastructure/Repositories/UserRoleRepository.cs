@@ -5,15 +5,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Infrastructure.Repositories;
 
-public class UserRoleRepository : BaseRepository<UserRole, Guid>, IUserRoleRepository
+public class UserRoleRepository(IdentityDbContext context)
+    : BaseRepository<UserRole, Guid>(context), IUserRoleRepository
 {
-    public UserRoleRepository(IdentityDbContext context) : base(context)
-    {
-    }
-
     public async Task<UserRole?> GetByUserAndRoleAsync(Guid userId, Guid roleId, CancellationToken cancellationToken = default)
     {
-        return await _context.UserRoles
+        return await Context.UserRoles
             .Include(ur => ur.User)
             .Include(ur => ur.Role)
             .FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == roleId, cancellationToken);
@@ -21,7 +18,7 @@ public class UserRoleRepository : BaseRepository<UserRole, Guid>, IUserRoleRepos
 
     public async Task<IEnumerable<UserRole>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        return await _context.UserRoles
+        return await Context.UserRoles
             .Include(ur => ur.Role)
             .Where(ur => ur.UserId == userId)
             .ToListAsync(cancellationToken);
@@ -29,7 +26,7 @@ public class UserRoleRepository : BaseRepository<UserRole, Guid>, IUserRoleRepos
 
     public async Task<IEnumerable<UserRole>> GetByRoleIdAsync(Guid roleId, CancellationToken cancellationToken = default)
     {
-        return await _context.UserRoles
+        return await Context.UserRoles
             .Include(ur => ur.User)
             .Where(ur => ur.RoleId == roleId)
             .ToListAsync(cancellationToken);
@@ -37,7 +34,7 @@ public class UserRoleRepository : BaseRepository<UserRole, Guid>, IUserRoleRepos
 
     public async Task<bool> ExistsAsync(Guid userId, Guid roleId, CancellationToken cancellationToken = default)
     {
-        return await _context.UserRoles
+        return await Context.UserRoles
             .AnyAsync(ur => ur.UserId == userId && ur.RoleId == roleId, cancellationToken);
     }
 
@@ -46,8 +43,8 @@ public class UserRoleRepository : BaseRepository<UserRole, Guid>, IUserRoleRepos
         var userRole = await GetByUserAndRoleAsync(userId, roleId, cancellationToken);
         if (userRole != null)
         {
-            _context.UserRoles.Remove(userRole);
-            await _context.SaveChangesAsync(cancellationToken);
+            Context.UserRoles.Remove(userRole);
+            await Context.SaveChangesAsync(cancellationToken);
         }
     }
 }

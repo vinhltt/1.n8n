@@ -46,19 +46,11 @@ public class AuthService(
     IApiKeyRepository apiKeyRepository,
     IApiKeyHasher apiKeyHasher) : IAuthService
 {
-    private readonly IUserRepository _userRepository = userRepository;
-    private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
-    private readonly IPasswordHasher _passwordHasher = passwordHasher;
-    private readonly IJwtTokenService _jwtTokenService = jwtTokenService;
-    private readonly IGoogleAuthService _googleAuthService = googleAuthService;
-    private readonly IApiKeyRepository _apiKeyRepository = apiKeyRepository;
-    private readonly IApiKeyHasher _apiKeyHasher = apiKeyHasher;
-
     public async Task<LoginResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
     {
-        var user = await _userRepository.GetByUsernameOrEmailAsync(request.UsernameOrEmail, cancellationToken);
+        var user = await userRepository.GetByUsernameOrEmailAsync(request.UsernameOrEmail, cancellationToken);
         
-        if (user == null || !_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
+        if (user == null || !passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
         {
             throw new UnauthorizedAccessException("Invalid credentials");
         }
@@ -69,28 +61,28 @@ public class AuthService(
         }
 
         // Update last login
-        await _userRepository.UpdateLastLoginAsync(user.Id, DateTime.UtcNow, cancellationToken);
+        await userRepository.UpdateLastLoginAsync(user.Id, DateTime.UtcNow, cancellationToken);
 
         return await GenerateLoginResponseAsync(user, cancellationToken);
     }
 
     public async Task<LoginResponse> GoogleLoginAsync(GoogleLoginRequest request, CancellationToken cancellationToken = default)
     {
-        var googleUser = await _googleAuthService.VerifyGoogleTokenAsync(request.IdToken);
+        var googleUser = await googleAuthService.VerifyGoogleTokenAsync(request.IdToken);
 
-        var user = await _userRepository.GetByGoogleIdAsync(googleUser.GoogleId, cancellationToken);
+        var user = await userRepository.GetByGoogleIdAsync(googleUser.GoogleId, cancellationToken);
         
         if (user == null)
         {
             // Check if user exists with same email
-            user = await _userRepository.GetByEmailAsync(googleUser.Email, cancellationToken);
-            
-            if (user != null)
+            user = await userRepository.GetByEmailAsync(googleUser.Email, cancellationToken);
+              if (user != null)
             {
                 // Link Google account to existing user
                 user.GoogleId = googleUser.GoogleId;
                 user.AvatarUrl = googleUser.AvatarUrl;
-                await _userRepository.UpdateAsync(user, cancellationToken);
+                user.EmailConfirmed = googleUser.IsEmailVerified; // Set based on Google verification
+                await userRepository.UpdateAsync(user, cancellationToken);
             }
             else
             {
@@ -104,10 +96,13 @@ public class AuthService(
                     AvatarUrl = googleUser.AvatarUrl,
                     GoogleId = googleUser.GoogleId,
                     IsActive = true,
-                    PasswordHash = string.Empty // Google users don't have password
+                    EmailConfirmed = googleUser.IsEmailVerified, // Google users have verified emails
+                    PasswordHash = string.Empty, // Google users don't have password
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
                 };
                 
-                await _userRepository.AddAsync(user, cancellationToken);
+                await userRepository.AddAsync(user, cancellationToken);
             }
         }
 
@@ -117,59 +112,59 @@ public class AuthService(
         }
 
         // Update last login
-        await _userRepository.UpdateLastLoginAsync(user.Id, DateTime.UtcNow, cancellationToken);
+        await userRepository.UpdateLastLoginAsync(user.Id, DateTime.UtcNow, cancellationToken);
 
         return await GenerateLoginResponseAsync(user, cancellationToken);
     }
 
     public async Task<RefreshTokenResponse> RefreshTokenAsync(RefreshTokenRequest request, CancellationToken cancellationToken = default)
     {
-        var refreshToken = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
+        var refreshToken = await refreshTokenRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
         
         if (refreshToken == null || refreshToken.IsRevoked || refreshToken.ExpiresAt <= DateTime.UtcNow)
         {
             throw new UnauthorizedAccessException("Invalid or expired refresh token");
         }
 
-        var user = await _userRepository.GetByIdAsync(refreshToken.UserId, cancellationToken);
+        var user = await userRepository.GetByIdAsync(refreshToken.UserId, cancellationToken);
         if (user == null || !user.IsActive)
         {
             throw new UnauthorizedAccessException("User not found or disabled");
         }
 
         // Revoke old refresh token
-        await _refreshTokenRepository.RevokeTokenAsync(request.RefreshToken, "system", cancellationToken);
+        await refreshTokenRepository.RevokeTokenAsync(request.RefreshToken, "system", cancellationToken);
 
         // Generate new tokens
         var userProfile = new UserProfile(user.Id, user.Email, user.Username, user.FullName, user.AvatarUrl, []);
-        var newAccessToken = _jwtTokenService.GenerateAccessToken(userProfile);
-        var newRefreshToken = _jwtTokenService.GenerateRefreshToken();
+        var newAccessToken = jwtTokenService.GenerateAccessToken(userProfile);
+        var newRefreshToken = jwtTokenService.GenerateRefreshToken();
 
         // Store new refresh token
         var refreshTokenEntity = new RefreshToken
         {
             UserId = user.Id,
             Token = newRefreshToken,
-            ExpiresAt = DateTime.UtcNow.Add(_jwtTokenService.RefreshTokenLifetime)
+            ExpiresAt = DateTime.UtcNow.Add(jwtTokenService.RefreshTokenLifetime)
         };
         
-        await _refreshTokenRepository.AddAsync(refreshTokenEntity, cancellationToken);
+        await refreshTokenRepository.AddAsync(refreshTokenEntity, cancellationToken);
 
         return new RefreshTokenResponse(
             newAccessToken,
             newRefreshToken,
-            DateTime.UtcNow.Add(_jwtTokenService.AccessTokenLifetime));
+            DateTime.UtcNow.Add(jwtTokenService.AccessTokenLifetime));
     }
 
     public async Task LogoutAsync(LogoutRequest request, CancellationToken cancellationToken = default)
     {
-        await _refreshTokenRepository.RevokeTokenAsync(request.RefreshToken, "user", cancellationToken);
+        await refreshTokenRepository.RevokeTokenAsync(request.RefreshToken, "user", cancellationToken);
     }
 
     public async Task<ApiKeyVerificationResponse> VerifyApiKeyAsync(string apiKey, CancellationToken cancellationToken = default)
     {
-        var hashedKey = _apiKeyHasher.HashApiKey(apiKey);
-        var apiKeyEntity = await _apiKeyRepository.GetActiveKeyByHashAsync(hashedKey, cancellationToken);
+        var hashedKey = apiKeyHasher.HashApiKey(apiKey);
+        var apiKeyEntity = await apiKeyRepository.GetActiveKeyByHashAsync(hashedKey, cancellationToken);
 
         if (apiKeyEntity == null)
         {
@@ -183,10 +178,10 @@ public class AuthService(
         }
 
         // Update usage
-        await _apiKeyRepository.UpdateLastUsedAsync(apiKeyEntity.Id, DateTime.UtcNow, cancellationToken);
-        await _apiKeyRepository.IncrementUsageCountAsync(apiKeyEntity.Id, cancellationToken);
+        await apiKeyRepository.UpdateLastUsedAsync(apiKeyEntity.Id, DateTime.UtcNow, cancellationToken);
+        await apiKeyRepository.IncrementUsageCountAsync(apiKeyEntity.Id, cancellationToken);
 
-        var user = await _userRepository.GetByIdAsync(apiKeyEntity.UserId, cancellationToken);
+        var user = await userRepository.GetByIdAsync(apiKeyEntity.UserId, cancellationToken);
         if (user == null || !user.IsActive)
         {
             return new ApiKeyVerificationResponse(false, null, [], null);
@@ -201,23 +196,23 @@ public class AuthService(
     {
         var userProfile = new UserProfile(user.Id, user.Email, user.Username, user.FullName, user.AvatarUrl, []);
         
-        var accessToken = _jwtTokenService.GenerateAccessToken(userProfile);
-        var refreshToken = _jwtTokenService.GenerateRefreshToken();
+        var accessToken = jwtTokenService.GenerateAccessToken(userProfile);
+        var refreshToken = jwtTokenService.GenerateRefreshToken();
 
         // Store refresh token
         var refreshTokenEntity = new RefreshToken
         {
             UserId = user.Id,
             Token = refreshToken,
-            ExpiresAt = DateTime.UtcNow.Add(_jwtTokenService.RefreshTokenLifetime)
+            ExpiresAt = DateTime.UtcNow.Add(jwtTokenService.RefreshTokenLifetime)
         };
         
-        await _refreshTokenRepository.AddAsync(refreshTokenEntity, cancellationToken);
+        await refreshTokenRepository.AddAsync(refreshTokenEntity, cancellationToken);
 
         return new LoginResponse(
             accessToken,
             refreshToken,
-            DateTime.UtcNow.Add(_jwtTokenService.AccessTokenLifetime),
+            DateTime.UtcNow.Add(jwtTokenService.AccessTokenLifetime),
             userProfile);
     }
 }

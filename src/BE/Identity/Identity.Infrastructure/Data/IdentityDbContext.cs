@@ -1,24 +1,26 @@
 using System.Text.Json;
 using Identity.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.EntityFrameworkCore.Models;
 
 namespace Identity.Infrastructure.Data;
 
-public class IdentityDbContext : DbContext
-{
-    public DbSet<User> Users { get; set; }
+public class IdentityDbContext(DbContextOptions<IdentityDbContext> options) : DbContext(options)
+{    public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<ApiKey> ApiKeys { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<OAuthClient> OAuthClients { get; set; }
 
-    public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
-    {
-    }
+    // OpenIddict entities
+    public DbSet<OpenIddictEntityFrameworkCoreApplication> Applications { get; set; }
+    public DbSet<OpenIddictEntityFrameworkCoreAuthorization> Authorizations { get; set; }
+    public DbSet<OpenIddictEntityFrameworkCoreScope> Scopes { get; set; }
+    public DbSet<OpenIddictEntityFrameworkCoreToken> Tokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        // User configuration
+    {        // User configuration
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -32,6 +34,7 @@ public class IdentityDbContext : DbContext
             entity.Property(e => e.GoogleId).HasMaxLength(100);
             entity.Property(e => e.AvatarUrl).HasMaxLength(500);
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
+            entity.Property(e => e.EmailConfirmed).IsRequired().HasDefaultValue(false);
 
             // Soft delete
             entity.HasQueryFilter(e => !e.IsDeleted);
@@ -94,9 +97,7 @@ public class IdentityDbContext : DbContext
 
             // Soft delete
             entity.HasQueryFilter(e => !e.IsDeleted);
-        });
-
-        // RefreshToken configuration
+        });        // RefreshToken configuration
         modelBuilder.Entity<RefreshToken>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -109,6 +110,25 @@ public class IdentityDbContext : DbContext
                   .WithMany(u => u.RefreshTokens)
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            // Soft delete
+            entity.HasQueryFilter(e => !e.IsDeleted);
+        });
+
+        // OAuthClient configuration
+        modelBuilder.Entity<OAuthClient>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.ClientId).IsUnique();
+            
+            entity.Property(e => e.ClientId).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Name).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.ClientSecretHash).HasMaxLength(255);
+            entity.Property(e => e.RedirectUris).HasMaxLength(2000).IsRequired();
+            entity.Property(e => e.PostLogoutRedirectUris).HasMaxLength(2000);
+            entity.Property(e => e.AllowedScopes).HasMaxLength(1000).IsRequired();
+            entity.Property(e => e.ApplicationUrl).HasMaxLength(500);
 
             // Soft delete
             entity.HasQueryFilter(e => !e.IsDeleted);
@@ -136,7 +156,71 @@ public class IdentityDbContext : DbContext
             }
         );
 
+        // Seed default OAuth clients
+        modelBuilder.Entity<OAuthClient>().HasData(
+            new OAuthClient
+            {
+                Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+                ClientId = "pfm-web-client",
+                Name = "PFM Web Application",
+                Description = "Nuxt.js web application client",
+                Type = OAuthClientType.Public,
+                Platform = ClientPlatform.Web,
+                RedirectUris = "http://localhost:3000/auth/callback,https://app.pfm.vn/auth/callback",
+                PostLogoutRedirectUris = "http://localhost:3000,https://app.pfm.vn",
+                AllowedScopes = "openid,profile,email,offline_access",
+                IsActive = true,
+                AccessTokenLifetime = 3600, // 1 hour
+                RefreshTokenLifetime = 2592000, // 30 days
+                AllowRefreshTokens = true,
+                RequirePkce = true,
+                ApplicationUrl = "https://app.pfm.vn",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new OAuthClient
+            {
+                Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
+                ClientId = "pfm-mobile-ios",
+                Name = "PFM iOS Application",
+                Description = "iOS mobile application client",
+                Type = OAuthClientType.Public,
+                Platform = ClientPlatform.IOs,
+                RedirectUris = "pfm://auth/callback,pfm-ios://auth/callback",
+                PostLogoutRedirectUris = "pfm://logout,pfm-ios://logout",
+                AllowedScopes = "openid,profile,email,offline_access",
+                IsActive = true,
+                AccessTokenLifetime = 3600, // 1 hour
+                RefreshTokenLifetime = 2592000, // 30 days
+                AllowRefreshTokens = true,
+                RequirePkce = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new OAuthClient
+            {
+                Id = Guid.Parse("55555555-5555-5555-5555-555555555555"),
+                ClientId = "pfm-mobile-android",
+                Name = "PFM Android Application",
+                Description = "Android mobile application client",
+                Type = OAuthClientType.Public,
+                Platform = ClientPlatform.Android,
+                RedirectUris = "pfm://auth/callback,pfm-android://auth/callback",
+                PostLogoutRedirectUris = "pfm://logout,pfm-android://logout",
+                AllowedScopes = "openid,profile,email,offline_access",
+                IsActive = true,
+                AccessTokenLifetime = 3600, // 1 hour
+                RefreshTokenLifetime = 2592000, // 30 days
+                AllowRefreshTokens = true,
+                RequirePkce = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }        );
+
         base.OnModelCreating(modelBuilder);
+        
+        // Configure OpenIddict entities
+        modelBuilder.UseOpenIddict();
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

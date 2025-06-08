@@ -49,6 +49,7 @@ public record UserResponse
     public string FullName { get; init; } = string.Empty;
     public string? AvatarUrl { get; init; }
     public bool IsActive { get; init; }
+    public bool EmailConfirmed { get; init; }
     public string? GoogleId { get; init; }
     public DateTime? LastLoginAt { get; init; }
     public DateTime CreatedAt { get; init; }

@@ -5,15 +5,10 @@ using Microsoft.Extensions.Configuration;
 
 namespace Identity.Infrastructure.Services;
 
-public class GoogleAuthService : IGoogleAuthService
+public class GoogleAuthService(IConfiguration configuration) : IGoogleAuthService
 {
-    private readonly string _googleClientId;
-
-    public GoogleAuthService(IConfiguration configuration)
-    {
-        _googleClientId = configuration["Google:ClientId"] ?? 
-                         throw new InvalidOperationException("Google Client ID not configured");
-    }
+    private readonly string _googleClientId = configuration["Google:ClientId"] ?? 
+                                              throw new InvalidOperationException("Google Client ID not configured");
 
     public async Task<GoogleUserInfo> VerifyGoogleTokenAsync(string idToken)
     {
@@ -22,7 +17,7 @@ public class GoogleAuthService : IGoogleAuthService
             var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, 
                 new GoogleJsonWebSignature.ValidationSettings
                 {
-                    Audience = new[] { _googleClientId }
+                    Audience = [_googleClientId]
                 });
 
             return new GoogleUserInfo(

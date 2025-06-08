@@ -8,6 +8,7 @@ public class User : BaseEntity<Guid>
     public string FullName { get; set; } = string.Empty;
     public string? AvatarUrl { get; set; }
     public bool IsActive { get; set; } = true;
+    public bool EmailConfirmed { get; set; } = false;
     public string? GoogleId { get; set; }
     public DateTime? LastLoginAt { get; set; }
     

@@ -19,15 +19,13 @@ namespace Identity.Api.Controllers;
 [Authorize(Policy = "RequireAdmin")]
 public class RolesController(IRoleService roleService) : ControllerBase
 {
-    private readonly IRoleService _roleService = roleService;
-
     /// <summary>
     /// Get all roles
     /// </summary>
     [HttpGet]
     public async Task<ActionResult<ApiResponse<List<RoleResponse>>>> GetRoles()
     {
-        var roles = await _roleService.GetAllAsync();
+        var roles = await roleService.GetAllAsync();
         
         return Ok(new ApiResponse<List<RoleResponse>>
         {
@@ -43,7 +41,7 @@ public class RolesController(IRoleService roleService) : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ApiResponse<RoleResponse>>> GetRole(Guid id)
     {
-        var role = await _roleService.GetByIdAsync(id);
+        var role = await roleService.GetByIdAsync(id);
         
         if (role == null)
         {
@@ -69,7 +67,7 @@ public class RolesController(IRoleService roleService) : ControllerBase
     public async Task<ActionResult<ApiResponse<RoleResponse>>> CreateRole(
         [FromBody] CreateRoleRequest request)
     {
-        var role = await _roleService.CreateAsync(request);
+        var role = await roleService.CreateAsync(request);
         
         return CreatedAtAction(
             nameof(GetRole),
@@ -90,7 +88,7 @@ public class RolesController(IRoleService roleService) : ControllerBase
         Guid id,
         [FromBody] UpdateRoleRequest request)
     {
-        var role = await _roleService.UpdateAsync(id, request);
+        var role = await roleService.UpdateAsync(id, request);
         
         return Ok(new ApiResponse<RoleResponse>
         {
@@ -106,7 +104,7 @@ public class RolesController(IRoleService roleService) : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<ApiResponse<object>>> DeleteRole(Guid id)
     {
-        await _roleService.DeleteAsync(id);
+        await roleService.DeleteAsync(id);
         
         return Ok(new ApiResponse<object>
         {
@@ -122,7 +120,7 @@ public class RolesController(IRoleService roleService) : ControllerBase
     public async Task<ActionResult<ApiResponse<object>>> AssignRoleToUser(
         Guid roleId,
         Guid userId)    {
-        await _roleService.AssignRoleToUserAsync(roleId, userId);
+        await roleService.AssignRoleToUserAsync(roleId, userId);
         
         return Ok(new ApiResponse<object>
         {
@@ -138,7 +136,7 @@ public class RolesController(IRoleService roleService) : ControllerBase
     public async Task<ActionResult<ApiResponse<object>>> RemoveRoleFromUser(
         Guid roleId,
         Guid userId)    {
-        await _roleService.RemoveRoleFromUserAsync(roleId, userId);
+        await roleService.RemoveRoleFromUserAsync(roleId, userId);
         
         return Ok(new ApiResponse<object>
         {

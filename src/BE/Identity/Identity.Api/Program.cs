@@ -2,7 +2,6 @@ using System.Text;
 using Identity.Infrastructure;
 using Identity.Infrastructure.Data;
 using Identity.Api.Middleware;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using FluentValidation;
@@ -21,16 +20,12 @@ builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 // Infrastructure
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// JWT Authentication
+// JWT Authentication (for legacy API compatibility)
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT secret key not configured");
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
+builder.Services.AddAuthentication("JWT")
+.AddJwtBearer("JWT", options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -100,15 +95,27 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// CORS
+// CORS for SSO - Support multiple clients
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend", policy =>
+        // API access policy for external services
+    options.AddPolicy("AllowAPI", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "https://localhost:3000")
+        policy.WithOrigins(
+                // Local development
+                "http://localhost:3000", "https://localhost:3000",
+                "http://localhost:3001", "https://localhost:3001",
+                "http://localhost:5217", "https://localhost:7226", // Identity.Sso
+                // Production domains
+                "https://app.pfm.vn", "https://pfm.vn", "https://login.pfm.vn",
+                // Mobile development (for WebView)
+                "capacitor://localhost", "ionic://localhost",
+                "http://localhost", "https://localhost"
+              )
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials();
+              .AllowCredentials()
+              .SetIsOriginAllowedToAllowWildcardSubdomains();
     });
 });
 
@@ -139,7 +146,7 @@ app.UseHttpsRedirection();
 // Global exception handling
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
-app.UseCors("AllowFrontend");
+app.UseCors("AllowAPI");
 
 app.UseAuthentication();
 app.UseMiddleware<ApiKeyAuthenticationMiddleware>();

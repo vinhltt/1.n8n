@@ -1,5 +1,6 @@
 using Identity.Contracts.Users;
 using Identity.Contracts.Common;
+using Identity.Contracts.Roles;
 
 namespace Identity.Application.Services.Users;
 
@@ -15,4 +16,5 @@ public interface IUserService
     Task<bool> ValidatePasswordAsync(Guid userId, string password, CancellationToken cancellationToken = default);
     Task<bool> IsEmailExistsAsync(string email, Guid? excludeUserId = null, CancellationToken cancellationToken = default);
     Task<bool> IsUsernameExistsAsync(string username, Guid? excludeUserId = null, CancellationToken cancellationToken = default);
+    Task<IEnumerable<RoleResponse>> GetUserRolesAsync(Guid userId, CancellationToken cancellationToken = default);
 }

@@ -5,22 +5,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Infrastructure.Repositories;
 
-public class RefreshTokenRepository : BaseRepository<RefreshToken, Guid>, IRefreshTokenRepository
+public class RefreshTokenRepository(IdentityDbContext context)
+    : BaseRepository<RefreshToken, Guid>(context), IRefreshTokenRepository
 {
-    public RefreshTokenRepository(IdentityDbContext context) : base(context)
-    {
-    }
-
     public async Task<RefreshToken?> GetByTokenAsync(string token, CancellationToken cancellationToken = default)
     {
-        return await _dbSet
+        return await DbSet
             .Include(rt => rt.User)
             .FirstOrDefaultAsync(rt => rt.Token == token, cancellationToken);
     }
 
     public async Task<IEnumerable<RefreshToken>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        return await _dbSet
+        return await DbSet
             .Where(rt => rt.UserId == userId)
             .OrderByDescending(rt => rt.CreatedAt)
             .ToListAsync(cancellationToken);
@@ -28,7 +25,7 @@ public class RefreshTokenRepository : BaseRepository<RefreshToken, Guid>, IRefre
 
     public async Task RevokeAllUserTokensAsync(Guid userId, string revokedBy, CancellationToken cancellationToken = default)
     {
-        var tokens = await _dbSet
+        var tokens = await DbSet
             .Where(rt => rt.UserId == userId && !rt.IsRevoked)
             .ToListAsync(cancellationToken);
 
@@ -39,12 +36,12 @@ public class RefreshTokenRepository : BaseRepository<RefreshToken, Guid>, IRefre
             token.RevokedAt = DateTime.UtcNow;
         }
 
-        await _context.SaveChangesAsync(cancellationToken);
+        await Context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task RevokeTokenAsync(string token, string revokedBy, CancellationToken cancellationToken = default)
     {
-        var refreshToken = await _dbSet
+        var refreshToken = await DbSet
             .FirstOrDefaultAsync(rt => rt.Token == token, cancellationToken);
 
         if (refreshToken != null && !refreshToken.IsRevoked)
@@ -52,13 +49,13 @@ public class RefreshTokenRepository : BaseRepository<RefreshToken, Guid>, IRefre
             refreshToken.IsRevoked = true;
             refreshToken.RevokedBy = revokedBy;
             refreshToken.RevokedAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync(cancellationToken);
+            await Context.SaveChangesAsync(cancellationToken);
         }
     }
 
     public async Task CleanupExpiredTokensAsync(CancellationToken cancellationToken = default)
     {
-        var expiredTokens = await _dbSet
+        var expiredTokens = await DbSet
             .Where(rt => rt.ExpiresAt <= DateTime.UtcNow && !rt.IsRevoked)
             .ToListAsync(cancellationToken);
 
@@ -69,6 +66,6 @@ public class RefreshTokenRepository : BaseRepository<RefreshToken, Guid>, IRefre
             token.RevokedAt = DateTime.UtcNow;
         }
 
-        await _context.SaveChangesAsync(cancellationToken);
+        await Context.SaveChangesAsync(cancellationToken);
     }
 }
