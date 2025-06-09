@@ -2,7 +2,7 @@ using Identity.Contracts.Common;
 using System.Net;
 using System.Text.Json;
 
-namespace Identity.Api.Middleware;
+namespace Identity.Sso.Middleware;
 
 public class GlobalExceptionHandlingMiddleware(RequestDelegate next, ILogger<GlobalExceptionHandlingMiddleware> logger)
 {

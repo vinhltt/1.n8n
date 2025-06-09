@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace Identity.Api.Controllers;
+namespace Identity.Sso.Controllers;
 
 /// <summary>
 /// Controller for API key management operations (EN)<br/>

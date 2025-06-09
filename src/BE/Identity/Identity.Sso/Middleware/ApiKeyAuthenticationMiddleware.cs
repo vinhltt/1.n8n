@@ -1,7 +1,7 @@
 using Identity.Application.Services.ApiKeys;
 using System.Security.Claims;
 
-namespace Identity.Api.Middleware;
+namespace Identity.Sso.Middleware;
 
 public class ApiKeyAuthenticationMiddleware(RequestDelegate next)
 {
