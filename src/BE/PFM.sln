@@ -56,6 +56,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExcelApi", "ExcelApi", "{8E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelApi", "ExcelApi\ExcelApi.csproj", "{64D3F8BB-1386-454C-98AF-8A1F2AEA52B5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ocelot.Gateway", "Ocelot.Gateway\Ocelot.Gateway.csproj", "{A24B0E03-7AC6-4870-9812-661EA4247748}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -294,6 +296,18 @@ Global
 		{64D3F8BB-1386-454C-98AF-8A1F2AEA52B5}.Release|x64.Build.0 = Release|Any CPU
 		{64D3F8BB-1386-454C-98AF-8A1F2AEA52B5}.Release|x86.ActiveCfg = Release|Any CPU
 		{64D3F8BB-1386-454C-98AF-8A1F2AEA52B5}.Release|x86.Build.0 = Release|Any CPU
+		{A24B0E03-7AC6-4870-9812-661EA4247748}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A24B0E03-7AC6-4870-9812-661EA4247748}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A24B0E03-7AC6-4870-9812-661EA4247748}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A24B0E03-7AC6-4870-9812-661EA4247748}.Debug|x64.Build.0 = Debug|Any CPU
+		{A24B0E03-7AC6-4870-9812-661EA4247748}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A24B0E03-7AC6-4870-9812-661EA4247748}.Debug|x86.Build.0 = Debug|Any CPU
+		{A24B0E03-7AC6-4870-9812-661EA4247748}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A24B0E03-7AC6-4870-9812-661EA4247748}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A24B0E03-7AC6-4870-9812-661EA4247748}.Release|x64.ActiveCfg = Release|Any CPU
+		{A24B0E03-7AC6-4870-9812-661EA4247748}.Release|x64.Build.0 = Release|Any CPU
+		{A24B0E03-7AC6-4870-9812-661EA4247748}.Release|x86.ActiveCfg = Release|Any CPU
+		{A24B0E03-7AC6-4870-9812-661EA4247748}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
