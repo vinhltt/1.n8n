@@ -37,12 +37,24 @@
   - **ExcelApi: Excel processing services (đã di chuyển vào src/BE/ExcelApi)**
 - Mỗi service gắn với database riêng, không chia sẻ schema.
 - File storage (MinIO) dùng cho import/export statement.
+- **✅ MoneyManagement Services Implementation Status:**
+  - **BudgetService**: ✅ Complete với business logic, DTOs, validators
+  - **JarService**: ✅ Complete với 6 Jars method implementation (fixed 12 interface errors)
+  - **SharedExpenseService**: 🚧 Next priority for implementation
+  - **Infrastructure**: ✅ Complete BaseRepository, UnitOfWork, DbContext implementation
+  - **Build Status**: ✅ 0 errors, 3 warnings - Production ready
 
 **Backend Organization:**
 - **Tất cả backend services** được tổ chức trong `src/BE/` folder
 - **ExcelApi** đã được di chuyển từ `src/ExcelApi/` vào `src/BE/ExcelApi/` để thống nhất cấu trúc
 - **PFM.sln** trong `src/BE/` quản lý tất cả backend projects
 - **Docker configuration** đã được cập nhật để phù hợp với cấu trúc mới
+- **✅ Identity Architecture Consolidation**: Successfully merged Identity.Api into Identity.Sso
+  - **Eliminated duplication**: Single project handles both SSO web interface and API functionality
+  - **Dual authentication**: Cookie-based (SSO) + JWT-based (API) trong cùng application
+  - **Unified configuration**: Combined appsettings, middleware, và dependency injection
+  - **Simplified maintenance**: One project to build, deploy, và maintain
+  - **URLs**: Web interface (http://localhost:5217), API docs (http://localhost:5217/swagger)
 
 **Core Finance Services:**
 - **RecurringTransactionTemplateService:**

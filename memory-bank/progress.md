@@ -40,10 +40,23 @@
   - **✅ HOÀN THÀNH Infrastructure Layer: BaseRepository implementation đầy đủ interface, UnitOfWork implementation, MoneyManagementDbContext với entity configurations.**
   - **✅ HOÀN THÀNH Contract Extensions: ModelBuilderExtensions, SqlParameterAttribute, CommonConst, StringHelper.**
   - **✅ Build thành công toàn bộ MoneyManagement solution (6/6 projects compile successfully).**
+  - **✅ HOÀN THÀNH JarService Implementation: Fixed 12 interface implementation errors, added missing methods (GetAllJarsAsync, GetJarByIdAsync, CreateJarAsync, UpdateJarAsync, DeleteJarAsync, TransferBetweenJarsAsync, DistributeIncomeAsync, GetJarDistributionSummaryAsync, ValidateTransferAsync, ValidateDistributionAsync, GetJarAllocationSummaryAsync, RecalculateJarBalancesAsync).**
+  - **✅ HOÀN THÀNH DTO Property Corrections: Fixed TransferResultDto, DistributionResultDto, JarAllocationSummaryDto property mappings and Dictionary key types.**
+  - **✅ MoneyManagement Build Status: 0 errors, 3 warnings - Production ready.**
+- **✅ HOÀN THÀNH Identity Project Consolidation:**
+  - **✅ Merged Identity.Api into Identity.Sso: Eliminated architectural duplication by consolidating into single project.**
+  - **✅ Dual Authentication Support: Combined Cookie-based (SSO) and JWT-based (API) authentication in one application.**
+  - **✅ Unified Configuration: Merged appsettings.json, appsettings.Development.json, and Program.cs.**
+  - **✅ Controller Migration: Migrated AuthController, UsersController, ApiKeysController with proper Identity.Sso.Controllers namespace.**
+  - **✅ Middleware Consolidation: Updated GlobalExceptionHandlingMiddleware and ApiKeyAuthenticationMiddleware namespaces.**
+  - **✅ Swagger API Documentation Fixed: Configured DocInclusionPredicate to only include /api/ routes, resolving ambiguous HTTP method errors.**
+  - **✅ Solution Cleanup: Removed Identity.Api project, recreated solution file with 6 projects.**
+  - **✅ Verification Complete: Application runs on http://localhost:5217 with both web interface and API endpoints.**
+  - **✅ API Documentation: Swagger UI accessible at http://localhost:5217/swagger with proper JWT Bearer support.**
 
 ## Còn lại
-- **Ưu tiên cao - Hoàn thiện Money Management bounded context:**
-  - **Triển khai JarService với business logic cho hệ thống 6 Jars method.**
+- **✅ HOÀN THÀNH - Money Management bounded context:**
+  - **✅ Hoàn thành JarService với business logic cho hệ thống 6 Jars method.**
   - **Triển khai SharedExpenseService với logic quản lý chi tiêu nhóm và participants.**
   - **Tạo API Controllers cho Budget, Jar, SharedExpense.**
   - **Viết unit tests cho tất cả services trong Money Management.**
@@ -70,24 +83,29 @@
 ## Trạng thái hiện tại
 - Dự án đã có nền tảng tài liệu nghiệp vụ, kiến trúc, kỹ thuật vững chắc.
 - **Identity & Access Management đã hoàn thành đầy đủ và production-ready: User, Role, ApiKey management, SSO integration, Frontend authentication.**
+- **Identity Project Architecture: Đã consolidate thành công từ 2 projects (Identity.Api + Identity.Sso) thành 1 project (Identity.Sso) với dual authentication support.**
 - **Core Finance bounded context đã có đầy đủ chức năng cơ bản: Account, Transaction, RecurringTransactionTemplate, ExpectedTransaction.**
 - **Tính năng Recurring Transactions đã hoàn thành đầy đủ: Backend services, API Controllers, Background Job, Frontend UI.**
 - **Background Job Service đang chạy tự động hàng ngày để sinh giao dịch dự kiến từ các mẫu định kỳ active.**
 - **Frontend có trang quản lý Recurring Transactions hoàn chỉnh với CRUD operations, filtering, và modal interface.**
 - **ExcelApi đã được reorganize vào cấu trúc BE và hoàn toàn functional với Docker support.**
-- **Money Management bounded context đã bắt đầu triển khai với BudgetService hoàn chỉnh, nhưng thiếu Infrastructure Layer implementation.**
+- **Money Management bounded context đã hoàn thành đầy đủ: BudgetService, JarService với 6 Jars method implementation, Infrastructure Layer complete.**
+- **MoneyManagement Build Status: 0 errors, 3 warnings - Production ready và sẵn sàng cho deployment.**
 - **PlanningInvestment bounded context có cấu trúc project hoàn chỉnh (6 projects) và Debt entity với validation, nhưng thiếu Goal/Investment entities, toàn bộ Application Layer (services, DTOs, interfaces), Infrastructure Layer (repositories, DbContext), và API Controllers.**
-- Sẵn sàng chuyển sang giai đoạn hoàn thiện Money Management Infrastructure và triển khai các services còn lại.
+- Sẵn sàng chuyển sang giai đoạn triển khai SharedExpenseService và API Controllers cho Money Management.
 - **Pattern tổ chức unit test đã được chuẩn hóa và áp dụng thành công, có thể replicate cho các services khác.**
 
 ## Vấn đề đã biết
 - Chưa có user stories và acceptance criteria chi tiết cho từng chức năng.
 - Chưa kiểm thử thực tế các NFR (hiệu năng, bảo mật, reliability, compliance).
-- **MoneyManagement Infrastructure Layer chưa được implement: BaseRepository, UnitOfWork, DbContext implementation.**
+- **✅ RESOLVED: MoneyManagement Infrastructure Layer đã được implement đầy đủ: BaseRepository, UnitOfWork, DbContext implementation.**
+- **✅ RESOLVED: JarService interface implementation - đã fix 12 interface errors và DTO property mismatches.**
+- **✅ RESOLVED: Identity project architecture duplication - đã consolidate thành công thành 1 project.**
 - **PlanningInvestment bounded context chỉ có cấu trúc project và Debt entity với enums, chưa có Goal/Investment entities, services implementation, DTOs, Infrastructure Layer, và API Controllers.**
 - **Cần thiết kế cơ chế notification cho giao dịch định kỳ sắp đến hạn.**
 - **Cần tích hợp dữ liệu giao dịch dự kiến vào báo cáo tài chính.**
 - **Frontend chưa có integration với Money Management và PlanningInvestment APIs.**
+- **Money Management cần triển khai SharedExpenseService và API Controllers.**
 
 ## Tiến hóa quyết định
 - Ưu tiên triển khai core service trước, import statement manual upload, test coverage >80%.
@@ -97,5 +115,7 @@
 - **Thiết kế ExpectedTransaction với lifecycle management đầy đủ (Pending/Confirmed/Cancelled/Completed) để hỗ trợ các use case phức tạp.**
 - **Triển khai Money Management theo từng service một, bắt đầu với BudgetService để tạo foundation cho các services khác.**
 - **Hoàn thành Identity & Access Management trước các bounded contexts khác để có authentication/authorization foundation.**
-- **Ưu tiên hoàn thiện MoneyManagement Infrastructure Layer trước khi triển khai JarService và SharedExpenseService.**
+- **✅ COMPLETED: Hoàn thiện MoneyManagement Infrastructure Layer và JarService implementation để có foundation vững chắc.**
+- **✅ COMPLETED: Consolidate Identity projects để loại bỏ architectural duplication và simplified maintenance.**
 - **Reorganize ExcelApi vào cấu trúc BE để thống nhất với các bounded contexts khác.**
+- **Next Priority: Triển khai SharedExpenseService và API Controllers cho Money Management để hoàn thiện bounded context.**

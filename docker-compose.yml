@@ -65,12 +65,11 @@ services:
       - EXECUTIONS_DATA_MAX_AGE=${EXECUTIONS_DATA_MAX_AGE:-720}
       - EXECUTIONS_DATA_PRUNE_MAX_COUNT=${EXECUTIONS_DATA_PRUNE_MAX_COUNT:-50000}
       - N8N_DEFAULT_BINARY_DATA_MODE=${N8N_DEFAULT_BINARY_DATA_MODE:-filesystem}
-
   pfm_excel_api:
     # Static IP: ${IP_PREFIX}.2
     build:
       context: ./src
-      dockerfile: ExcelApi/Dockerfile
+      dockerfile: BE/ExcelApi/Dockerfile
     restart: always
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}

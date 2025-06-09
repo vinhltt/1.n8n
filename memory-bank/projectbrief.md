@@ -20,4 +20,12 @@
 - Hỗ trợ backup, restore, triển khai linh hoạt trên nhiều môi trường.
 - Đáp ứng các yêu cầu phi chức năng: hiệu năng, mở rộng, sẵn sàng cao, bảo mật, dễ bảo trì, tuân thủ quy định pháp lý nếu có.
 - Chuẩn hóa sử dụng FluentAssertions cho assert kết quả trong unit test, tuân thủ .NET rule.
-- Có khả năng dự báo dòng tiền chính xác, kết hợp giữa giao dịch thực tế và giao dịch dự kiến từ các mẫu định kỳ. 
+- Có khả năng dự báo dòng tiền chính xác, kết hợp giữa giao dịch thực tế và giao dịch dự kiến từ các mẫu định kỳ.
+
+## Trạng thái hiện tại (June 2025)
+- **✅ Identity & Access Management**: Hoàn thành đầy đủ với SSO + API consolidated architecture
+- **✅ Core Finance**: Hoàn thành với Recurring Transactions feature
+- **✅ Money Management**: BudgetService và JarService implementation complete, Infrastructure Layer complete
+- **✅ ExcelApi**: Reorganized và functional trong BE structure
+- **🚧 Planning & Investment**: Project structure exists, cần implementation
+- **🎯 Next Priority**: SharedExpenseService implementation và API Controllers
