@@ -2,6 +2,7 @@ using System.Text;
 using Identity.Infrastructure;
 using Identity.Infrastructure.Data;
 using Identity.Sso.Middleware;
+using Identity.Contracts.ConfigurationOptions;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -10,6 +11,11 @@ using FluentValidation.AspNetCore;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Get CORS configuration
+var corsConfigSection = builder.Configuration.GetSection("CorsOptions");
+var corsOptions = corsConfigSection.Get<CorsOptions>();
+var policyName = corsOptions?.PolicyName ?? "IdentityCorsPolicy";
 
 // Add services to the container
 builder.Services.AddControllersWithViews()
@@ -112,34 +118,82 @@ builder.Services.AddSwaggerGen(c =>
                 }
             },
             []
-        }
-    });
+        }    });
 });
 
-// CORS - Combined policy for both SSO and API
-builder.Services.AddCors(options =>
+// CORS - Use configuration-based approach
+if (corsOptions != null)
 {
-    options.AddPolicy("AllowAll", policy =>
+    builder.Services.AddCors(options =>
     {
-        policy.WithOrigins(
-                // Local development
-                "http://localhost:3000", "https://localhost:3000",  // Vue.js/React dev
-                "http://localhost:3001", "https://localhost:3001",  // Alternative dev
-                "http://localhost:5173", "https://localhost:5173",  // Vite dev
-                "http://localhost:8080", "https://localhost:8080",  // Alternative Vue dev
-                "http://localhost:5217", "https://localhost:5001",  // Identity.Sso
-                // Production domains
-                "https://app.pfm.vn", "https://pfm.vn", "https://login.pfm.vn",
-                // Mobile development (for WebView)
-                "capacitor://localhost", "ionic://localhost",
-                "http://localhost", "https://localhost"
-              )
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials()
-              .SetIsOriginAllowedToAllowWildcardSubdomains();
+        options.AddPolicy(policyName, policyBuilder =>
+        {
+            // Configure origins
+            if (corsOptions.AllowedOrigins == null || corsOptions.AllowedOrigins.Length == 0 || corsOptions.AllowedOrigins.Contains("*"))
+                policyBuilder.AllowAnyOrigin();
+            else
+                policyBuilder.WithOrigins(corsOptions.AllowedOrigins);
+
+            // Configure methods
+            if (corsOptions.AllowedMethods == null || corsOptions.AllowedMethods.Length == 0 || corsOptions.AllowedMethods.Contains("*"))
+                policyBuilder.AllowAnyMethod();
+            else
+                policyBuilder.WithMethods(corsOptions.AllowedMethods);
+
+            // Configure headers
+            if (corsOptions.AllowedHeaders == null || corsOptions.AllowedHeaders.Length == 0 || corsOptions.AllowedHeaders.Contains("*"))
+                policyBuilder.AllowAnyHeader();
+            else
+                policyBuilder.WithHeaders(corsOptions.AllowedHeaders);
+
+            // Configure exposed headers
+            if (corsOptions.ExposedHeaders != null && corsOptions.ExposedHeaders.Length > 0 && !corsOptions.ExposedHeaders.Contains("*"))
+                policyBuilder.WithExposedHeaders(corsOptions.ExposedHeaders);
+
+            // Configure credentials - only if not using AllowAnyOrigin
+            if (corsOptions.AllowedOrigins != null && corsOptions.AllowedOrigins.Length > 0 && !corsOptions.AllowedOrigins.Contains("*"))
+            {
+                policyBuilder.AllowCredentials();
+            }
+
+            // Configure preflight max age
+            if (!string.IsNullOrWhiteSpace(corsOptions.PreflightMaxAgeInMinutes))
+            {
+                if (int.TryParse(corsOptions.PreflightMaxAgeInMinutes, out var maxAge))
+                {
+                    policyBuilder.SetPreflightMaxAge(TimeSpan.FromMinutes(maxAge));
+                }
+            }
+        });
     });
-});
+}
+else
+{
+    // Fallback to default CORS policy if configuration is missing
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(policyName, policy =>
+        {
+            policy.WithOrigins(
+                    // Local development
+                    "http://localhost:3000", "https://localhost:3000",  // Vue.js/React dev
+                    "http://localhost:3001", "https://localhost:3001",  // Alternative dev
+                    "http://localhost:5173", "https://localhost:5173",  // Vite dev
+                    "http://localhost:8080", "https://localhost:8080",  // Alternative Vue dev
+                    "http://localhost:5217", "https://localhost:5001",  // Identity.Sso
+                    // Production domains
+                    "https://app.pfm.vn", "https://pfm.vn", "https://login.pfm.vn",
+                    // Mobile development (for WebView)
+                    "capacitor://localhost", "ionic://localhost",
+                    "http://localhost", "https://localhost"
+                  )
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials()
+                  .SetIsOriginAllowedToAllowWildcardSubdomains();
+        });
+    });
+}
 
 // Add health checks
 builder.Services.AddHealthChecks()
@@ -176,7 +230,7 @@ app.UseStaticFiles();
 // Global exception handling middleware
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
-app.UseCors("AllowAll");
+app.UseCors(policyName);
 
 app.UseRouting();
 
