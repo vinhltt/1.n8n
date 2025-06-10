@@ -1,8 +1,8 @@
 using CoreFinance.Api.Controllers.Base;
 using CoreFinance.Application.DTOs.ExpectedTransaction;
 using CoreFinance.Application.Interfaces;
-using CoreFinance.Contracts.BaseEfModels;
-using CoreFinance.Contracts.DTOs;
+using Shared.Contracts.BaseEfModels;
+using Shared.Contracts.DTOs;
 using CoreFinance.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 

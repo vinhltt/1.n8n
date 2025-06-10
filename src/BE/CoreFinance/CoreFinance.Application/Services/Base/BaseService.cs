@@ -1,7 +1,7 @@
 using AutoMapper;
-using CoreFinance.Contracts.BaseEfModels;
-using CoreFinance.Contracts.DTOs;
-using CoreFinance.Contracts.Utilities;
+using Shared.Contracts.BaseEfModels;
+using Shared.Contracts.DTOs;
+using Shared.Contracts.Utilities;
 using CoreFinance.Domain.Exceptions;
 using CoreFinance.Domain.UnitOfWorks;
 using Microsoft.EntityFrameworkCore;

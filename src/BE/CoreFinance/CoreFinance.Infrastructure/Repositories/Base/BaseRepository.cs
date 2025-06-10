@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Security.Claims;
-using CoreFinance.Contracts.BaseEfModels;
+using Shared.Contracts.BaseEfModels;
 using CoreFinance.Domain.BaseRepositories;
 using Microsoft.AspNetCore.Http;
 

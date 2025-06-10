@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using CoreFinance.Contracts.BaseEfModels;
+using Shared.Contracts.BaseEfModels;
 
 namespace CoreFinance.Domain.BaseRepositories;
 

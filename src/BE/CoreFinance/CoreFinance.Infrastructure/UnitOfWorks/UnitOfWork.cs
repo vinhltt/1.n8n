@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
-using CoreFinance.Contracts.Attributes;
-using CoreFinance.Contracts.BaseEfModels;
-using CoreFinance.Contracts.Constants;
-using CoreFinance.Contracts.Utilities;
+using Shared.Contracts.Attributes;
+using Shared.Contracts.BaseEfModels;
+using Shared.Contracts.Constants;
+using Shared.Contracts.Utilities;
 using CoreFinance.Domain.BaseRepositories;
 using CoreFinance.Domain.UnitOfWorks;
 using Microsoft.EntityFrameworkCore;

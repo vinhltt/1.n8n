@@ -1,8 +1,8 @@
 using CoreFinance.Api.Infrastructures.Middlewares;
 using CoreFinance.Api.Infrastructures.Modules;
 using CoreFinance.Api.Infrastructures.ServicesExtensions;
-using CoreFinance.Contracts.ConfigurationOptions;
-using CoreFinance.Contracts.Utilities;
+using Shared.Contracts.ConfigurationOptions;
+using Shared.Contracts.Utilities;
 using CoreFinance.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;

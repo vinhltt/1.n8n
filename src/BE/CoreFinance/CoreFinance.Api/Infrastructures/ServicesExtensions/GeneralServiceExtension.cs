@@ -3,7 +3,7 @@ using CoreFinance.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
-using CoreFinance.Contracts.ConfigurationOptions;
+using Shared.Contracts.ConfigurationOptions;
 using CoreFinance.Api.Infrastructures.Swagger.SchemaFilters;
 
 namespace CoreFinance.Api.Infrastructures.ServicesExtensions;

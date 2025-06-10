@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using CoreFinance.Contracts.Utilities;
+using Shared.Contracts.Utilities;
 using Microsoft.IO;
 
 namespace CoreFinance.Api.Infrastructures.Middlewares;

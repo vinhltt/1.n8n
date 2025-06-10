@@ -2,7 +2,7 @@
 using CoreFinance.Api.Infrastructures.Interceptors;
 using CoreFinance.Application.Interfaces;
 using CoreFinance.Application.Services;
-using CoreFinance.Contracts.Extensions;
+using Shared.Contracts.Extensions;
 using CoreFinance.Domain.UnitOfWorks;
 using CoreFinance.Infrastructure;
 using CoreFinance.Infrastructure.UnitOfWorks;

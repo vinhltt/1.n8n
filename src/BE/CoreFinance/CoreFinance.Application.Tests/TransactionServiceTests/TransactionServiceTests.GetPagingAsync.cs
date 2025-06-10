@@ -1,7 +1,7 @@
 using CoreFinance.Application.DTOs.Transaction;
 using CoreFinance.Application.Services;
-using CoreFinance.Contracts.BaseEfModels;
-using CoreFinance.Contracts.Enums;
+using Shared.Contracts.BaseEfModels;
+using Shared.Contracts.Enums;
 using CoreFinance.Domain.BaseRepositories;
 using Microsoft.Extensions.Logging;
 using MockQueryable;

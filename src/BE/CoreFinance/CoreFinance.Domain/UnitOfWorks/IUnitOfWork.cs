@@ -1,5 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
-using CoreFinance.Contracts.BaseEfModels;
+using Shared.Contracts.BaseEfModels;
 using CoreFinance.Domain.BaseRepositories;
 using Microsoft.EntityFrameworkCore.Storage;
 

@@ -1,5 +1,5 @@
 using CoreFinance.Application.Services;
-using CoreFinance.Contracts.BaseEfModels;
+using Shared.Contracts.BaseEfModels;
 using CoreFinance.Domain.BaseRepositories;
 using CoreFinance.Domain.Entities;
 using Microsoft.Extensions.Logging;

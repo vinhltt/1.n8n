@@ -1,6 +1,6 @@
 ﻿using CoreFinance.Application.Services.Base;
-using CoreFinance.Contracts.BaseEfModels;
-using CoreFinance.Contracts.DTOs;
+using Shared.Contracts.BaseEfModels;
+using Shared.Contracts.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreFinance.Api.Controllers.Base;

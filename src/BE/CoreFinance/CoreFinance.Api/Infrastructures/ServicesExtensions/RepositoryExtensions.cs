@@ -1,4 +1,4 @@
-﻿using CoreFinance.Contracts.Extensions;
+﻿using Shared.Contracts.Extensions;
 using CoreFinance.Domain.BaseRepositories;
 using CoreFinance.Domain.Entities;
 using CoreFinance.Infrastructure.Repositories.Base;

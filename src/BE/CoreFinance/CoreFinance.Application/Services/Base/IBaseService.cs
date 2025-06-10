@@ -1,5 +1,5 @@
-﻿using CoreFinance.Contracts.BaseEfModels;
-using CoreFinance.Contracts.DTOs;
+﻿using Shared.Contracts.BaseEfModels;
+using Shared.Contracts.DTOs;
 
 namespace CoreFinance.Application.Services.Base;
 

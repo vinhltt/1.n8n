@@ -1,4 +1,4 @@
-using CoreFinance.Contracts.DTOs;
+using Shared.Contracts.DTOs;
 
 namespace CoreFinance.Application.DTOs.Account;
 

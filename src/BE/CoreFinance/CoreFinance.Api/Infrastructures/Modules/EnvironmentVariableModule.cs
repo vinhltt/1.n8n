@@ -1,4 +1,4 @@
-﻿using CoreFinance.Contracts.ConfigurationOptions;
+﻿using Shared.Contracts.ConfigurationOptions;
 
 namespace CoreFinance.Api.Infrastructures.Modules;
 
