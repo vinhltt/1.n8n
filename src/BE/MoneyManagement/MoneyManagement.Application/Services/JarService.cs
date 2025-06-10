@@ -160,7 +160,7 @@ public class JarService : IJarService
             {
                 TotalAllocated = request.IncomeAmount,
                 AllocationTime = DateTime.UtcNow,
-                JarAllocations = new List<JarAllocationDetail>()
+                JarAllocations = []
             };
 
             decimal totalAllocated = 0;
@@ -238,7 +238,7 @@ public class JarService : IJarService
             result.FromJar = _mapper.Map<JarViewModel>(fromJar);
             result.ToJar = _mapper.Map<JarViewModel>(toJar);
 
-            await _unitOfWork.Repository<Jar, Guid>().UpdateAsync(new[] { fromJar, toJar });
+            await _unitOfWork.Repository<Jar, Guid>().UpdateAsync([fromJar, toJar]);
 
             _logger.LogInformation("Transferred {Amount} from jar {FromJarId} to jar {ToJarId} for user {UserId}", 
                 request.Amount, request.FromJarId, request.ToJarId, userId);
@@ -696,7 +696,7 @@ public class JarService : IJarService
             fromJar.UpdateAt = DateTime.UtcNow;
             toJar.UpdateAt = DateTime.UtcNow;
 
-            await _unitOfWork.Repository<Jar, Guid>().UpdateAsync(new[] { fromJar, toJar });
+            await _unitOfWork.Repository<Jar, Guid>().UpdateAsync([fromJar, toJar]);
 
             _logger.LogInformation("Transferred {Amount} from jar {FromJarId} to jar {ToJarId}", 
                 request.Amount, request.FromJarId, request.ToJarId);            return new TransferResultDto

@@ -17,16 +17,30 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     // Add Serilog
-    builder.Host.UseSerilog();
-
-    // Add configuration
+    builder.Host.UseSerilog();    // Add configuration
     builder.Configuration
         .SetBasePath(builder.Environment.ContentRootPath)
         .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
         .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-        .AddJsonFile("ocelot.json", optional: false, reloadOnChange: true)
-        .AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
         .AddEnvironmentVariables();
+
+    // Read service ports configuration
+    var servicePorts = builder.Configuration.GetSection("ServicePorts").Get<Dictionary<string, int>>() ?? new Dictionary<string, int>();
+    
+    // Read ocelot.json and replace environment variables with actual port values
+    var ocelotConfig = File.ReadAllText(Path.Combine(builder.Environment.ContentRootPath, "ocelot.json"));
+    foreach (var port in servicePorts)
+    {
+        ocelotConfig = ocelotConfig.Replace($"${{{port.Key}}}", port.Value.ToString());
+    }
+    
+    // Write the processed ocelot configuration to a temporary file
+    var tempOcelotPath = Path.Combine(builder.Environment.ContentRootPath, "ocelot.processed.json");
+    File.WriteAllText(tempOcelotPath, ocelotConfig);
+    
+    // Add the processed ocelot configuration
+    builder.Configuration.AddJsonFile("ocelot.processed.json", optional: false, reloadOnChange: true)
+        .AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
     // Bind configuration sections
     var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>() ?? new JwtSettings();
@@ -120,9 +134,7 @@ try
                 WriteIndented = true
             }));
         }
-    });
-
-    // Use middleware to conditionally apply Ocelot
+    });    // Use middleware to conditionally apply Ocelot
     app.UseWhen(context =>
     {
         var path = context.Request.Path.Value?.ToLower();
@@ -131,13 +143,14 @@ try
                !path.StartsWith("/health") &&
                !path.StartsWith("/swagger") &&
                !path.StartsWith("/api/health") &&
-               (path.StartsWith("/api/sso") ||
-                path.StartsWith("/api/auth") ||
+               (path.StartsWith("/sso") ||
+                path.StartsWith("/auth") ||
                 path.StartsWith("/api/users") ||
                 path.StartsWith("/api/admin") ||
-                path.StartsWith("/api/finance") ||
-                path.StartsWith("/api/money") ||
-                path.StartsWith("/api/planning"));
+                path.StartsWith("/api/core-finance") ||
+                path.StartsWith("/api/money-management") ||
+                path.StartsWith("/api/planning-investment") ||
+                path.StartsWith("/api/excel"));
     }, 
     appBuilder =>
     {

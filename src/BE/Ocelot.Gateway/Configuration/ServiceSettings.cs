@@ -38,17 +38,17 @@ public class CorsSettings
     /// <summary>
     /// Allowed origins for CORS
     /// </summary>
-    public List<string> AllowedOrigins { get; set; } = new();
+    public List<string> AllowedOrigins { get; set; } = [];
     
     /// <summary>
     /// Allowed methods for CORS
     /// </summary>
-    public List<string> AllowedMethods { get; set; } = new() { "GET", "POST", "PUT", "DELETE", "OPTIONS" };
+    public List<string> AllowedMethods { get; set; } = ["GET", "POST", "PUT", "DELETE", "OPTIONS"];
     
     /// <summary>
     /// Allowed headers for CORS
     /// </summary>
-    public List<string> AllowedHeaders { get; set; } = new() { "*" };
+    public List<string> AllowedHeaders { get; set; } = ["*"];
     
     /// <summary>
     /// Whether to allow credentials

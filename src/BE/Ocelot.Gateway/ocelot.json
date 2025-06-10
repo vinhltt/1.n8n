@@ -2,11 +2,11 @@
   "Routes": [
     {
       "DownstreamPathTemplate": "/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5217
+          "Port": "${IdentitySsoPort}"
         }
       ],
       "UpstreamPathTemplate": "/sso/{everything}",
@@ -22,11 +22,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5228
+          "Port": "${IdentitySsoPort}"
         }
       ],
       "UpstreamPathTemplate": "/auth/{everything}",
@@ -42,17 +42,17 @@
     },
     {
       "DownstreamPathTemplate": "/api/users/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5228
+          "Port": "${IdentitySsoPort}"
         }
       ],
       "UpstreamPathTemplate": "/api/users/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
+        "AuthenticationProviderKeys": [ "Bearer", "ApiKey" ],
         "AllowedScopes": []
       },
       "RouteClaimsRequirement": {},
@@ -66,17 +66,17 @@
     },
     {
       "DownstreamPathTemplate": "/api/admin/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5228
+          "Port": "${IdentitySsoPort}"
         }
       ],
       "UpstreamPathTemplate": "/api/admin/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
+        "AuthenticationProviderKeys": [ "Bearer", "ApiKey" ],
         "AllowedScopes": []
       },
       "RouteClaimsRequirement": {
@@ -89,20 +89,19 @@
         "PeriodTimespan": 60,
         "Limit": 200
       }
-    },
-    {
-      "DownstreamPathTemplate": "/api/{everything}",
-      "DownstreamScheme": "http",
+    },    {
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5001
+          "Port": "${CoreFinanceApiPort}"
         }
       ],
-      "UpstreamPathTemplate": "/api/finance/{everything}",
+      "UpstreamPathTemplate": "/api/core-finance/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
+        "AuthenticationProviderKeys": [ "Bearer", "ApiKey" ],
         "AllowedScopes": []
       },
       "RouteClaimsRequirement": {},
@@ -116,20 +115,19 @@
         "PeriodTimespan": 60,
         "Limit": 200
       }
-    },
-    {
-      "DownstreamPathTemplate": "/api/{everything}",
-      "DownstreamScheme": "http",
+    },    {
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5002
+          "Port": "${MoneyManagementApiPort}"
         }
       ],
-      "UpstreamPathTemplate": "/api/money/{everything}",
+      "UpstreamPathTemplate": "/api/money-management/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
+        "AuthenticationProviderKeys": [ "Bearer", "ApiKey" ],
         "AllowedScopes": []
       },
       "RouteClaimsRequirement": {},
@@ -143,20 +141,19 @@
         "PeriodTimespan": 60,
         "Limit": 200
       }
-    },
-    {
-      "DownstreamPathTemplate": "/api/{everything}",
-      "DownstreamScheme": "http",
+    },    {
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 5003
+          "Port": "${PlanningInvestmentApiPort}"
         }
       ],
-      "UpstreamPathTemplate": "/api/planning/{everything}",
+      "UpstreamPathTemplate": "/api/planning-investment/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
+        "AuthenticationProviderKeys": [ "Bearer", "ApiKey" ],
         "AllowedScopes": []
       },
       "RouteClaimsRequirement": {},
@@ -173,7 +170,7 @@
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:5000",
+    "BaseUrl": "https://localhost:${GatewayPort}",
     "RateLimitOptions": {
       "DisableRateLimitHeaders": false,
       "QuotaExceededMessage": "Rate limit exceeded. Please try again later.",

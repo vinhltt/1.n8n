@@ -81,5 +81,5 @@ public class CreateSharedExpenseRequestDto
     /// List of participant data for this expense (EN)<br/>
     /// Danh sách dữ liệu người tham gia cho chi tiêu này (VI)
     /// </summary>
-    public List<CreateSharedExpenseParticipantRequestDto> Participants { get; set; } = new();
+    public List<CreateSharedExpenseParticipantRequestDto> Participants { get; set; } = [];
 }

@@ -16,7 +16,7 @@ public class DistributionResultDto
     /// List of jar distributions (EN)<br/>
     /// Danh sách phân phối cho các lọ (VI)
     /// </summary>
-    public List<JarDistributionItemDto> JarDistributions { get; set; } = new();
+    public List<JarDistributionItemDto> JarDistributions { get; set; } = [];
 
     /// <summary>
     /// Distribution date and time (EN)<br/>

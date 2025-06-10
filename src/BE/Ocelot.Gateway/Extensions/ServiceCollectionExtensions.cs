@@ -16,37 +16,28 @@ public static class HealthCheckExtensions
     /// <returns>Service collection</returns>
     public static IServiceCollection AddDownstreamHealthChecks(this IServiceCollection services, IConfiguration configuration)
     {
-        var healthChecksBuilder = services.AddHealthChecks();
-
-        // Add health check for Identity SSO service
+        var healthChecksBuilder = services.AddHealthChecks();        // Add health check for Identity SSO service
         healthChecksBuilder.AddTypeActivatedCheck<DownstreamServiceHealthCheck>(
             "Identity.Sso",
-            args: new object[] { "Identity.Sso", "https://localhost:5217/health" });
-
-        // Add health check for Identity API service
-        healthChecksBuilder.AddTypeActivatedCheck<DownstreamServiceHealthCheck>(
-            "Identity.Api",
-            args: new object[] { "Identity.Api", "https://localhost:5228/health" });
+            args: ["Identity.Sso", "https://localhost:5001/health"]);
 
         // Add health check for Core Finance service
         healthChecksBuilder.AddTypeActivatedCheck<DownstreamServiceHealthCheck>(
             "CoreFinance.Api",
-            args: new object[] { "CoreFinance.Api", "https://localhost:5001/health" });
+            args: ["CoreFinance.Api", "https://localhost:5004/health"]);
 
         // Add health check for Money Management service
         healthChecksBuilder.AddTypeActivatedCheck<DownstreamServiceHealthCheck>(
             "MoneyManagement.Api",
-            args: new object[] { "MoneyManagement.Api", "https://localhost:5002/health" });
-
-        // Add health check for Planning Investment service
+            args: ["MoneyManagement.Api", "https://localhost:5002/health"]);        // Add health check for Planning Investment service
         healthChecksBuilder.AddTypeActivatedCheck<DownstreamServiceHealthCheck>(
             "PlanningInvestment.Api",
-            args: new object[] { "PlanningInvestment.Api", "https://localhost:5003/health" });
+            args: ["PlanningInvestment.Api", "https://localhost:5206/health"]);
 
         // Add health check for Reporting service (when available)
         healthChecksBuilder.AddTypeActivatedCheck<DownstreamServiceHealthCheck>(
             "Reporting.Api",
-            args: new object[] { "Reporting.Api", "https://localhost:5004/health" });
+            args: ["Reporting.Api", "https://localhost:5004/health"]);
 
         // Configure HttpClient for health checks
         services.AddHttpClient<DownstreamServiceHealthCheck>(client =>

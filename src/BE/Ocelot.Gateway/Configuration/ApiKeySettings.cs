@@ -43,7 +43,7 @@ public class RateLimitSettings
     /// <summary>
     /// IP whitelist that bypasses rate limiting
     /// </summary>
-    public List<string> IpWhitelist { get; set; } = new();
+    public List<string> IpWhitelist { get; set; } = [];
 }
 
 /// <summary>

@@ -34,7 +34,7 @@ public class EqualSplitCalculationDto
     /// List of participants in the split (EN)<br/>
     /// Danh sách người tham gia trong việc chia (VI)
     /// </summary>
-    public List<ParticipantSplitDto> Participants { get; set; } = new();
+    public List<ParticipantSplitDto> Participants { get; set; } = [];
 
     /// <summary>
     /// Calculation details and notes (EN)<br/>

@@ -1,5 +1,5 @@
 ---
-description: 
+description: used when updating, creating, deleting rules
 globs: 
 alwaysApply: false
 ---

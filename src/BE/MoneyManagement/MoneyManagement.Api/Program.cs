@@ -50,6 +50,10 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Add health checks
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<MoneyManagement.Infrastructure.MoneyManagementDbContext>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
@@ -72,5 +76,8 @@ app.UseCors();
 // app.UseAuthorization();
 
 app.MapControllers();
+
+// Add health check endpoint
+app.MapHealthChecks("/health");
 
 app.Run();

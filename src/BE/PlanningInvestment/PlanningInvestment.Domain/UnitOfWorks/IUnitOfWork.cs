@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore.Storage;
-using PlanningInvestment.Domain.BaseRepositories;
 using Shared.Contracts.BaseEfModels;
+using PlanningInvestment.Domain.BaseRepositories;
 
 namespace PlanningInvestment.Domain.UnitOfWorks;
 

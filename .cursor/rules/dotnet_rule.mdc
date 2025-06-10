@@ -1,6 +1,6 @@
 ---
 description: 
-globs: src/BE/**/*.cs
+globs: src/BE/**
 alwaysApply: false
 ---
 # .NET Development Rules

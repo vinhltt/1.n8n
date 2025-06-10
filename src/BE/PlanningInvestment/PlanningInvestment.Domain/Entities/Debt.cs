@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using PlanningInvestment.Contracts.BaseEfModels;
 using PlanningInvestment.Domain.Enums;
+using Shared.Contracts.BaseEfModels;
 
 namespace PlanningInvestment.Domain.Entities;
 

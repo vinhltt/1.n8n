@@ -109,7 +109,7 @@ public class SharedExpenseResponseDto
     /// List of participants in this shared expense (EN)<br/>
     /// Danh sách người tham gia trong chi tiêu chung này (VI)
     /// </summary>
-    public List<SharedExpenseParticipantResponseDto> Participants { get; set; } = new();
+    public List<SharedExpenseParticipantResponseDto> Participants { get; set; } = [];
 
     /// <summary>
     /// Check if expense is fully settled (EN)<br/>

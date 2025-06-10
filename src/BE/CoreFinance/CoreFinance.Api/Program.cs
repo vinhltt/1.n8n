@@ -5,6 +5,7 @@ using CoreFinance.Contracts.ConfigurationOptions;
 using CoreFinance.Contracts.Utilities;
 using CoreFinance.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Serilog;
 
 async Task CreateDbIfNotExistsAsync(IHost host)
@@ -49,6 +50,10 @@ var policyName = corsOption!.PolicyName.Nullify("AppCorsPolicy");
 builder.AddConfigurationSettings();
 builder.AddGeneralConfigurations(policyName, corsOption);
 builder.Services.AddInjectedServices();
+
+// Add health checks
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<CoreFinanceDbContext>();
 builder.Host.UseSerilog((hostingContext, loggerConfiguration) =>
 {
     loggerConfiguration
@@ -81,6 +86,10 @@ app.UseCors(policyName);
 // Add the authorization middleware
 //app.UseAuthorization();
 app.UseRouting();
+
+// Map health check endpoint
+app.MapHealthChecks("/health");
+
 app.MapControllers();
 
 await CreateDbIfNotExistsAsync(app);

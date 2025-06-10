@@ -36,7 +36,7 @@ public class JarAllocationSummaryDto
     /// List of jar allocations (EN)<br/>
     /// Danh sách phân bổ các lọ (VI)
     /// </summary>
-    public List<JarAllocationItemDto> JarAllocations { get; set; } = new();
+    public List<JarAllocationItemDto> JarAllocations { get; set; } = [];
 
     /// <summary>
     /// Default Six Jars allocation percentages (EN)<br/>

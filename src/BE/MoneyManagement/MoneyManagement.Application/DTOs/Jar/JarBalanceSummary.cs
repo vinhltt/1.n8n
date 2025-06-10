@@ -3,7 +3,7 @@ namespace MoneyManagement.Application.DTOs.Jar;
 public class JarBalanceSummary
 {
     public Guid UserId { get; set; }
-    public List<JarBalanceDetail> JarBalances { get; set; } = new();
+    public List<JarBalanceDetail> JarBalances { get; set; } = [];
     public decimal TotalBalance { get; set; }
     public decimal TotalTarget { get; set; }
     public decimal OverallProgress { get; set; }

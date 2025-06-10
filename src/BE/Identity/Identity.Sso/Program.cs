@@ -127,7 +127,7 @@ builder.Services.AddCors(options =>
                 "http://localhost:3001", "https://localhost:3001",  // Alternative dev
                 "http://localhost:5173", "https://localhost:5173",  // Vite dev
                 "http://localhost:8080", "https://localhost:8080",  // Alternative Vue dev
-                "http://localhost:5217", "https://localhost:7226",  // Identity.Sso
+                "http://localhost:5217", "https://localhost:5001",  // Identity.Sso
                 // Production domains
                 "https://app.pfm.vn", "https://pfm.vn", "https://login.pfm.vn",
                 // Mobile development (for WebView)
@@ -140,6 +140,10 @@ builder.Services.AddCors(options =>
               .SetIsOriginAllowedToAllowWildcardSubdomains();
     });
 });
+
+// Add health checks
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<IdentityDbContext>();
 
 var app = builder.Build();
 
@@ -187,5 +191,8 @@ app.MapControllerRoute(
 
 // Map API controllers
 app.MapControllers();
+
+// Add health check endpoint
+app.MapHealthChecks("/health");
 
 await app.RunAsync();

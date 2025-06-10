@@ -58,7 +58,7 @@ public class IncomeAllocationResult
     /// List of jar allocations (EN)<br/>
     /// Danh sách phân bổ lọ (VI)
     /// </summary>
-    public List<JarAllocationDetail> JarAllocations { get; set; } = new();
+    public List<JarAllocationDetail> JarAllocations { get; set; } = [];
 
     /// <summary>
     /// Success status (EN)<br/>
