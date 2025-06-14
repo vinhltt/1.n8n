@@ -1,4 +1,4 @@
-﻿namespace CoreFinance.Contracts.DTOs;
+﻿namespace PlanningInvestment.Contracts.DTOs;
 
 /// <summary>
 /// Base Data Transfer Object providing a common base for DTOs. (EN)<br/>

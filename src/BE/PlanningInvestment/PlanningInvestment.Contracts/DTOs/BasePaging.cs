@@ -1,6 +1,47 @@
-﻿using CoreFinance.Contracts.BaseEfModels;
+﻿namespace PlanningInvestment.Contracts.DTOs;
 
-namespace CoreFinance.Contracts.DTOs;
+/// <summary>
+/// Represents pagination information. (EN)<br/>
+/// Đại diện cho thông tin phân trang. (VI)
+/// </summary>
+public class Pagination
+{
+    /// <summary>
+    /// Gets or sets the current page number (1-based). (EN)<br/>
+    /// Lấy hoặc đặt số trang hiện tại (bắt đầu từ 1). (VI)
+    /// </summary>
+    public int PageNumber { get; set; } = 1;
+
+    /// <summary>
+    /// Gets or sets the number of items per page. (EN)<br/>
+    /// Lấy hoặc đặt số mục trên mỗi trang. (VI)
+    /// </summary>
+    public int PageSize { get; set; } = 10;
+
+    /// <summary>
+    /// Gets or sets the total number of items. (EN)<br/>
+    /// Lấy hoặc đặt tổng số mục. (VI)
+    /// </summary>
+    public int TotalCount { get; set; }
+
+    /// <summary>
+    /// Gets the total number of pages. (EN)<br/>
+    /// Lấy tổng số trang. (VI)
+    /// </summary>
+    public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
+
+    /// <summary>
+    /// Gets whether there is a previous page. (EN)<br/>
+    /// Lấy thông tin có trang trước hay không. (VI)
+    /// </summary>
+    public bool HasPrevious => PageNumber > 1;
+
+    /// <summary>
+    /// Gets whether there is a next page. (EN)<br/>
+    /// Lấy thông tin có trang tiếp theo hay không. (VI)
+    /// </summary>
+    public bool HasNext => PageNumber < TotalPages;
+}
 
 /// <summary>
 /// Represents base pagination information for a collection of data. (EN)<br/>

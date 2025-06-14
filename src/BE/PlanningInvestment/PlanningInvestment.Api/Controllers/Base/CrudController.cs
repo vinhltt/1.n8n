@@ -14,11 +14,11 @@ public abstract class CrudController<TEntity, TCreateRequest, TUpdateRequest,
     IBaseService<TEntity, TCreateRequest, TUpdateRequest, TViewModel, TKey>
         baseService
 )
-    : BaseController(logger)
-    where TEntity : BaseEntity<TKey>, new()
+    : BaseController(logger)    where TEntity : BaseEntity<TKey>, new()
     where TCreateRequest : BaseCreateRequest, new()
     where TUpdateRequest : BaseUpdateRequest<TKey>, new()
     where TViewModel : BaseViewModel<TKey>, new()
+    where TKey : struct
 {
     /// <summary>
     ///     Creates a new entity. (EN)<br />

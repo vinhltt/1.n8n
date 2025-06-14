@@ -1,4 +1,4 @@
-﻿namespace CoreFinance.Contracts.DTOs;
+﻿namespace PlanningInvestment.Contracts.DTOs;
 
 /// <summary>
 /// Base abstract class for create request DTOs providing a common base. (EN)<br/>

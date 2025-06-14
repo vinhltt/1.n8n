@@ -1,6 +1,46 @@
 {
-    "cSpell.words": [
-        "Cloudflared",
-        "TRUENAS"
-    ]
+  "cSpell.words": [
+    "Cloudflared",
+    "TRUENAS"
+  ],
+  "git.path": "C:\\Program Files\\Git\\cmd\\git.exe",
+  "terminal.integrated.env.windows": {
+    "PATH": "${env:PATH};C:\\Program Files\\Git\\cmd"
+  },
+  // TypeScript/JavaScript formatting settings
+  // Cài đặt định dạng cho TypeScript/JavaScript
+  "[typescript]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false
+  },
+  "[javascript]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false
+  },
+  "[vue]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false
+  },
+  "[json]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false
+  },
+  "[jsonc]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false
+  },
+  // Global editor settings
+  // Cài đặt editor toàn cục
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
 }

@@ -35,9 +35,7 @@ public class AuthController(IAuthService authService, IUserService userService) 
         };
 
         return View(model);
-    }
-
-    /// <summary>
+    }    /// <summary>
     /// Handle login form submission
     /// Xử lý form đăng nhập
     /// </summary>
@@ -45,15 +43,23 @@ public class AuthController(IAuthService authService, IUserService userService) 
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
+        Console.WriteLine($"[AUTH DEBUG] Login POST started - Username: {model.UsernameOrEmail}, ReturnUrl: {model.ReturnUrl}");
+        
         if (!ModelState.IsValid)
         {
+            Console.WriteLine("[AUTH DEBUG] ModelState is invalid:");
+            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                Console.WriteLine($"  - {error.ErrorMessage}");
+            }
             return View(model);
         }
 
-        try
+        Console.WriteLine("[AUTH DEBUG] ModelState is valid, proceeding with authentication...");        try
         {            var loginRequest = new LoginRequest(model.UsernameOrEmail, model.Password);
 
             var loginResponse = await authService.LoginAsync(loginRequest);
+            Console.WriteLine($"[AUTH DEBUG] Authentication successful for user: {loginResponse.User.Email}");
 
             // Create claims for the authenticated user
             var claims = new List<Claim>
@@ -70,32 +76,52 @@ public class AuthController(IAuthService authService, IUserService userService) 
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var authProperties = new AuthenticationProperties
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);            var authProperties = new AuthenticationProperties
             {
                 IsPersistent = model.RememberMe,
                 ExpiresUtc = DateTimeOffset.UtcNow.AddHours(24)
-            };
-
-            await HttpContext.SignInAsync(
+            };            await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
 
-            if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+            Console.WriteLine($"[AUTH DEBUG] User signed in successfully. ReturnUrl: '{model.ReturnUrl}'");
+
+            // Handle return URL with support for trusted external URLs
+            // Xử lý return URL với hỗ trợ external URLs đáng tin cậy
+            if (!string.IsNullOrEmpty(model.ReturnUrl))
             {
-                return Redirect(model.ReturnUrl);
+                Console.WriteLine($"[AUTH DEBUG] Checking ReturnUrl: '{model.ReturnUrl}'");
+                Console.WriteLine($"[AUTH DEBUG] IsLocalUrl: {Url.IsLocalUrl(model.ReturnUrl)}");
+                Console.WriteLine($"[AUTH DEBUG] IsTrustedUrl: {IsTrustedUrl(model.ReturnUrl)}");
+                
+                if (Url.IsLocalUrl(model.ReturnUrl) || IsTrustedUrl(model.ReturnUrl))
+                {
+                    Console.WriteLine($"[AUTH DEBUG] ReturnUrl is trusted, redirecting to: {model.ReturnUrl}");
+                    return Redirect(model.ReturnUrl);
+                }
+                else
+                {
+                    Console.WriteLine($"[AUTH DEBUG] ReturnUrl is NOT trusted, falling back to Dashboard");
+                }
+            }
+            else
+            {
+                Console.WriteLine("[AUTH DEBUG] No ReturnUrl provided, redirecting to Dashboard");
             }
 
-            return RedirectToAction("Dashboard", "Home");
-        }
+            Console.WriteLine("[AUTH DEBUG] Redirecting to Dashboard");
+            return RedirectToAction("Dashboard", "Home");        }
         catch (UnauthorizedAccessException ex)
         {
+            Console.WriteLine($"[AUTH DEBUG] Authentication failed - Unauthorized: {ex.Message}");
             ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Console.WriteLine($"[AUTH DEBUG] Authentication failed - Exception: {ex.Message}");
+            Console.WriteLine($"[AUTH DEBUG] Exception StackTrace: {ex.StackTrace}");
             ModelState.AddModelError(string.Empty, "An error occurred during login. Please try again.");
             return View(model);
         }
@@ -199,7 +225,9 @@ public class AuthController(IAuthService authService, IUserService userService) 
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
         {
             return Redirect(returnUrl);
-        }        return RedirectToAction("Index", "Home");
+                }
+        
+        return RedirectToAction("Index", "Home");
     }
 
     /// <summary>
@@ -212,137 +240,42 @@ public class AuthController(IAuthService authService, IUserService userService) 
         return View();
     }
 
-    #region API Endpoints - Merged from Identity.Api
+    #region Private Helper Methods
 
     /// <summary>
-    /// Traditional login with username/email and password (API endpoint)
+    /// Check if URL is trusted for redirect
+    /// Kiểm tra URL có đáng tin cậy cho redirect không
     /// </summary>
-    [HttpPost("api/login")]
-    public async Task<ActionResult<LoginResponse>> LoginAsync([FromBody] LoginRequest request)
+    private bool IsTrustedUrl(string url)
     {
-        try
-        {
-            var response = await authService.LoginAsync(request);
-            return Ok(response);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(new { message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
+        if (string.IsNullOrEmpty(url))
+            return false;
 
-    /// <summary>
-    /// Register a new user (API endpoint - Temporary for testing)
-    /// </summary>
-    [HttpPost("api/register")]
-    public async Task<ActionResult<ApiResponse<UserResponse>>> RegisterAsync([FromBody] CreateUserRequest request)
-    {
         try
         {
-            var user = await userService.CreateAsync(request);
-            return Ok(new ApiResponse<UserResponse>
+            var uri = new Uri(url);
+            
+            // Allow localhost URLs for development
+            // Cho phép localhost URLs cho development
+            if (uri.Host == "localhost" || uri.Host == "127.0.0.1")
             {
-                Success = true,
-                Message = "User registered successfully",
-                Data = user
-            });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new ApiResponse<UserResponse>
+                // Allow common development ports
+                // Cho phép các ports development thông dụng
+                var allowedPorts = new[] { 3000, 3001, 8080, 5173, 4200 };
+                return allowedPorts.Contains(uri.Port);
+            }            // Add more trusted domains here as needed
+            // Thêm các domains đáng tin cậy khác ở đây nếu cần
+            var trustedHosts = new string[]
             {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new ApiResponse<UserResponse>
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-    }
+                // Add production domains here
+                // Thêm production domains ở đây
+            };
 
-    /// <summary>
-    /// Google OAuth2 login (API endpoint)
-    /// </summary>
-    [HttpPost("api/login/google")]
-    public async Task<ActionResult<LoginResponse>> GoogleLoginAsync([FromBody] GoogleLoginRequest request)
-    {
-        try
-        {
-            var response = await authService.GoogleLoginAsync(request);
-            return Ok(response);
+            return trustedHosts.Any(host => string.Equals(host, uri.Host, StringComparison.OrdinalIgnoreCase));
         }
-        catch (UnauthorizedAccessException ex)
+        catch
         {
-            return Unauthorized(new { message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
-
-    /// <summary>
-    /// Refresh access token using refresh token (API endpoint)
-    /// </summary>
-    [HttpPost("api/token/refresh")]
-    public async Task<ActionResult<RefreshTokenResponse>> RefreshTokenAsync([FromBody] RefreshTokenRequest request)
-    {
-        try
-        {
-            var response = await authService.RefreshTokenAsync(request);
-            return Ok(response);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(new { message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
-
-    /// <summary>
-    /// Logout and revoke refresh token (API endpoint)
-    /// </summary>
-    [HttpPost("api/logout")]
-    [Authorize]
-    public async Task<IActionResult> LogoutApiAsync([FromBody] LogoutRequest request)
-    {
-        try
-        {
-            await authService.LogoutAsync(request);
-            return Ok(new { message = "Logged out successfully" });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-    }
-
-    /// <summary>
-    /// Verify API key (internal use by API Gateway)
-    /// </summary>
-    [HttpPost("api/apikey/verify")]
-    public async Task<ActionResult<ApiKeyVerificationResponse>> VerifyApiKeyAsync([FromBody] string apiKey)
-    {
-        try
-        {
-            var response = await authService.VerifyApiKeyAsync(apiKey);
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
+            return false;
         }
     }
 

@@ -1,4 +1,4 @@
-﻿namespace CoreFinance.Contracts.DTOs;
+﻿namespace PlanningInvestment.Contracts.DTOs;
 
 /// <summary>
 /// Represents a Data Transfer Object for user login information. (EN)<br/>

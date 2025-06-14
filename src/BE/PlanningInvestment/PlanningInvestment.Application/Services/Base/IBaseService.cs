@@ -10,6 +10,7 @@ public interface IBaseService<TEntity, TCreateRequest, in TUpdateRequest, TViewM
     where TCreateRequest : BaseCreateRequest, new()
     where TUpdateRequest : BaseUpdateRequest<TKey>, new()
     where TViewModel : BaseViewModel<TKey>, new()
+    where TKey : struct
 {
     /// <summary>
     /// Gets all entities as view models asynchronously.<br/>

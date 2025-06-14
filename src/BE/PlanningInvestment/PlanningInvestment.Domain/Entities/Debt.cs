@@ -97,7 +97,12 @@ public class Debt : BaseEntity<Guid>
     /// Target payoff date (EN)<br/>
     /// Ngày mục tiêu trả hết nợ (VI)
     /// </summary>
-    public DateTime? TargetPayoffDate { get; set; }
+    public DateTime? TargetPayoffDate { get; set; }    /// <summary>
+    /// Status of the debt (EN)<br/>
+    /// Trạng thái của khoản nợ (VI)
+    /// </summary>
+    [Required]
+    public DebtStatus Status { get; set; } = DebtStatus.Active;
 
     /// <summary>
     /// Whether the debt is active (EN)<br/>
@@ -112,6 +117,12 @@ public class Debt : BaseEntity<Guid>
     /// </summary>
     [MaxLength(1000)]
     public string? Notes { get; set; }
+
+    /// <summary>
+    /// Navigation property for debt payments (EN)<br/>
+    /// Thuộc tính điều hướng cho các khoản thanh toán nợ (VI)
+    /// </summary>
+    public virtual ICollection<DebtPayment> DebtPayments { get; set; } = new List<DebtPayment>();
 
     /// <summary>
     /// Calculated property: Amount paid so far (EN)<br/>

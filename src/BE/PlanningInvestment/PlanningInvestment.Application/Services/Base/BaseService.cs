@@ -29,6 +29,7 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
     where TCreateRequest : BaseCreateRequest, new()
     where TUpdateRequest : BaseUpdateRequest<TKey>, new()
     where TViewModel : BaseViewModel<TKey>, new()
+    where TKey : struct
 {
     protected readonly IMapper Mapper = mapper;
 
@@ -95,10 +96,9 @@ public abstract class BaseService<TEntity, TCreateRequest, TUpdateRequest, TView
     {
         await using var trans = await unitOfWork.BeginTransactionAsync();
         try
-        {
-            logger.LogTrace("{UpdateAsync} request: {id}, {request}", nameof(UpdateAsync), id,
+        {            logger.LogTrace("{UpdateAsync} request: {id}, {request}", nameof(UpdateAsync), id,
                 request.TryParseToString());
-            if (id is null || !id.Equals(request.Id))
+            if (!id.Equals(request.Id))
                 throw new KeyNotFoundException();
             var entity = await unitOfWork.Repository<TEntity, TKey>().GetByIdAsync(id);
             logger.LogTrace("{UpdateAsync} old entity: {entity}", nameof(UpdateAsync), entity.TryParseToString());

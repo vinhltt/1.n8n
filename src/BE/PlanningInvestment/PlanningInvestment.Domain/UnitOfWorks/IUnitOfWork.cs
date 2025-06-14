@@ -20,16 +20,14 @@ public interface IUnitOfWork : IDisposable
     Task<string> GetTemplateQueryAsync(
         [CallerMemberName] string methodName = "",
         [CallerFilePath] string path = ""
-    );
-
-    /// <summary>
+    );    /// <summary>
     /// Gets a repository for the specified entity type and key type. (EN)<br/>
     /// Lấy một repository cho kiểu entity và kiểu khóa được chỉ định. (VI)
     /// </summary>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <typeparam name="TKey">The type of the entity's key.</typeparam>
     /// <returns>An instance of IBaseRepository for the specified entity and key type.</returns>
-    IBaseRepository<TEntity, TKey> Repository<TEntity, TKey>() where TEntity : BaseEntity<TKey>;
+    IBaseRepository<TEntity, TKey> Repository<TEntity, TKey>() where TEntity : BaseEntity<TKey> where TKey : struct;
 
     /// <summary>
     /// Begins a new database transaction asynchronously. (EN)<br/>
