@@ -105,7 +105,7 @@ services:
       custom_network:
         ipv4_address: ${IP_PREFIX}.5
     healthcheck:
-      test: ["/bin/sh", "/usr/local/bin/healthcheck.sh"]
+      test: ["CMD-SHELL", "pgrep -f 'node.*index.js' || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5

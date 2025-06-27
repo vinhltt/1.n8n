@@ -16,10 +16,8 @@ COPY package*.json ./
 # Cài đặt dependencies (sử dụng --omit=dev thay vì --only=production)
 RUN npm ci --omit=dev && npm cache clean --force
 
-# Copy source code và healthcheck script
+# Copy source code
 COPY . .
-COPY healthcheck.sh /usr/local/bin/healthcheck.sh
-RUN chmod +x /usr/local/bin/healthcheck.sh
 
 # Tạo user non-root để chạy ứng dụng
 RUN addgroup -g 1001 -S nodejs && \
@@ -32,9 +30,9 @@ USER discordbot
 # Expose port (không cần thiết cho Discord bot nhưng để sẵn cho health check)
 EXPOSE 3000
 
-# Health check
+# Health check - simple process check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD /usr/local/bin/healthcheck.sh || exit 1
+    CMD pgrep -f "node.*index.js" || exit 1
 
 # Sử dụng dumb-init để xử lý signals properly
 ENTRYPOINT ["dumb-init", "--"]
