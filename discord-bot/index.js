@@ -232,13 +232,34 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
   await sendWebhook(eventData);
 });
 
-// Xử lý lỗi
+// Xử lý lỗi và warnings
 client.on(Events.Error, (error) => {
-  log('error', 'Discord client error:', error);
+  log('error', 'Discord client error:', error.message);
+  log('debug', 'Error details:', error);
 });
 
 client.on(Events.Warn, (warning) => {
   log('warn', 'Discord client warning:', warning);
+});
+
+client.on(Events.Debug, (info) => {
+  if (config.logLevel === 'debug') {
+    log('debug', `Discord debug: ${info}`);
+  }
+});
+
+// Xử lý disconnect
+client.on(Events.Disconnect, () => {
+  log('warn', '⚠️  Bot bị disconnect từ Discord');
+});
+
+// Xử lý reconnecting  
+client.on(Events.Resuming, () => {
+  log('info', '🔄 Bot đang reconnecting...');
+});
+
+client.on(Events.Ready, () => {
+  log('info', '✅ Bot đã reconnect thành công');
 });
 
 // Xử lý tín hiệu tắt ứng dụng
@@ -255,18 +276,62 @@ process.on('SIGTERM', () => {
 });
 
 // Kiểm tra cấu hình trước khi khởi động
-if (!config.token) {
-  log('error', 'DISCORD_TOKEN không được cấu hình trong file .env');
-  process.exit(1);
+function validateConfig() {
+  log('info', 'Đang kiểm tra cấu hình...');
+  
+  if (!config.token) {
+    log('error', 'DISCORD_TOKEN không được cấu hình trong file .env');
+    log('error', 'Vui lòng thêm DISCORD_TOKEN=your_bot_token_here vào file .env');
+    process.exit(1);
+  }
+  
+  if (config.token === 'YOUR_DISCORD_TOKEN_HERE') {
+    log('error', 'DISCORD_TOKEN vẫn là placeholder. Vui lòng thay bằng token thật từ Discord Developer Portal');
+    process.exit(1);
+  }
+  
+  if (!config.webhookUrl) {
+    log('warn', 'N8N_WEBHOOK_URL không được cấu hình - bot sẽ chạy nhưng không gửi webhook');
+  }
+  
+  log('info', 'Cấu hình hợp lệ');
+  log('info', `Token length: ${config.token.length} chars`);
+  log('info', `Token preview: ${config.token.substring(0, 10)}...`);
+  log('debug', 'Webhook URL:', config.webhookUrl);
 }
 
-if (!config.webhookUrl) {
-  log('warn', 'N8N_WEBHOOK_URL không được cấu hình - bot sẽ chạy nhưng không gửi webhook');
+// Hàm khởi động bot với retry logic
+async function startBot() {
+  try {
+    validateConfig();
+    
+    log('info', 'Đang khởi động Discord bot...');
+    await client.login(config.token);
+    
+  } catch (error) {
+    log('error', 'Không thể đăng nhập Discord bot:');
+    log('error', `Error message: ${error.message}`);
+    
+    if (error.code === 'TokenInvalid') {
+      log('error', '❌ Token không hợp lệ hoặc đã hết hạn');
+      log('error', '💡 Vui lòng kiểm tra token tại: https://discord.com/developers/applications');
+    } else if (error.code === 'DisallowedIntents') {
+      log('error', '❌ Bot thiếu permissions hoặc Privileged Gateway Intents');
+      log('error', '💡 Bật Message Content Intent tại Discord Developer Portal > Bot > Privileged Gateway Intents');
+    } else if (error.code === 'ENOTFOUND' || error.code === 'ETIMEDOUT') {
+      log('error', '❌ Không thể kết nối đến Discord. Kiểm tra kết nối mạng');
+    } else {
+      log('error', `❌ Lỗi không xác định: ${error.code || 'Unknown'}`);
+      log('debug', 'Full error:', error);
+    }
+    
+    // Thay vì exit ngay, đợi 5 giây rồi retry
+    log('info', '🔄 Thử lại sau 5 giây...');
+    setTimeout(() => {
+      process.exit(1);
+    }, 5000);
+  }
 }
 
-// Đăng nhập bot
-log('info', 'Đang khởi động Discord bot...');
-client.login(config.token).catch(error => {
-  log('error', 'Không thể đăng nhập Discord bot:', error);
-  process.exit(1);
-}); 
+// Khởi động bot
+startBot(); 

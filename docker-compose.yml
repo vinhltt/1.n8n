@@ -89,7 +89,7 @@ services:
     build:
       context: ./discord-bot
       dockerfile: Dockerfile
-    restart: on-failure:3
+    restart: unless-stopped
     environment:
       - TZ=${TZ:-Asia/Ho_Chi_Minh}
       - DISCORD_TOKEN=${DISCORD_TOKEN}
@@ -105,11 +105,11 @@ services:
       custom_network:
         ipv4_address: ${IP_PREFIX}.5
     healthcheck:
-      test: ["CMD", "node", "-e", "console.log('Bot is running')"]
+      test: ["/bin/sh", "/usr/local/bin/healthcheck.sh"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 10s
+      retries: 5
+      start_period: 30s
 
 # Custom bridge network with static IPs
 # Last edited: 2024-05-18

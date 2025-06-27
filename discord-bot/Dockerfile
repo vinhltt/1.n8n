@@ -7,6 +7,7 @@ WORKDIR /app
 # Cài đặt các dependencies hệ thống cần thiết
 RUN apk add --no-cache \
     dumb-init \
+    curl \
     && rm -rf /var/cache/apk/*
 
 # Copy package.json và package-lock.json (nếu có)
@@ -15,8 +16,10 @@ COPY package*.json ./
 # Cài đặt dependencies (sử dụng --omit=dev thay vì --only=production)
 RUN npm ci --omit=dev && npm cache clean --force
 
-# Copy source code
+# Copy source code và healthcheck script
 COPY . .
+COPY healthcheck.sh /usr/local/bin/healthcheck.sh
+RUN chmod +x /usr/local/bin/healthcheck.sh
 
 # Tạo user non-root để chạy ứng dụng
 RUN addgroup -g 1001 -S nodejs && \
@@ -30,8 +33,8 @@ USER discordbot
 EXPOSE 3000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD node -e "console.log('Bot is running')" || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD /usr/local/bin/healthcheck.sh || exit 1
 
 # Sử dụng dumb-init để xử lý signals properly
 ENTRYPOINT ["dumb-init", "--"]
