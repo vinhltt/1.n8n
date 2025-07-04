@@ -102,10 +102,11 @@ fi
 # 6.2) Archive Docker volume
 VOL_FILE="n8n_data_backup.tar.gz"
 echo "[*] Archiving Docker volume …"
+# Add progress output to prevent SSH timeout
 if sudo docker run --rm \
      -v "${N8N_VOLUME_NAME}:/volume_data:ro" \
      -v "${RUN_DIR}:/backup_target" \
-     alpine sh -c "tar czf \"/backup_target/$VOL_FILE\" -C /volume_data ."; then
+     alpine sh -c "echo 'Starting tar archive...'; tar czf \"/backup_target/$VOL_FILE\" -C /volume_data . && echo 'Archive completed successfully'"; then
   echo "    → OK: $VOL_FILE"
 else
   echo "    → LỖI: backup volume thất bại."

@@ -30,14 +30,17 @@ jobs:
           # Tạo thư mục $HOME/.ssh nếu chưa tồn tại
           mkdir -p "$HOME/.ssh"
           
-          # Tạo tệp cấu hình SSH sử dụng $HOME
+          # Tạo tệp cấu hình SSH sử dụng $HOME với keep-alive settings
           echo "Host truenas-cf-tunnel
             HostName ${{ secrets.TRUENAS_SSH_HOSTNAME_THROUGH_CLOUDFLARED }}
             ProxyCommand cloudflared access ssh --hostname %h
             User ${{ secrets.TRUENAS_USER }}
             StrictHostKeyChecking no
             UserKnownHostsFile /dev/null
-            LogLevel ERROR" > "$HOME/.ssh/config" # Sử dụng $HOME
+            LogLevel ERROR
+            ServerAliveInterval 60
+            ServerAliveCountMax 10
+            TCPKeepAlive yes" > "$HOME/.ssh/config" # Sử dụng $HOME
           
           chmod 600 "$HOME/.ssh/config"
           echo "✅ SSH config for Cloudflared created at $HOME/.ssh/config"
