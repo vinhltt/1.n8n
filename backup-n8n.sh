@@ -26,18 +26,18 @@ set +a
 if [ -z "${POSTGRES_CONTAINER:-}" ]; then
   # Thử lấy tên service postgres từ docker-compose.yml (ưu tiên postgresdb)
   if command -v docker-compose &>/dev/null; then
-    POSTGRES_SERVICE=$(docker-compose ps --services | grep -E '^postgres(db)?$' | head -n1)
+    POSTGRES_SERVICE=$(sudo docker-compose ps --services | grep -E '^postgres(db)?$' | head -n1)
     # Lấy container ID từ service
-    POSTGRES_CONTAINER_ID=$(docker-compose ps -q "$POSTGRES_SERVICE")
+    POSTGRES_CONTAINER_ID=$(sudo docker-compose ps -q "$POSTGRES_SERVICE")
   else
-    POSTGRES_SERVICE=$(docker compose ps --services | grep -E '^postgres(db)?$' | head -n1)
-    POSTGRES_CONTAINER_ID=$(docker compose ps -q "$POSTGRES_SERVICE")
+    POSTGRES_SERVICE=$(sudo docker compose ps --services | grep -E '^postgres(db)?$' | head -n1)
+    POSTGRES_CONTAINER_ID=$(sudo docker compose ps -q "$POSTGRES_SERVICE")
   fi
   if [ -z "$POSTGRES_CONTAINER_ID" ]; then
     echo "Lỗi: Không xác định được container PostgreSQL từ docker-compose." >&2; exit 1;
   fi
   # Lấy tên container thực tế từ container ID
-  POSTGRES_CONTAINER=$(docker ps --filter id="$POSTGRES_CONTAINER_ID" --format '{{.Names}}')
+  POSTGRES_CONTAINER=$(sudo docker ps --filter id="$POSTGRES_CONTAINER_ID" --format '{{.Names}}')
   if [ -z "$POSTGRES_CONTAINER" ]; then
     echo "Lỗi: Không lấy được tên container PostgreSQL từ ID." >&2; exit 1;
   fi
@@ -60,9 +60,9 @@ DB_PASSWORD="$POSTGRES_PASSWORD"
 BACKUP_DIR="$N8N_BACKUP_DIR_HOST" # Thay đổi đường dẫn backup
 
 # 4) Sanity checks Docker
-docker inspect "$POSTGRES_CONTAINER" >/dev/null 2>&1 \
+sudo docker inspect "$POSTGRES_CONTAINER" >/dev/null 2>&1 \
   || { echo "Lỗi: container $POSTGRES_CONTAINER không tồn tại." >&2; exit 1; }
-docker volume inspect "$N8N_VOLUME_NAME" >/dev/null 2>&1 \
+sudo docker volume inspect "$N8N_VOLUME_NAME" >/dev/null 2>&1 \
   || { echo "Lỗi: volume $N8N_VOLUME_NAME không tồn tại." >&2; exit 1; }
 
 # 5) Tạo RUN_DIR & file log trong đó
@@ -88,7 +88,7 @@ FAILED=0
 # 6.1) Dump PostgreSQL
 DB_FILE="n8n_db_backup.sql.gz"
 echo "[*] Dumping PostgreSQL …"
-if docker exec -i \
+if sudo docker exec -i \
      -e PGPASSWORD="$DB_PASSWORD" \
      "$POSTGRES_CONTAINER" \
      pg_dump -U "$DB_USER" -d "$DB_NAME" -Fc 2>/dev/null \
@@ -102,7 +102,7 @@ fi
 # 6.2) Archive Docker volume
 VOL_FILE="n8n_data_backup.tar.gz"
 echo "[*] Archiving Docker volume …"
-if docker run --rm \
+if sudo docker run --rm \
      -v "${N8N_VOLUME_NAME}:/volume_data:ro" \
      -v "${RUN_DIR}:/backup_target" \
      alpine sh -c "tar czf \"/backup_target/$VOL_FILE\" -C /volume_data ."; then
