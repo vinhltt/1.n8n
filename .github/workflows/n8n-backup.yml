@@ -48,19 +48,51 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.TRUENAS_SSH_PRIVATE_KEY }}
 
-      - name: Check required files on TrueNAS
+      - name: Check required files and environment on TrueNAS
         run: |
           ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
             set -e # Exit immediately if a command exits with a non-zero status.
-            echo "Checking files in ${{ env.TRUENAS_DEPLOY_DIR }} on TrueNAS..."
+            echo "🔍 Checking environment in ${{ env.TRUENAS_DEPLOY_DIR }} on TrueNAS..."
             cd "${{ env.TRUENAS_DEPLOY_DIR }}"
+            
+            # Check required files
             if [ ! -f .env ]; then
               echo "❌ Không tìm thấy file .env trong ${{ env.TRUENAS_DEPLOY_DIR }} trên TrueNAS"; exit 1;
             fi
             if [ ! -f backup-n8n.sh ]; then
               echo "❌ Không tìm thấy script backup-n8n.sh trong ${{ env.TRUENAS_DEPLOY_DIR }} trên TrueNAS"; exit 1;
             fi
-            echo "✅ Required files .env and backup-n8n.sh found on TrueNAS."
+            if [ ! -f docker-compose.yml ]; then
+              echo "❌ Không tìm thấy docker-compose.yml trong ${{ env.TRUENAS_DEPLOY_DIR }} trên TrueNAS"; exit 1;
+            fi
+            
+            # Load environment and check key variables
+            set -a
+            source .env
+            set +a
+            
+            echo "✅ Required files found."
+            echo "🔍 Environment variables check:"
+            echo "   COMPOSE_PROJECT_NAME: \${COMPOSE_PROJECT_NAME:-NOT_SET}"
+            echo "   POSTGRES_DB: \${POSTGRES_DB:-NOT_SET}"
+            echo "   POSTGRES_USER: \${POSTGRES_USER:-NOT_SET}"
+            echo "   N8N_BACKUP_DIR_HOST: \${N8N_BACKUP_DIR_HOST:-NOT_SET}"
+            
+            # Check Docker services status
+            echo "🔍 Docker services status:"
+            if command -v docker-compose &>/dev/null; then
+              docker-compose ps || docker compose ps
+            else
+              docker compose ps
+            fi
+            
+            # Check backup directory
+            if [ -n "\${N8N_BACKUP_DIR_HOST:-}" ] && [ ! -d "\${N8N_BACKUP_DIR_HOST}" ]; then
+              echo "⚠️  Backup directory \${N8N_BACKUP_DIR_HOST} không tồn tại, sẽ tạo mới."
+              mkdir -p "\${N8N_BACKUP_DIR_HOST}"
+            fi
+            
+            echo "✅ Environment check completed."
           EOF
         shell: bash
 
@@ -70,9 +102,37 @@ jobs:
             set -e # Exit immediately if a command exits with a non-zero status.
             echo "🔒 Đang backup dữ liệu n8n cho môi trường production (branch: ${{ github.ref_name }}) trên TrueNAS..."
             echo "   Thư mục triển khai: ${{ env.TRUENAS_DEPLOY_DIR }}"
+            echo "   Thời gian bắt đầu: \$(date '+%Y-%m-%d %H:%M:%S')"
+            
             cd "${{ env.TRUENAS_DEPLOY_DIR }}"
-            bash ./backup-n8n.sh
-            echo "✅ Đã backup dữ liệu n8n thành công trên TrueNAS."
+            
+            # Make backup script executable
+            chmod +x ./backup-n8n.sh
+            
+            # Execute backup with detailed logging
+            echo "🚀 Executing backup script..."
+            if bash ./backup-n8n.sh; then
+              echo "✅ Backup completed successfully!"
+              
+              # Show backup results
+              source .env
+              if [ -n "\${N8N_BACKUP_DIR_HOST:-}" ] && [ -d "\${N8N_BACKUP_DIR_HOST}" ]; then
+                echo "📁 Recent backups:"
+                ls -la "\${N8N_BACKUP_DIR_HOST}" | tail -5
+                
+                # Show latest backup contents
+                LATEST_BACKUP=\$(ls -1t "\${N8N_BACKUP_DIR_HOST}" | head -1)
+                if [ -n "\$LATEST_BACKUP" ] && [ -d "\${N8N_BACKUP_DIR_HOST}/\$LATEST_BACKUP" ]; then
+                  echo "📦 Latest backup contents:"
+                  ls -la "\${N8N_BACKUP_DIR_HOST}/\$LATEST_BACKUP/"
+                fi
+              fi
+            else
+              echo "❌ Backup failed!"
+              exit 1
+            fi
+            
+            echo "   Thời gian kết thúc: \$(date '+%Y-%m-%d %H:%M:%S')"
           EOF
         shell: bash
 

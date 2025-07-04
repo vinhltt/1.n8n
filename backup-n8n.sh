@@ -24,30 +24,50 @@ set +a
 # 3) Biến cấu hình, báo lỗi nếu thiếu
 # --- Lấy tên container PostgreSQL thực tế ---
 if [ -z "${POSTGRES_CONTAINER:-}" ]; then
-  # Thử lấy tên service postgres từ docker-compose.yml (ưu tiên postgresdb)
-  if command -v docker-compose &>/dev/null; then
-    POSTGRES_SERVICE=$(docker-compose ps --services | grep -E '^postgres(db)?$' | head -n1)
-    # Lấy container ID từ service
-    POSTGRES_CONTAINER_ID=$(docker-compose ps -q "$POSTGRES_SERVICE")
+  # Ưu tiên sử dụng COMPOSE_PROJECT_NAME để construct container name
+  if [ -n "${COMPOSE_PROJECT_NAME:-}" ]; then
+    POSTGRES_CONTAINER="${COMPOSE_PROJECT_NAME}-postgresdb-1"
+    echo "🔍 Using COMPOSE_PROJECT_NAME to construct container: $POSTGRES_CONTAINER"
   else
-    POSTGRES_SERVICE=$(docker compose ps --services | grep -E '^postgres(db)?$' | head -n1)
-    POSTGRES_CONTAINER_ID=$(docker compose ps -q "$POSTGRES_SERVICE")
-  fi
-  if [ -z "$POSTGRES_CONTAINER_ID" ]; then
-    echo "Lỗi: Không xác định được container PostgreSQL từ docker-compose." >&2; exit 1;
-  fi
-  # Lấy tên container thực tế từ container ID
-  POSTGRES_CONTAINER=$(docker ps --filter id="$POSTGRES_CONTAINER_ID" --format '{{.Names}}')
-  if [ -z "$POSTGRES_CONTAINER" ]; then
-    echo "Lỗi: Không lấy được tên container PostgreSQL từ ID." >&2; exit 1;
+    # Fallback: Thử lấy từ docker-compose nếu không có COMPOSE_PROJECT_NAME
+    echo "🔍 COMPOSE_PROJECT_NAME not set, trying auto-detection..."
+    if command -v docker-compose &>/dev/null; then
+      POSTGRES_SERVICE=$(docker-compose ps --services 2>/dev/null | grep -E '^postgres(db)?$' | head -n1)
+      if [ -n "$POSTGRES_SERVICE" ]; then
+        POSTGRES_CONTAINER_ID=$(docker-compose ps -q "$POSTGRES_SERVICE" 2>/dev/null)
+      fi
+    else
+      POSTGRES_SERVICE=$(docker compose ps --services 2>/dev/null | grep -E '^postgres(db)?$' | head -n1)
+      if [ -n "$POSTGRES_SERVICE" ]; then
+        POSTGRES_CONTAINER_ID=$(docker compose ps -q "$POSTGRES_SERVICE" 2>/dev/null)
+      fi
+    fi
+    
+    if [ -n "$POSTGRES_CONTAINER_ID" ]; then
+      POSTGRES_CONTAINER=$(docker ps --filter id="$POSTGRES_CONTAINER_ID" --format '{{.Names}}')
+    fi
+    
+    if [ -z "$POSTGRES_CONTAINER" ]; then
+      echo "❌ Không thể xác định container PostgreSQL."
+      echo "   Hãy đặt biến POSTGRES_CONTAINER hoặc COMPOSE_PROJECT_NAME"
+      echo "   Các container đang chạy:"
+      docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
+      exit 1
+    fi
   fi
 fi
-POSTGRES_CONTAINER=${POSTGRES_CONTAINER}
+
 DB_NAME=${POSTGRES_DB:-n8n_database}
 if [ -z "${N8N_VOLUME_NAME:-}" ]; then
-  # Lấy prefix từ tên container PostgreSQL, ví dụ: pfm_prod-postgresdb-1
-  PREFIX=$(echo "$POSTGRES_CONTAINER" | sed -E 's/-postgres(db)?-[0-9]+$//')
-  N8N_VOLUME_NAME="${PREFIX}_n8n_data"
+  if [ -n "${COMPOSE_PROJECT_NAME:-}" ]; then
+    N8N_VOLUME_NAME="${COMPOSE_PROJECT_NAME}_n8n_data"
+    echo "🔍 Using COMPOSE_PROJECT_NAME to construct volume: $N8N_VOLUME_NAME"
+  else
+    # Fallback: Lấy prefix từ tên container PostgreSQL
+    PREFIX=$(echo "$POSTGRES_CONTAINER" | sed -E 's/-postgres(db)?-[0-9]+$//')
+    N8N_VOLUME_NAME="${PREFIX}_n8n_data"
+    echo "🔍 Extracted prefix '$PREFIX' from container name"
+  fi
 fi
 RETENTION_DAYS=${N8N_RETENTION_DAYS:-7}
 
@@ -59,11 +79,34 @@ DB_USER="$POSTGRES_USER"
 DB_PASSWORD="$POSTGRES_PASSWORD"
 BACKUP_DIR="$N8N_BACKUP_DIR_HOST" # Thay đổi đường dẫn backup
 
-# 4) Sanity checks Docker
-docker inspect "$POSTGRES_CONTAINER" >/dev/null 2>&1 \
-  || { echo "Lỗi: container $POSTGRES_CONTAINER không tồn tại." >&2; exit 1; }
-docker volume inspect "$N8N_VOLUME_NAME" >/dev/null 2>&1 \
-  || { echo "Lỗi: volume $N8N_VOLUME_NAME không tồn tại." >&2; exit 1; }
+# 4) Sanity checks Docker với debugging
+echo "🔍 Kiểm tra container và volume..."
+echo "   Container cần backup: $POSTGRES_CONTAINER"
+echo "   Volume cần backup: $N8N_VOLUME_NAME"
+
+# List containers for debugging
+echo "   Các container đang chạy:"
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Image}}" | head -10
+
+if ! docker inspect "$POSTGRES_CONTAINER" >/dev/null 2>&1; then
+  echo "❌ Container $POSTGRES_CONTAINER không tồn tại hoặc không chạy."
+  echo "   Các container hiện có:"
+  docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
+  exit 1
+fi
+
+# List volumes for debugging  
+echo "   Các volume hiện có:"
+docker volume ls | head -10
+
+if ! docker volume inspect "$N8N_VOLUME_NAME" >/dev/null 2>&1; then
+  echo "❌ Volume $N8N_VOLUME_NAME không tồn tại."
+  echo "   Các volume hiện có:"
+  docker volume ls
+  exit 1
+fi
+
+echo "✅ Container và volume đã được xác nhận."
 
 # 5) Tạo RUN_DIR & file log trong đó
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
