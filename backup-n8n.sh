@@ -49,7 +49,8 @@ if [ -z "${N8N_VOLUME_NAME:-}" ]; then
   PREFIX=$(echo "$POSTGRES_CONTAINER" | sed -E 's/-postgres(db)?-[0-9]+$//')
   N8N_VOLUME_NAME="${PREFIX}_n8n_data"
 fi
-RETENTION_DAYS=${N8N_RETENTION_DAYS:-7}
+# Số bản backup mới nhất sẽ được giữ lại (mặc định: 7 bản)
+RETENTION=${N8N_RETENTION:-7}
 
 : "${POSTGRES_USER:?Lỗi: POSTGRES_USER chưa đặt}"
 : "${POSTGRES_PASSWORD:?Lỗi: POSTGRES_PASSWORD chưa đặt}"
@@ -80,7 +81,7 @@ echo "BẮT ĐẦU backup lúc:  $(date '+%F %T')"
 echo "RUN_DIR:            $RUN_DIR"
 echo "Container DB:       $POSTGRES_CONTAINER (DB: $DB_NAME)"
 echo "Volume:             $N8N_VOLUME_NAME"
-echo "Giữ lại:            $RETENTION_DAYS ngày"
+echo "Giữ lại:            $RETENTION bản backup mới nhất"
 echo "------------------------------------------------------------------"
 
 FAILED=0
@@ -113,11 +114,19 @@ else
   FAILED=1
 fi
 
-# 6.3) Cleanup các RUN_DIR cũ
-echo "[*] Xoá thư mục backup cũ (> $RETENTION_DAYS ngày) …"
+# 6.3) Cleanup để giữ lại chỉ N bản backup mới nhất
+echo "[*] Giữ lại $RETENTION bản backup mới nhất, xóa các bản cũ hơn …"
+# Liệt kê các thư mục backup theo thứ tự thời gian (mới nhất đầu tiên)
+# Bỏ qua N bản đầu tiên (mới nhất), xóa phần còn lại
 find "$BACKUP_DIR" -maxdepth 1 -mindepth 1 -type d \
-     -name '[0-9]*_[0-9]*' -mtime +"$RETENTION_DAYS" \
-     -print -exec rm -rf {} +
+     -name '[0-9]*_[0-9]*' -printf '%T@ %p\n' | \
+     sort -nr | \
+     tail -n +$((RETENTION + 1)) | \
+     cut -d' ' -f2- | \
+     while IFS= read -r backup_dir; do
+         echo "    → Xóa backup cũ: $(basename "$backup_dir")"
+         rm -rf "$backup_dir"
+     done
 
 echo "------------------------------------------------------------------"
 if [[ "$FAILED" -eq 0 ]]; then

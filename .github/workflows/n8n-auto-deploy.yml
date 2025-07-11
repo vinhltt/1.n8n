@@ -154,6 +154,7 @@ jobs:
           DB_POSTGRESDB_PASSWORD='${{ secrets.POSTGRES_PASSWORD }}'
           WEBHOOK_URL=${{ vars.WEBHOOK_URL }}
           N8N_EXTERNAL_PORT=${{ vars.N8N_EXTERNAL_PORT || '5678' }}
+          N8N_RETENTION=${{ vars.N8N_RETENTION || '7' }}
           # Excel API
           EXCEL_API_HTTP_PORT=${{ vars.EXCEL_API_HTTP_PORT || '8080' }}
           EXCEL_API_HTTPS_PORT=${{ vars.EXCEL_API_HTTPS_PORT || '8443' }}
