@@ -32,7 +32,8 @@ jobs:
           if [ -z "${{ secrets.DISCORD_TOKEN }}" ]; then
             MISSING_SECRETS+=("DISCORD_TOKEN")
           else
-            echo "✅ DISCORD_TOKEN: Có (độ dài: ${#DISCORD_TOKEN} ký tự)"
+            TOKEN_LENGTH=$(echo "${{ secrets.DISCORD_TOKEN }}" | wc -c)
+            echo "✅ DISCORD_TOKEN: Có (độ dài: $TOKEN_LENGTH ký tự)"
           fi
           
           if [ -z "${{ secrets.POSTGRES_PASSWORD }}" ]; then
@@ -56,8 +57,6 @@ jobs:
           
           echo "✅ Tất cả secrets cần thiết đã được cấu hình"
         shell: bash
-        env:
-          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
 
       - name: Set TrueNAS Deploy Directory Environment Variable
         run: echo "TRUENAS_DEPLOY_DIR=${{ vars.DEPLOY_PATH_ON_TRUENAS }}/deploy_${GITHUB_REF_NAME}" >> $GITHUB_ENV
@@ -115,9 +114,8 @@ jobs:
 
       - name: Prepare deploy directory on TrueNAS
         run: |
-          # Sử dụng alias 'truenas-cf-tunnel' đã cấu hình
-          # Thêm -F "$HOME/.ssh/config" vào lệnh ssh để chỉ định rõ ràng
-          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << 'EOF'
+            #!/bin/bash
             mkdir -p ${{ env.TRUENAS_DEPLOY_DIR }}
             echo "✅ Prepared TrueNAS deploy directory: ${{ env.TRUENAS_DEPLOY_DIR }}"
           EOF
@@ -183,22 +181,25 @@ jobs:
 
       - name: Debug Discord Token Configuration
         run: |
-          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << 'EOF'
+            #!/bin/bash
             cd ${{ env.TRUENAS_DEPLOY_DIR }}
             echo "🔍 Kiểm tra cấu hình Discord Token..."
             
             # Kiểm tra DISCORD_TOKEN có tồn tại trong .env không
             if grep -q "DISCORD_TOKEN=" .env; then
-              TOKEN_LINE=\$(grep "DISCORD_TOKEN=" .env)
-              if [[ "\$TOKEN_LINE" == "DISCORD_TOKEN=" ]]; then
+              TOKEN_LINE=$(grep "DISCORD_TOKEN=" .env)
+              if [ "$TOKEN_LINE" = "DISCORD_TOKEN=" ]; then
                 echo "❌ DISCORD_TOKEN rỗng trong file .env"
               else
-                TOKEN_VALUE=\$(echo "\$TOKEN_LINE" | cut -d'=' -f2)
-                if [[ "\$TOKEN_VALUE" == "" ]]; then
+                TOKEN_VALUE=$(echo "$TOKEN_LINE" | cut -d'=' -f2)
+                if [ "$TOKEN_VALUE" = "" ]; then
                   echo "❌ DISCORD_TOKEN không có giá trị"
                 else
-                  echo "✅ DISCORD_TOKEN đã được cấu hình (độ dài: \${#TOKEN_VALUE} ký tự)"
-                  echo "🔑 Token preview: \${TOKEN_VALUE:0:10}..."
+                  TOKEN_LENGTH=$(echo "$TOKEN_VALUE" | wc -c)
+                  TOKEN_PREVIEW=$(echo "$TOKEN_VALUE" | cut -c1-10)
+                  echo "✅ DISCORD_TOKEN đã được cấu hình (độ dài: $TOKEN_LENGTH ký tự)"
+                  echo "🔑 Token preview: ${TOKEN_PREVIEW}..."
                 fi
               fi
             else
@@ -212,7 +213,8 @@ jobs:
 
       - name: Prepare n8n host mount directories on TrueNAS
         run: |
-          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << 'EOF'
+            #!/bin/bash
             mkdir -p ${{ env.TRUENAS_DEPLOY_DIR }}/n8n_data
             mkdir -p ${{ env.TRUENAS_DEPLOY_DIR }}/ssh
             echo "✅ Prepared n8n host mount directories on TrueNAS (within deployment folder)"
@@ -221,7 +223,8 @@ jobs:
 
       - name: Prepare n8n config file on TrueNAS
         run: |
-          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << 'EOF'
+            #!/bin/bash
             set -e 
             cd ${{ env.TRUENAS_DEPLOY_DIR }}
             echo "🧹 Đang chuẩn bị môi trường cho file config n8n..."
@@ -231,7 +234,7 @@ jobs:
             fi
             if [ -f "./n8n_data/config" ]; then
               echo "📦 Sao lưu file config hiện tại..."
-              cp "./n8n_data/config" "./n8n_data/config.bak.\$(date +%Y%m%d_%H%M%S)"
+              cp "./n8n_data/config" "./n8n_data/config.bak.$(date +%Y%m%d_%H%M%S)"
               echo "✅ Đã sao lưu file config"
             fi
             CONFIG_ISSUE=false
@@ -241,12 +244,12 @@ jobs:
                 CONFIG_ISSUE=true
               fi
             fi
-            if [ ! -f "./n8n_data/config" ] || [ "\$CONFIG_ISSUE" = true ]; then
+            if [ ! -f "./n8n_data/config" ] || [ "$CONFIG_ISSUE" = true ]; then
               if [ -f ".env" ]; then
-                CLEAN_KEY=\$(grep "N8N_ENCRYPTION_KEY=" .env | cut -d '=' -f2- | sed "s/^'//;s/'\$//")
-                if [ ! -z "\$CLEAN_KEY" ] && [ "\$CLEAN_KEY" != "null" ]; then
+                CLEAN_KEY=$(grep "N8N_ENCRYPTION_KEY=" .env | cut -d '=' -f2- | sed "s/^'//;s/'$//")
+                if [ ! -z "$CLEAN_KEY" ] && [ "$CLEAN_KEY" != "null" ]; then
                   echo "📝 Tạo file config với encryptionKey từ .env..."
-                  printf '{"encryptionKey": "%s"}\n' "\$CLEAN_KEY" > ./n8n_data/config
+                  printf '{"encryptionKey": "%s"}\n' "$CLEAN_KEY" > ./n8n_data/config
                   echo "✅ Đã tạo file config mới tại ./n8n_data/config"
                 else
                   echo "⚠️ Không tìm thấy N8N_ENCRYPTION_KEY hợp lệ trong file .env hoặc giá trị rỗng/null"
@@ -260,37 +263,102 @@ jobs:
           EOF
         shell: bash
 
+      - name: Check Docker permissions and setup sudo if needed
+        run: |
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << 'EOF'
+            #!/bin/bash
+            cd ${{ env.TRUENAS_DEPLOY_DIR }}
+            echo "🔍 Kiểm tra quyền Docker..."
+            
+            # Kiểm tra xem user có quyền Docker không
+            if docker ps >/dev/null 2>&1; then
+              echo "✅ User có quyền Docker, không cần sudo"
+              USE_SUDO=""
+            else
+              echo "⚠️ User không có quyền Docker, sẽ sử dụng sudo"
+              # Kiểm tra xem sudo có hoạt động với docker không
+              if sudo docker ps >/dev/null 2>&1; then
+                echo "✅ Sudo Docker hoạt động bình thường"
+                USE_SUDO="sudo"
+              else
+                echo "❌ Không thể sử dụng Docker ngay cả với sudo"
+                exit 1
+              fi
+            fi
+            
+            # Xuất biến môi trường để các lệnh tiếp theo sử dụng
+            echo "USE_SUDO=$USE_SUDO" > /tmp/docker_sudo_config
+            echo "🔧 Docker command prefix được thiết lập: '$USE_SUDO'"
+          EOF
+        shell: bash
+
       - name: docker compose operations on TrueNAS
         run: |
-          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << 'EOF'
+            #!/bin/bash
             set -e 
             cd ${{ env.TRUENAS_DEPLOY_DIR }}
+            
+            # Đọc cấu hình sudo từ step trước
+            if [ -f /tmp/docker_sudo_config ]; then
+              source /tmp/docker_sudo_config
+            else
+              # Fallback: kiểm tra lại quyền Docker
+              if ! docker ps >/dev/null 2>&1; then
+                USE_SUDO="sudo"
+              else
+                USE_SUDO=""
+              fi
+            fi
+            
             echo "🐳 Working with Docker Compose in ${{ env.TRUENAS_DEPLOY_DIR }}"
+            echo "🔧 Using Docker command prefix: '$USE_SUDO'"
+            
             echo "🔄 Đang pull images mới nhất..."
-            docker compose pull
+            $USE_SUDO docker compose pull
             echo "✅ Đã pull images thành công"
+            
             echo "🔨 Đang build images cho tất cả các dịch vụ (nếu có thay đổi)..."
-            docker compose build
+            $USE_SUDO docker compose build
             echo "✅ Đã build images thành công"
+            
             echo "⏹️  Dừng containers hiện tại (nếu đang chạy)..."
-            docker compose down --remove-orphans || true 
+            $USE_SUDO docker compose down --remove-orphans || true 
             echo "✅ Đã dừng các containers hiện tại"
+            
             echo "🚀 Khởi động lại n8n và các dịch vụ liên quan..."
-            docker compose up -d
+            $USE_SUDO docker compose up -d
             echo "✅ Đã khởi động containers thành công"
+            
             echo "⏳ Đang đợi n8n khởi động (30 giây)..."
             sleep 30
+            
             echo "📊 Kiểm tra trạng thái các container..."
-            docker compose ps
+            $USE_SUDO docker compose ps
           EOF
         shell: bash
 
       - name: Verify Discord Bot deployment
         run: |
-          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << EOF
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << 'EOF'
+            #!/bin/bash
             set -e 
             cd ${{ env.TRUENAS_DEPLOY_DIR }}
+            
+            # Đọc cấu hình sudo từ file config
+            if [ -f /tmp/docker_sudo_config ]; then
+              source /tmp/docker_sudo_config
+            else
+              # Fallback: kiểm tra lại quyền Docker
+              if ! docker ps >/dev/null 2>&1; then
+                USE_SUDO="sudo"
+              else
+                USE_SUDO=""
+              fi
+            fi
+            
             echo "🤖 Kiểm tra trạng thái Discord Bot..."
+            echo "🔧 Using Docker command prefix: '$USE_SUDO'"
             
             # Đợi Discord Bot khởi động (60 giây thay vì ngay lập tức)
             echo "⏳ Đợi Discord Bot khởi động (60 giây)..."
@@ -298,41 +366,41 @@ jobs:
             
             # Kiểm tra container Discord bot có chạy không
             echo "📊 Trạng thái tất cả containers:"
-            docker compose ps
+            $USE_SUDO docker compose ps
             
-            if docker compose ps discord-bot | grep -q "Up"; then
+            if $USE_SUDO docker compose ps discord-bot | grep -q "Up"; then
               echo "✅ Discord Bot container đang chạy"
               
               # Kiểm tra logs để xem bot có kết nối thành công không
               echo "📋 Logs Discord Bot (20 dòng cuối):"
-              docker compose logs --tail=20 discord-bot
+              $USE_SUDO docker compose logs --tail=20 discord-bot
               
               # Kiểm tra xem có lỗi kết nối không
-              if docker compose logs discord-bot | grep -q "✅ Đăng nhập Discord bot thành công"; then
+              if $USE_SUDO docker compose logs discord-bot | grep -q "✅ Đăng nhập Discord bot thành công"; then
                 echo "✅ Discord Bot đã kết nối thành công"
-              elif docker compose logs discord-bot | grep -q "Bot đã online"; then
+              elif $USE_SUDO docker compose logs discord-bot | grep -q "Bot đã online"; then
                 echo "✅ Discord Bot đã kết nối thành công (legacy check)"
               else
                 echo "⚠️ Discord Bot chưa kết nối hoặc có lỗi"
                 echo "🔍 Kiểm tra chi tiết logs:"
-                docker compose logs discord-bot
+                $USE_SUDO docker compose logs discord-bot
                 
                 # Kiểm tra lỗi token
-                if docker compose logs discord-bot | grep -q "TokenInvalid\|DISCORD_TOKEN"; then
+                if $USE_SUDO docker compose logs discord-bot | grep -q "TokenInvalid\|DISCORD_TOKEN"; then
                   echo "❌ Lỗi DISCORD_TOKEN - vui lòng kiểm tra GitHub Secrets"
                 fi
               fi
             else
               echo "❌ Discord Bot container không chạy"
               echo "📋 Logs Discord Bot để debug:"
-              docker compose logs discord-bot
+              $USE_SUDO docker compose logs discord-bot
               
               # Kiểm tra exit code
-              EXIT_CODE=\$(docker compose ps discord-bot --format "table {{.State}}" | tail -n +2)
-              echo "🔍 Trạng thái container: \$EXIT_CODE"
+              EXIT_CODE=$($USE_SUDO docker compose ps discord-bot --format "table {{.State}}" | tail -n +2)
+              echo "🔍 Trạng thái container: $EXIT_CODE"
               
               # Không exit với lỗi nếu chỉ là vấn đề Discord token
-              if docker compose logs discord-bot | grep -q "TokenInvalid\|DISCORD_TOKEN"; then
+              if $USE_SUDO docker compose logs discord-bot | grep -q "TokenInvalid\|DISCORD_TOKEN"; then
                 echo "⚠️ Lỗi Discord Token - deployment vẫn tiếp tục cho các service khác"
               else
                 exit 1
@@ -340,7 +408,10 @@ jobs:
             fi
             
             echo "🔍 Tổng quan trạng thái tất cả services:"
-            docker compose ps
+            $USE_SUDO docker compose ps
+            
+            # Cleanup config file
+            rm -f /tmp/docker_sudo_config
           EOF
         shell: bash
 
@@ -396,4 +467,3 @@ jobs:
             • **Thời gian:** Vượt quá 30 phút
             
             [📋 Xem Chi Tiết Deploy](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-
