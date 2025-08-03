@@ -14,7 +14,7 @@ namespace ExcelApi.Services
         /// <param name="headerRowIndex">Optional index of the header row (0-based)</param>
         /// <param name="endMarker">Optional text marker to indicate where to stop processing</param>
         /// <returns>Dictionary containing the processed data</returns>
-        Task<List<Dictionary<string, string>>> ProcessExcelFileAsync(
+        List<Dictionary<string, string>> ProcessExcelFileAsync(
             IFormFile file, 
             string? password, 
             List<string>? headers = null,

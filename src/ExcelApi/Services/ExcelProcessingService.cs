@@ -13,7 +13,7 @@ namespace ExcelApi.Services
         private const string DEFAULT_END_MARKER = "Total Debit Transaction";
 
         /// <inheritdoc/>
-        public async Task<List<Dictionary<string, string>>> ProcessExcelFileAsync(
+        public List<Dictionary<string, string>> ProcessExcelFileAsync(
             IFormFile file,
             string? password,
             List<string>? headers = null,
@@ -31,12 +31,12 @@ namespace ExcelApi.Services
                 }
 
                 // Process Excel file with ExcelDataReader
-                return await Task.Run(() => ProcessExcelFileWithDataReader(
+                return ProcessExcelFileWithDataReader(
                     file,
                     password,
                     headers,
                     headerRowIndex ?? DEFAULT_HEADER_ROW_INDEX,
-                    endMarker ?? DEFAULT_END_MARKER));
+                    endMarker ?? DEFAULT_END_MARKER);
             }
             catch (Exception ex)
             {

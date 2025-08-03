@@ -55,7 +55,7 @@ namespace ExcelApi.Controllers
 
             try
             {
-                var result = await excelProcessingService.ProcessExcelFileAsync(
+                var result = excelProcessingService.ProcessExcelFileAsync(
                     file, 
                     model?.Password, 
                     model?.Headers,
@@ -82,7 +82,7 @@ namespace ExcelApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> ExtractDataWithDynamicFileField()
+        public IActionResult ExtractDataWithDynamicFileField()
         {
             // Get form data
             var password = Request.Form["Password"].FirstOrDefault();
@@ -113,7 +113,7 @@ namespace ExcelApi.Controllers
             
             try
             {
-                var result = await excelProcessingService.ProcessExcelFileAsync(
+                var result = excelProcessingService.ProcessExcelFileAsync(
                     file, 
                     password, 
                     headers,
