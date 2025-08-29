@@ -80,22 +80,31 @@ jobs:
 
       - name: Create .env file on TrueNAS
         run: |
-          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel "cat > ${{ env.TRUENAS_DEPLOY_DIR }}/.env <<EOF
+          # Create .env file via SSH with proper variable substitution
+          ssh -F "$HOME/.ssh/config" truenas-cf-tunnel << 'REMOTE_EOF'
+          set -e
+          cd "${{ env.TRUENAS_DEPLOY_DIR }}"
+          
+          echo "Creating .env file..."
+          cat > .env << 'EOF'
           # Project name
           COMPOSE_PROJECT_NAME=${{ vars.COMPOSE_PROJECT_NAME || 'n8n' }}
+          
           # PostgreSQL
           POSTGRES_USER=${{ secrets.POSTGRES_USER || 'n8n' }}
           POSTGRES_PASSWORD='${{ secrets.POSTGRES_PASSWORD }}'
           POSTGRES_DB=${{ secrets.POSTGRES_DB || 'n8n_database' }}
           POSTGRES_EXTERNAL_PORT=${{ vars.POSTGRES_EXTERNAL_PORT || '5432' }}
+          
           # n8n
           N8N_BASIC_AUTH_USER=${{ secrets.N8N_BASIC_AUTH_USER || 'admin' }}
           N8N_BASIC_AUTH_PASSWORD='${{ secrets.N8N_BASIC_AUTH_PASSWORD }}'
           N8N_ENCRYPTION_KEY='${{ secrets.N8N_ENCRYPTION_KEY }}'
           DB_POSTGRESDB_PASSWORD='${{ secrets.POSTGRES_PASSWORD }}'
-          WEBHOOK_URL=${{ vars.WEBHOOK_URL }}
+          WEBHOOK_URL=${{ vars.WEBHOOK_URL || 'https://your-domain.com' }}
           N8N_EXTERNAL_PORT=${{ vars.N8N_EXTERNAL_PORT || '5678' }}
           N8N_RETENTION=${{ vars.N8N_RETENTION || '7' }}
+          
           # Excel API
           EXCEL_API_HTTP_PORT=${{ vars.EXCEL_API_HTTP_PORT || '8080' }}
           EXCEL_API_HTTPS_PORT=${{ vars.EXCEL_API_HTTPS_PORT || '8443' }}
@@ -110,24 +119,38 @@ jobs:
           
           # Redis Configuration
           REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+          REDIS_DB=${{ secrets.REDIS_DB || '0' }}
+          
+          # n8n Main/Worker Configuration
+          N8N_BASIC_AUTH_ACTIVE=${{ secrets.N8N_BASIC_AUTH_ACTIVE || 'true' }}
+          N8N_CONCURRENCY=${{ secrets.N8N_CONCURRENCY || '1' }}
+          
+          # Excel API Configuration
+          ASPNETCORE_ENVIRONMENT=${{ secrets.ASPNETCORE_ENVIRONMENT || 'Production' }}
+          ASPNETCORE_URLS=${{ secrets.ASPNETCORE_URLS || 'http://+:80' }}
+          
           # Backup settings
-          N8N_BACKUP_DIR_HOST=${{ secrets.N8N_BACKUP_DIR_HOST }}
-          IP_PREFIX=${{ vars.IP_PREFIX }}
-          TRUENAS_DEPLOY_DIR=${{ vars.TRUENAS_DEPLOY_DIR }}
+          N8N_BACKUP_DIR_HOST=${{ secrets.N8N_BACKUP_DIR_HOST || '/mnt/data/n8n-backup' }}
+          IP_PREFIX=${{ vars.IP_PREFIX || '172.20.0' }}
+          TRUENAS_DEPLOY_DIR=${{ env.TRUENAS_DEPLOY_DIR }}
+          
+          # Redis External Port
+          REDIS_EXTERNAL_PORT=${{ vars.REDIS_EXTERNAL_PORT || '6379' }}
           EOF
 
-            # Setup n8n config
-            if [ -f "./n8n_data/config" ]; then
-              cp "./n8n_data/config" "./n8n_data/config.bak.$(date +%Y%m%d_%H%M%S)"
-            fi
-            
-            CLEAN_KEY=$(grep "N8N_ENCRYPTION_KEY=" .env | cut -d '=' -f2- | sed "s/^'//;s/'$//")
-            if [ ! -z "$CLEAN_KEY" ] && [ "$CLEAN_KEY" != "null" ]; then
-              printf '{"encryptionKey": "%s"}\n' "$CLEAN_KEY" > ./n8n_data/config
-            fi
-            
-            echo "✅ Environment configured successfully"
-          EOF
+          echo "Setting up n8n config..."
+          mkdir -p ./n8n_data
+          if [ -f "./n8n_data/config" ]; then
+            cp "./n8n_data/config" "./n8n_data/config.bak.$(date +%Y%m%d_%H%M%S)"
+          fi
+          
+          CLEAN_KEY=$(grep "N8N_ENCRYPTION_KEY=" .env | cut -d '=' -f2- | sed "s/^'//;s/'$//")
+          if [ ! -z "$CLEAN_KEY" ] && [ "$CLEAN_KEY" != "null" ]; then
+            printf '{"encryptionKey": "%s"}\n' "$CLEAN_KEY" > ./n8n_data/config
+          fi
+          
+          echo "✅ Environment configured successfully"
+          REMOTE_EOF
         shell: bash
 
       - name: docker compose operations on TrueNAS
