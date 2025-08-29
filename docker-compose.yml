@@ -1,14 +1,31 @@
 # =============================
 # Static IPv4 assignments for services
-# Last edited: 2024-05-18
+# Last edited: 2025-08-29
 # IP Prefix will be taken from the IP_PREFIX environment variable
 # - Gateway: ${IP_PREFIX}.1
 # - pfm_excel_api: ${IP_PREFIX}.2
 # - postgresdb: ${IP_PREFIX}.3
-# - n8n: ${IP_PREFIX}.4
-# - discord-bot: ${IP_PREFIX}.5
+# - n8n-main: ${IP_PREFIX}.4
+# - redis: ${IP_PREFIX}.6
+# - n8n-worker: ${IP_PREFIX}.7
 # =============================
 services:
+  redis:
+    # Static IP: ${IP_PREFIX}.6
+    image: redis:7-alpine
+    restart: always
+    command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD}"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      custom_network:
+        ipv4_address: ${IP_PREFIX}.6
+
   postgresdb:
     # Static IP: ${IP_PREFIX}.3
     image: postgres:15
@@ -30,12 +47,9 @@ services:
       custom_network:
         ipv4_address: ${IP_PREFIX}.3
 
-  n8n:
-    # Static IP: ${IP_PREFIX}.4
+  n8n-main:
+    # Static IP: ${IP_PREFIX}.4 - Main instance for web UI and scheduling
     image: docker.n8n.io/n8nio/n8n
-    # build: # Nếu bạn có Dockerfile tùy chỉnh cho n8n, hãy giữ lại phần này
-    #   context: .
-    #   dockerfile: Dockerfile
     restart: always
     ports:
       - "${N8N_EXTERNAL_PORT}:5678"
@@ -45,27 +59,85 @@ services:
     volumes:
       - n8n_data:/home/node/.n8n
       - ./ssh:/home/node/.ssh
-    depends_on: # n8n phụ thuộc vào postgresdb
+    depends_on:
       postgresdb:
-        condition: service_healthy # Chờ postgresdb sẵn sàng
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       - TZ=Asia/Ho_Chi_Minh
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-Asia/Ho_Chi_Minh}
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      # Database configuration
       - DB_TYPE=postgresdb
-      - DB_POSTGRESDB_HOST=postgresdb # Service name is used for inter-container communication
+      - DB_POSTGRESDB_HOST=postgresdb
       - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
       - DB_POSTGRESDB_USER=${POSTGRES_USER}
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      # Redis configuration for main instance
+      - QUEUE_BULL_REDIS_HOST=redis
+      - QUEUE_BULL_REDIS_PORT=6379
+      - QUEUE_BULL_REDIS_PASSWORD=${REDIS_PASSWORD}
+      - QUEUE_BULL_REDIS_DB=${REDIS_DB:-0}
+      # Main instance configuration
+      - EXECUTIONS_MODE=queue
+      - N8N_WORKERS_COUNT=0
+      - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
+      - N8N_RUNNERS_ENABLED=true
+      - EXECUTIONS_CONCURRENCY_MAX=1
+      # Authentication
       - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE:-true}
       - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER:-admin}
       - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
+      # Webhook and execution settings
       - WEBHOOK_URL=${WEBHOOK_URL:-}
       - EXECUTIONS_DATA_PRUNE=${EXECUTIONS_DATA_PRUNE:-true}
       - EXECUTIONS_DATA_MAX_AGE=${EXECUTIONS_DATA_MAX_AGE:-720}
       - EXECUTIONS_DATA_PRUNE_MAX_COUNT=${EXECUTIONS_DATA_PRUNE_MAX_COUNT:-50000}
       - N8N_DEFAULT_BINARY_DATA_MODE=${N8N_DEFAULT_BINARY_DATA_MODE:-filesystem}
+      - N8N_LOG_LEVEL=info
+
+  n8n-worker:
+    # Static IP: ${IP_PREFIX}.7 - Worker instance for workflow execution
+    image: docker.n8n.io/n8nio/n8n
+    restart: always
+    command: ["worker", "--concurrency=1"]
+    networks:
+      custom_network:
+        ipv4_address: ${IP_PREFIX}.7
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./ssh:/home/node/.ssh
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      n8n-main:
+        condition: service_started
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-Asia/Ho_Chi_Minh}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      # Database configuration
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgresdb
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
+      - DB_POSTGRESDB_USER=${POSTGRES_USER}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      # Redis configuration for worker
+      - QUEUE_BULL_REDIS_HOST=redis
+      - QUEUE_BULL_REDIS_PORT=6379
+      - QUEUE_BULL_REDIS_PASSWORD=${REDIS_PASSWORD}
+      - QUEUE_BULL_REDIS_DB=${REDIS_DB:-0}
+      # Worker instance configuration
+      - EXECUTIONS_MODE=queue
+      - N8N_DEFAULT_BINARY_DATA_MODE=${N8N_DEFAULT_BINARY_DATA_MODE:-filesystem}
+      - N8N_LOG_LEVEL=info
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_CONCURRENCY=1
 
   pfm_excel_api:
     # Static IP: ${IP_PREFIX}.2
@@ -84,33 +156,6 @@ services:
       custom_network:
         ipv4_address: ${IP_PREFIX}.2
 
-  discord-bot:
-    # Static IP: ${IP_PREFIX}.5
-    build:
-      context: ./discord-bot
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    environment:
-      - TZ=${TZ:-Asia/Ho_Chi_Minh}
-      - DISCORD_TOKEN=${DISCORD_TOKEN}
-      - N8N_WEBHOOK_URL=${DISCORD_N8N_WEBHOOK_URL:-http://n8n:5678/webhook/discord-event}
-      - BOT_PREFIX=${DISCORD_BOT_PREFIX:-!}
-      - ENABLE_MESSAGE_LOGGING=${DISCORD_ENABLE_MESSAGE_LOGGING:-true}
-      - ENABLE_MEMBER_JOIN_LOGGING=${DISCORD_ENABLE_MEMBER_JOIN_LOGGING:-true}
-      - LOG_LEVEL=${DISCORD_LOG_LEVEL:-info}
-      - GUILD_ID=${DISCORD_GUILD_ID:-}
-    depends_on:
-      - n8n
-    networks:
-      custom_network:
-        ipv4_address: ${IP_PREFIX}.5
-    healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'node.*index.js' || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-
 # Custom bridge network with static IPs
 # Last edited: 2024-05-18
 networks:
@@ -124,3 +169,4 @@ networks:
 volumes:
   postgres_data:
   n8n_data:
+  redis_data:
