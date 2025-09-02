@@ -3,7 +3,7 @@
 #  n8n + PostgreSQL backup script
 # =====================================================================
 
-set -euo pipefail
+set -eo pipefail
 set -x
 IFS=$'\n\t'
 
@@ -17,9 +17,13 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_FILE="$SCRIPT_DIR/.env"
 [[ -f "$ENV_FILE" ]] || { echo "Lỗi: Không tìm thấy .env tại $ENV_FILE" >&2; exit 1; }
+
+# Tạm thời tắt 'nounset' khi load .env để tránh lỗi với biến không định nghĩa
+set +u
 set -a
-source <(sed 's/\r$//' "$ENV_FILE")
+source <(sed 's/\r$//' "$ENV_FILE" | grep -v '^\s*#' | grep -v '^\s*$')
 set +a
+set -u
 
 # 3) Biến cấu hình, báo lỗi nếu thiếu
 # --- Lấy tên container PostgreSQL thực tế ---
