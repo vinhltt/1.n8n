@@ -10,7 +10,6 @@
   "enabledMcpjsonServers": [
     "serena",
     "context7",
-    "awslabs.aws-api-mcp-server",
     "MCP_DOCKER"
   ],
   "enableAllProjectMcpServers": true

@@ -29,6 +29,7 @@ jobs:
           [ -z "${{ secrets.REDIS_PASSWORD }}" ] && MISSING+=("REDIS_PASSWORD")
           [ -z "${{ secrets.POSTGRES_PASSWORD }}" ] && MISSING+=("POSTGRES_PASSWORD") 
           [ -z "${{ secrets.N8N_ENCRYPTION_KEY }}" ] && MISSING+=("N8N_ENCRYPTION_KEY")
+          [ -z "${{ secrets.CLOUDFLARED_TOKEN }}" ] && MISSING+=("CLOUDFLARED_TOKEN")
           
           if [ ${#MISSING[@]} -gt 0 ]; then
             echo "❌ Missing secrets: ${MISSING[*]}"
@@ -135,6 +136,9 @@ jobs:
           
           # Redis External Port
           REDIS_EXTERNAL_PORT=${{ vars.REDIS_EXTERNAL_PORT || '6379' }}
+          
+          # Cloudflare Tunnel
+          CLOUDFLARED_TOKEN=${{ secrets.CLOUDFLARED_TOKEN }}
           EOF
 
           echo "Setting up n8n config..."
@@ -242,6 +246,13 @@ jobs:
               exit 1
             fi
             
+            if $USE_SUDO docker compose ps cloudflare-tunnel-n8n | grep -q "Up"; then
+              echo "✅ Cloudflare Tunnel is running"
+            else
+              echo "⚠️ Cloudflare Tunnel might not be configured or running"
+              $USE_SUDO docker compose logs --tail=10 cloudflare-tunnel-n8n || true
+            fi
+            
             echo "✅ Deployment verification completed"
           EOF
         shell: bash
@@ -253,6 +264,7 @@ jobs:
           echo "  • n8n URL: ${{ vars.WEBHOOK_URL || 'http://<IP_TRUENAS>:5678' }}"
           echo "  • Redis: Main/Worker architecture enabled"
           echo "  • Worker Concurrency: Sequential processing (1)"
+          echo "  • Cloudflare Tunnel: Configured for n8n access"
           echo "✅ Deployment completed successfully!"
         shell: bash
         
