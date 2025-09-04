@@ -1,8 +1,8 @@
-# 🚀 GitHub Actions Setup cho n8n + Discord Bot
+# 🚀 GitHub Actions Setup cho n8n Main/Worker
 
 ## 📋 Tổng quan
 
-File này hướng dẫn cấu hình GitHub Actions để tự động deploy n8n và Discord bot lên TrueNAS qua Cloudflared.
+File này hướng dẫn cấu hình GitHub Actions để tự động deploy n8n main/worker architecture lên TrueNAS qua Cloudflared.
 
 ## 🔐 GitHub Secrets (Repository Settings > Secrets and variables > Actions)
 
@@ -24,10 +24,19 @@ N8N_BASIC_AUTH_USER=admin
 N8N_BASIC_AUTH_PASSWORD=<strong_password>
 N8N_ENCRYPTION_KEY=<generate_with_openssl_rand_hex_32>
 
-# Discord Bot (MỚI)
-DISCORD_TOKEN=<your_discord_bot_token>
+# Redis Configuration
+REDIS_PASSWORD=<strong_redis_password>
+REDIS_DB=0
 
-# Optional
+# n8n Main/Worker Configuration
+N8N_BASIC_AUTH_ACTIVE=true
+N8N_CONCURRENCY=1
+
+# Excel API Configuration  
+ASPNETCORE_ENVIRONMENT=Production
+ASPNETCORE_URLS=http://+:80
+
+# Optional System Settings
 GENERIC_TIMEZONE=Asia/Ho_Chi_Minh
 TZ=Asia/Ho_Chi_Minh
 N8N_DEFAULT_BINARY_DATA_MODE=filesystem
@@ -36,8 +45,8 @@ EXECUTIONS_DATA_MAX_AGE=720
 EXECUTIONS_DATA_PRUNE_MAX_COUNT=50000
 N8N_BACKUP_DIR_HOST=<backup_directory_path>
 
-# Discord Webhook cho thông báo deploy
-DISCORD_WEBHOOK_URL=<discord_webhook_url_for_notifications>
+# Notification Webhook (optional)
+NOTIFICATION_WEBHOOK_URL=<webhook_url_for_notifications>
 ```
 
 ## 🔧 GitHub Variables (Repository Settings > Secrets and variables > Actions)
@@ -48,7 +57,7 @@ DISCORD_WEBHOOK_URL=<discord_webhook_url_for_notifications>
 # Project
 COMPOSE_PROJECT_NAME=n8n
 
-# Network
+# Network  
 IP_PREFIX=172.20.0
 
 # Ports
@@ -56,35 +65,29 @@ POSTGRES_EXTERNAL_PORT=5432
 N8N_EXTERNAL_PORT=5678
 EXCEL_API_HTTP_PORT=8080
 EXCEL_API_HTTPS_PORT=8443
+REDIS_EXTERNAL_PORT=6379
 
-# URLs
+# URLs & Paths
 WEBHOOK_URL=https://your-domain.com
 DEPLOY_PATH_ON_TRUENAS=/path/to/deploy
 
-# Discord Bot Configuration (MỚI)
+# n8n Configuration
+N8N_RETENTION=7
+
+# Discord (optional)
 DISCORD_N8N_WEBHOOK_URL=http://n8n:5678/webhook/discord-event
-DISCORD_BOT_PREFIX=!
-DISCORD_ENABLE_MESSAGE_LOGGING=true
-DISCORD_ENABLE_MEMBER_JOIN_LOGGING=true
-DISCORD_LOG_LEVEL=info
-DISCORD_GUILD_ID=<optional_discord_server_id>
 ```
 
-## 🤖 Discord Bot Setup
+## 📦 Redis Configuration
 
-### 1. Tạo Discord Bot Token
+### Redis Password Generation
 
-1. Truy cập [Discord Developer Portal](https://discord.com/developers/applications)
-2. Tạo **New Application** → đặt tên `n8n Trigger Bot`
-3. Vào tab **Bot** → **Add Bot**
-4. **QUAN TRỌNG**: Bật **Message Content Intent**
-5. Copy **Token** → thêm vào GitHub Secrets với tên `DISCORD_TOKEN`
+```bash
+# Generate strong Redis password
+openssl rand -hex 32
+```
 
-### 2. Cấu hình Discord Webhook cho thông báo
-
-1. Trong Discord server, vào Settings → Integrations → Webhooks
-2. Tạo webhook mới cho channel thông báo
-3. Copy webhook URL → thêm vào GitHub Secrets với tên `DISCORD_WEBHOOK_URL`
+Thêm password này vào GitHub Secrets với tên `REDIS_PASSWORD`.
 
 ## 🔄 Workflow Triggers
 
@@ -98,10 +101,10 @@ Workflow sẽ tự động chạy khi:
 2. **Setup Cloudflared** và SSH config
 3. **Sync files** lên TrueNAS
 4. **Tạo .env file** với tất cả biến môi trường
-5. **Prepare directories** cho n8n và Discord bot
+5. **Prepare directories** cho n8n main/worker setup
 6. **Docker operations**: pull, build, down, up
-7. **Verify Discord Bot** deployment
-8. **Send notifications** qua Discord webhook
+7. **Verify n8n services** deployment
+8. **Send notifications** qua webhook
 
 ## 🧪 Test Deployment
 
@@ -115,35 +118,38 @@ ssh your-truenas-user@your-truenas-ip
 cd /path/to/deploy/deploy_branch_name
 docker compose ps
 
-# Xem logs Discord bot
-docker compose logs -f discord-bot
+# Xem logs n8n main
+docker compose logs -f n8n-main
 
-# Xem logs n8n
-docker compose logs -f n8n
+# Xem logs n8n worker
+docker compose logs -f n8n-worker
+
+# Xem logs redis
+docker compose logs -f redis
 ```
 
-### Kiểm tra Discord Bot:
+### Kiểm tra n8n:
 
-1. ✅ Bot online trong Discord server
-2. ✅ Gửi tin nhắn test → kiểm tra n8n webhook
-3. ✅ Thêm member mới → kiểm tra member join event
+1. ✅ n8n main service online
+2. ✅ n8n worker connected to Redis
+3. ✅ Test workflow execution trên worker
 
 ## 🔍 Troubleshooting
 
-### Discord Bot không hoạt động:
+### n8n Worker không hoạt động:
 
 ```bash
 # Kiểm tra logs
-docker compose logs discord-bot
+docker compose logs n8n-worker
 
-# Kiểm tra biến môi trường
-docker compose exec discord-bot env | grep DISCORD
+# Kiểm tra Redis connection
+docker compose logs redis
 ```
 
 ### Common Issues:
 
-1. **DISCORD_TOKEN invalid**: Kiểm tra token trong GitHub Secrets
-2. **Bot không online**: Kiểm tra Message Content Intent
+1. **Redis connection failed**: Kiểm tra REDIS_PASSWORD trong GitHub Secrets
+2. **Worker không execute**: Kiểm tra concurrency settings
 3. **Webhook không hoạt động**: Kiểm tra n8n workflow đã kích hoạt
 4. **Network issues**: Kiểm tra IP_PREFIX và network config
 
@@ -173,14 +179,18 @@ N8N_EXTERNAL_PORT=5678
 EXCEL_API_HTTP_PORT=8080
 EXCEL_API_HTTPS_PORT=8443
 
-# Discord Bot Configuration
-DISCORD_TOKEN=***
-DISCORD_N8N_WEBHOOK_URL=http://n8n:5678/webhook/discord-event
-DISCORD_BOT_PREFIX=!
-DISCORD_ENABLE_MESSAGE_LOGGING=true
-DISCORD_ENABLE_MEMBER_JOIN_LOGGING=true
-DISCORD_LOG_LEVEL=info
-DISCORD_GUILD_ID=
+# Redis Configuration
+REDIS_PASSWORD=***
+REDIS_DB=0
+REDIS_EXTERNAL_PORT=6379
+
+# n8n Main/Worker Configuration  
+N8N_BASIC_AUTH_ACTIVE=true
+N8N_CONCURRENCY=1
+
+# Excel API Configuration
+ASPNETCORE_ENVIRONMENT=Production
+ASPNETCORE_URLS=http://+:80
 
 # Timezone & other settings
 GENERIC_TIMEZONE=Asia/Ho_Chi_Minh
@@ -199,12 +209,12 @@ TRUENAS_DEPLOY_DIR=/path/to/deploy
 ## 🎯 Next Steps
 
 1. ✅ Cấu hình tất cả GitHub Secrets và Variables
-2. ✅ Tạo Discord bot và lấy token
-3. ✅ Setup Discord webhook cho thông báo
-4. ✅ Tạo n8n workflow với webhook endpoint
+2. ✅ Generate Redis password và lưu vào GitHub Secrets
+3. ✅ Setup notification webhook cho thông báo (optional)
+4. ✅ Tạo n8n workflow cho testing worker functionality
 5. ✅ Push code để trigger deployment
-6. ✅ Monitor logs và test functionality
+6. ✅ Monitor logs và test sequential processing
 
 ---
 
-💡 **Tip**: Bắt đầu với `DISCORD_LOG_LEVEL=debug` để xem chi tiết, sau đó chuyển về `info` khi ổn định. 
+💡 **Tip**: Monitor worker logs để đảm bảo "Concurrency: 1" được hiển thị và sequential processing hoạt động đúng. 

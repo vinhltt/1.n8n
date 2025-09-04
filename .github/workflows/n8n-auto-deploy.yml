@@ -131,7 +131,6 @@ jobs:
           
           # Backup settings
           N8N_BACKUP_DIR_HOST=${{ secrets.N8N_BACKUP_DIR_HOST || '/mnt/data/n8n-backup' }}
-          IP_PREFIX=${{ vars.IP_PREFIX || '172.20.0' }}
           TRUENAS_DEPLOY_DIR=${{ env.TRUENAS_DEPLOY_DIR }}
           
           # Redis External Port

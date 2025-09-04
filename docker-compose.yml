@@ -1,17 +1,10 @@
 # =============================
-# Static IPv4 assignments for services
-# Last edited: 2025-08-29
-# IP Prefix will be taken from the IP_PREFIX environment variable
-# - Gateway: ${IP_PREFIX}.1
-# - pfm_excel_api: ${IP_PREFIX}.2
-# - postgresdb: ${IP_PREFIX}.3
-# - n8n-main: ${IP_PREFIX}.4
-# - redis: ${IP_PREFIX}.6
-# - n8n-worker: ${IP_PREFIX}.7
+# Docker Compose Configuration
+# Last edited: 2025-09-04
+# Services use container names for internal communication
 # =============================
 services:
   redis:
-    # Static IP: ${IP_PREFIX}.6
     image: redis:7-alpine
     restart: always
     command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD}"
@@ -23,11 +16,9 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      custom_network:
-        ipv4_address: ${IP_PREFIX}.6
+      - custom_network
 
   postgresdb:
-    # Static IP: ${IP_PREFIX}.3
     image: postgres:15
     restart: always
     environment:
@@ -44,18 +35,20 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      custom_network:
-        ipv4_address: ${IP_PREFIX}.3
+      - custom_network
 
   n8n-main:
-    # Static IP: ${IP_PREFIX}.4 - Main instance for web UI and scheduling
+    # Main instance for web UI and scheduling
     image: docker.n8n.io/n8nio/n8n
     restart: always
     ports:
       - "${N8N_EXTERNAL_PORT}:5678"
     networks:
-      custom_network:
-        ipv4_address: ${IP_PREFIX}.4
+      - custom_network
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
     volumes:
       - n8n_data:/home/node/.n8n
       - ./ssh:/home/node/.ssh
@@ -99,13 +92,16 @@ services:
       - N8N_LOG_LEVEL=info
 
   n8n-worker:
-    # Static IP: ${IP_PREFIX}.7 - Worker instance for workflow execution
+    # Worker instance for workflow execution
     image: docker.n8n.io/n8nio/n8n
     restart: always
     command: ["worker", "--concurrency=1"]
     networks:
-      custom_network:
-        ipv4_address: ${IP_PREFIX}.7
+      - custom_network
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
     volumes:
       - n8n_data:/home/node/.n8n
       - ./ssh:/home/node/.ssh
@@ -140,7 +136,6 @@ services:
       - N8N_CONCURRENCY=1
 
   pfm_excel_api:
-    # Static IP: ${IP_PREFIX}.2
     build:
       context: ./src
       dockerfile: ExcelApi/Dockerfile
@@ -153,18 +148,13 @@ services:
       - "${EXCEL_API_HTTP_PORT}:80"
       - "${EXCEL_API_HTTPS_PORT}:443"
     networks:
-      custom_network:
-        ipv4_address: ${IP_PREFIX}.2
+      - custom_network
 
-# Custom bridge network with static IPs
-# Last edited: 2024-05-18
+# Custom bridge network
+# Last edited: 2025-09-04
 networks:
   custom_network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: ${IP_PREFIX}.0/24
-          gateway: ${IP_PREFIX}.1
 
 volumes:
   postgres_data:

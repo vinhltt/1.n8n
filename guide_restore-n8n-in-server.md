@@ -51,7 +51,7 @@ Trước khi bắt đầu, hãy đảm bảo bạn có các thông tin và file 
     **Quan trọng:** Thay thế `YOUR_DB_USER` và `YOUR_DB_PASSWORD` bằng các giá trị thực tế lấy từ file `.env` của bạn.
     ```bash
     # Lệnh này sẽ giải nén, xóa DB cũ (nếu có), tạo DB mới và nạp dữ liệu
-    docker exec -i -e PGPASSWORD=YOUR_DB_PASSWORD postgresdb bash -c ' \
+    sudo docker exec -i -e PGPASSWORD=YOUR_DB_PASSWORD postgresdb bash -c ' \
         echo "--- Decompressing backup file ---" && \
         gunzip -f /tmp/n8n_restore_db.sql.gz && \
         echo "--- Dropping existing database (n8n_database) if exists ---" && \
@@ -79,7 +79,7 @@ Trước khi bắt đầu, hãy đảm bảo bạn có các thông tin và file 
     * Thay thế `your_n8n_data_backup.tar.gz` bằng tên file backup dữ liệu n8n thực tế của bạn.
 
     ```bash
-    docker run --rm \
+    sudo docker run --rm \
         -v n8n_data:/volume_data \
         -v /path/to/your/backup/folder:/backup_source \
         alpine \
